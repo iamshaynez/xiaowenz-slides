@@ -1,6 +1,10 @@
 ---
 marp: true
 paginate: true
+theme: gaia
+class:
+  - lead
+  - invert
 ---
 
 # Your slide deck

@@ -1,7 +1,7 @@
 ---
 marp: true
 paginate: true
-theme: gaia
+theme: uncover
 class:
   - lead
   - invert
@@ -10,6 +10,8 @@ class:
 # Your slide deck
 
 Start writing!
+
+> quota
 
 ---
 

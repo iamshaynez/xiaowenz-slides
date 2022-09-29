@@ -13,7 +13,7 @@ _class:
 # 生产力和个人发展
 
 ### [个人技能发展指北](/self-development.html)
-
+### [人生系统 All In One](/gtd-all-in-one.html)
 
 ---
 

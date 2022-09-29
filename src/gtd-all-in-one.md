@@ -26,13 +26,27 @@ _class:
 
 ## 方法论？
 
-- GTD的传统方法论
+### GTD的传统方法论
+
+1. 收集（确保不落事儿）
+2. 处置（明确的处置方式，不困惑）
+3. 分解（很重要）
+4. 循环（规划）
+
+![bg right:60% contain](https://vip2.loli.io/2022/09/29/Q4oic8n5VzRqS9b.jpg)
+
 
 ---
 
 ## 方法论？
 
-- 人生OKR的实践
+### 人生OKR的实践
+
+- 目标尽可以大
+- 路径尽可能清晰，有路，就能成
+- 步子，尽可能小，跬步需要积累
+
+![bg right:60% contain](https://vip2.loli.io/2022/09/29/YLUZdznfHOMCicW.jpg)
 
 ---
 

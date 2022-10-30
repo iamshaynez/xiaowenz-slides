@@ -44,7 +44,7 @@ _class:
 
 - 目标尽可以大
 - 路径尽可能清晰，有路，就能成
-- 步子，尽可能小，跬步需要积累
+- 步子，尽可能小，跬步需要在碎片化的忙碌生活中积累
 
 ![bg right:60% contain](https://vip2.loli.io/2022/09/29/YLUZdznfHOMCicW.jpg)
 
@@ -140,8 +140,8 @@ _class:
 
 - Projects
   - Started
-  - Pending
   - Someday
+  - Inbox and Today View
 
 <!--
 1. 这个时候，加上本来的Inbox，Today两个视图，整个框架都已经搭建完成

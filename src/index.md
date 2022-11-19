@@ -29,3 +29,5 @@ _class:
 ---
 
 # 经济学
+
+### [货币入门101](/finance-currency-101.html)

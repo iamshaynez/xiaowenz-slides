@@ -15,9 +15,9 @@
 
 ### 企业架构和管理
 
-- 企业架构
-- 数字化转型
-- 研发管理
+- [企业架构](https://slides.xiaowenz.com/enterprise-archi-101.html)
+- [服务管理](https://slides.xiaowenz.com/service-management-101.html)
+
 
 # 经济学
 

@@ -17,12 +17,6 @@ _class:
 
 ---
 
-# 软件技术
-
-### [一些好玩的白嫖产品](/free-service.html)
-
----
-
 # 企业架构和管理
 
 ### [企业架构](/enterprise-archi-101.html)

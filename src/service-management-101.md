@@ -51,6 +51,12 @@ _class:
 
 ---
 
+# Support Model in Production
+
+![image.png](https://cdn.sa.net/2024/10/23/JQxSpCX4O8dYcWh.png)
+
+---
+
 # Incident and Incident Management
 
 - 定义：服务被影响就是事故，不要纠结与技术组件是否工作。
@@ -74,3 +80,17 @@ _class:
 > 重启是否是变更，存在争议。
 
 ISO 认为重启改变了 State，因此应该做为变更管理。ITIL 没有强制定义，但业界更愿意把重启作为科技的 Operation 来管理，如果产生事故则按照事故和问题对应的制度流程管理。
+
+---
+
+# Role and Responsibility
+
+- 运维：对当下的 Service Level Agreement 负责
+  - 生产事故怎么修（指标还是治本）
+  - 紧急变更是否要上（究竟有多急）
+  - 问题（Problem）的优先级
+- 研发：对降低生产风险负责
+  - 根因分析，修复问题，配合紧急修复事故
+
+![bg right:50% contain](https://cdn.sa.net/2024/10/23/JQxSpCX4O8dYcWh.png)
+

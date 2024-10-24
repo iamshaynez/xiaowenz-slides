@@ -9,57 +9,18 @@ _class:
   - invert
 ---
 
-# 财务基础概念
-## Financial Fundamentals
+# 1. 公司会计基础知识
+Corporate Accounting Basics
 
 ---
 
-## 1.1 什么是企业财务 
-## What is Corporate Finance?
+## 1.1 什么是会计？
+What is Accounting?
 
-- 企业财务 (Corporate Finance) 是管理公司资金的过程
-- 包括:
-  - 筹资 (Financing)
-  - 投资 (Investing)
-  - 资本规划 (Capital Planning)
-  - 财务决策 (Financial Decision Making)
-
----
-
-## 1.2 财务的重要性
-## Importance of Finance
-
-- 确保企业生存和发展
-- 优化资源配置
-- 支持战略决策
-- 提高股东价值 (Shareholder Value)
-- 管理风险 (Risk Management)
-
----
-
-## 1.3 基本财务概念：收入与支出
-## Basic Financial Concepts: Revenue and Expenses
-
-- 收入 (Revenue):
-  - 定义：企业销售商品或提供服务所获得的收入
-  - 例子：销售产品收入、服务费收入
-
-- 支出 (Expenses):
-  - 定义：为获得收入而发生的各项成本和费用
-  - 例子：原材料成本、工资支出、租金支出
-
----
-
-## 1.4 收入与支出的关系
-## Relationship between Revenue and Expenses
-
-- 利润 (Profit) = 收入 (Revenue) - 支出 (Expenses)
-- 盈亏平衡点 (Break-even Point):
-  收入 = 支出
-- 例子：
-  - 收入: $100,000
-  - 支出: $80,000
-  - 利润: $20,000
+会计（Accounting）是：
+- 记录、分类和汇总经济业务
+- 解释财务成果
+- 为决策提供信息
 
 ---
 

@@ -13,7 +13,7 @@ _class:
 
 > Processes normally come with Service Level Agreement(SLA)
 
-![](https://vip2.loli.io/2023/09/04/WeVuJIxNmG8pMc4.png)
+![](https://cdn.sa.net/2024/10/31/DU4ZaSALxF2X8Hz.png)
 
 ---
 
@@ -21,7 +21,7 @@ _class:
 
 > Service to support process also has SLA
 
-![bg right:60% contain](https://vip2.loli.io/2023/09/04/azB8xlIF4viDYo3.png)
+![bg right:60% contain](https://cdn.sa.net/2024/10/31/XGycqIokimJ1hYx.png)
 
 
 ---
@@ -31,7 +31,9 @@ _class:
 - Service and tech components
 - Interruption on service or tech component?
 
-![bg right:60% contain](https://vip2.loli.io/2023/09/04/azB8xlIF4viDYo3.png)
+![bg right:60% contain](https://cdn.sa.net/2024/10/31/XGycqIokimJ1hYx.png)
+
+
 
 ---
 

@@ -14,6 +14,7 @@ _class:
 
 ### [个人技能发展指北](/self-development.html)
 ### [时间任务管理 All In One](/gtd-all-in-one.html)
+### [AI Code](/ai-agent-coder.html)
 
 ---
 

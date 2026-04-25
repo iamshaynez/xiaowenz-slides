@@ -12,9 +12,9 @@ _class:
 
 # 生产力和个人发展
 
-### [个人技能发展指北](/self-development.html)
-### [时间任务管理 All In One](/gtd-all-in-one.html)
-### [AI Code](/ai-agent-coder.html)
+
+### [时间任务管理 All In One](/time-management.html)
+### [向上管理](/office-communication.html)
 
 ---
 
@@ -22,6 +22,7 @@ _class:
 
 ### [企业架构](/enterprise-archi-101.html)
 ### [服务管理](/service-management-101.html)
+
 ---
 
 # 经济学

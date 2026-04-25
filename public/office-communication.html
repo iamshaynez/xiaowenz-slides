@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>时间管理 · 一套可执行的个人效率系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@300;400;500;600&family=Noto+Serif+SC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ============ 主题色(🌿 森林墨) ============ */
+    --ink:#1a2e1f;
+    --ink-rgb:26,46,31;
+    --paper:#f5f1e8;
+    --paper-rgb:245,241,232;
+    --paper-tint:#ece7da;
+    --ink-tint:#253d2c;
+
+    /* ============ 字体(跨主题固定) ============ */
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --serif-en:"Playfair Display","Source Serif 4",Georgia,serif;
+    --serif-body-en:"Source Serif 4",Georgia,serif;
+    --serif-zh:"Noto Serif SC",source-han-serif-sc,serif;
+    --sans-zh:"Noto Serif SC",source-han-serif-sc,serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--ink);color:var(--paper);font-family:var(--sans-zh);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+  /* ============ WebGL 双背景 ============ */
+  canvas.bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block;transition:opacity 1.2s ease}
+  canvas#bg-light{opacity:0}
+  canvas#bg-dark{opacity:1}
+  body.light-bg canvas#bg-light{opacity:1}
+  body.light-bg canvas#bg-dark{opacity:0}
+
+  /* ============ Deck 容器 + 翻页 ============ */
+  #deck{position:fixed;inset:0;width:10000vw;height:100vh;display:flex;flex-wrap:nowrap;transition:transform .9s cubic-bezier(.77,0,.175,1);z-index:10;will-change:transform}
+  .slide{width:100vw;height:100vh;flex:0 0 100vw;position:relative;padding:6vh 6vw 10vh 6vw;display:flex;flex-direction:column;overflow:hidden}
+  .slide.light{color:var(--ink)}
+  .slide.dark{color:var(--paper)}
+
+  /* 默认页：遮罩较厚，保证文字可读 */
+  .slide::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;transition:background .7s ease}
+  .slide.light::before{background:rgba(var(--paper-rgb),.78);backdrop-filter:blur(3px)}
+  .slide.dark::before{background:rgba(var(--ink-rgb),.78);backdrop-filter:blur(3px)}
+  /* Hero 页：遮罩大幅降低，让 WebGL 背景明显透出 */
+  .slide.hero.light::before{background:rgba(var(--paper-rgb),.16);backdrop-filter:none}
+  .slide.hero.dark::before{background:rgba(var(--ink-rgb),.12);backdrop-filter:none}
+  /* Hero 页顶底微弱渐隐，保证 chrome/foot 区域可读 */
+  .slide.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none}
+  .slide.hero.light::after{background:linear-gradient(180deg,rgba(var(--paper-rgb),.28) 0%,rgba(var(--paper-rgb),0) 14%,rgba(var(--paper-rgb),0) 86%,rgba(var(--paper-rgb),.28) 100%)}
+  .slide.hero.dark::after{background:linear-gradient(180deg,rgba(var(--ink-rgb),.32) 0%,rgba(var(--ink-rgb),0) 14%,rgba(var(--ink-rgb),0) 86%,rgba(var(--ink-rgb),.32) 100%)}
+
+  /* ============ Magazine chrome：顶部 meta + 底部 foot ============ */
+  .chrome{display:flex;justify-content:space-between;align-items:flex-start;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;opacity:.7}
+  .chrome .left,.chrome .right{display:flex;gap:2.4em;align-items:center}
+  .chrome .sep{width:40px;height:1px;background:currentColor;opacity:.4}
+  .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.55}
+  .foot .title{font-family:var(--serif-zh);font-weight:400;letter-spacing:.05em;text-transform:none;opacity:.75;font-size:13px}
+
+  .tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;padding:6px 14px;border:1px solid currentColor;opacity:.85}
+  .rule{width:100%;height:1px;background:currentColor;opacity:.25;margin:3vh 0}
+  .rule.v{width:1px;height:100%;margin:0}
+
+  /* ============ 字体规则 ============ */
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;opacity:.6;margin-bottom:2.6vh}
+  .display{font-family:var(--serif-en);font-weight:700;font-size:11vw;line-height:.92;letter-spacing:-.025em}
+  .display-zh{font-family:var(--serif-zh);font-weight:700;font-size:7.8vw;line-height:1.04;letter-spacing:-.005em}
+  .h1-zh{font-family:var(--serif-zh);font-weight:700;font-size:4.6vw;line-height:1.12;letter-spacing:-.005em}
+  .h2-zh{font-family:var(--serif-zh);font-weight:600;font-size:3.2vw;line-height:1.2;letter-spacing:0}
+  .h3-zh{font-family:var(--serif-zh);font-weight:500;font-size:1.9vw;line-height:1.35}
+  .body-zh{font-family:var(--sans-zh);font-weight:400;font-size:max(15px,1.22vw);line-height:1.75;opacity:.82;letter-spacing:.01em}
+  .body-serif{font-family:var(--serif-zh);font-weight:400;font-size:max(15px,1.3vw);line-height:1.65;opacity:.88}
+  .lead{font-family:var(--serif-zh);font-weight:400;font-size:1.9vw;line-height:1.4;opacity:.85}
+  .meta{font-family:var(--mono);font-size:max(11px,.88vw);letter-spacing:.16em;text-transform:uppercase;opacity:.6}
+  .big-num{font-family:var(--serif-en);font-weight:800;font-size:10vw;line-height:.85;letter-spacing:-.03em;font-feature-settings:"tnum"}
+  .mid-num{font-family:var(--serif-en);font-weight:700;font-size:5.5vw;line-height:.88;letter-spacing:-.02em;font-feature-settings:"tnum"}
+  .ghost{font-family:var(--serif-en);font-weight:900;font-size:34vw;line-height:.8;opacity:.06;letter-spacing:-.04em;position:absolute;font-feature-settings:"tnum"}
+  em{font-style:italic;font-family:var(--serif-en)}
+  .en{font-family:var(--serif-en);font-style:italic;font-weight:500}
+
+  /* ============ 布局工具 ============ */
+  .col{display:flex;flex-direction:column;gap:2.4vh}
+  .row{display:flex;align-items:center;gap:3vw}
+  .grid-6{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:4vw 6vw;flex:1;align-content:center;padding:2vh 0}
+  .grid-9{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:3vh 4vw;flex:1;align-content:center}
+  .grid-4{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:4vh 6vw;flex:1;align-content:center}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:4vw;flex:1;align-content:center}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:4vw;flex:1;align-items:center}
+  .split-55{display:grid;grid-template-columns:55fr 45fr;gap:5vw;flex:1;align-items:stretch}
+  .fill{flex:1}
+  .center{align-items:center;justify-content:center;text-align:center}
+  .bottom-left{position:absolute;left:6vw;bottom:9vh;max-width:50vw}
+  .bottom-right{position:absolute;right:6vw;bottom:9vh;max-width:50vw;text-align:right}
+  .top-right{position:absolute;right:6vw;top:6vh;text-align:right}
+
+  /* ============ Stat（数字矩阵） ============ */
+  .stat{display:flex;flex-direction:column;gap:1vh;align-items:flex-start}
+  .stat .n{font-family:var(--serif-en);font-weight:800;font-size:8vw;line-height:.88;letter-spacing:-.03em;font-feature-settings:"tnum"}
+  .stat .l{font-family:var(--sans-zh);font-size:max(13px,1.05vw);opacity:.7;margin-top:1vh;font-weight:400;line-height:1.5}
+  .stat .m{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.5;margin-bottom:.2vh}
+
+  /* ============ Callout（引用框） ============ */
+  .callout{padding:3vh 2.4vw;border-left:3px solid currentColor;position:relative;font-family:var(--serif-zh);font-size:max(15px,1.2vw);line-height:1.55;opacity:.92}
+  .slide.light .callout{background:rgba(var(--ink-rgb),.05)}
+  .slide.dark .callout{background:rgba(var(--paper-rgb),.06)}
+  .callout .cite{display:block;margin-top:1.6vh;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+  .callout .q-big{font-family:var(--serif-zh);font-weight:600;font-size:max(17px,1.6vw);line-height:1.42}
+
+  /* ============ Platform（平台卡） ============ */
+  .plat{display:flex;flex-direction:column;justify-content:flex-end;padding:2vh 0;border-top:1px solid currentColor;border-color:rgba(127,127,127,.35)}
+  .plat .name{font-family:var(--serif-zh);font-weight:700;font-size:1.8vw;margin-bottom:.6vh}
+  .plat .nb{font-family:var(--serif-en);font-weight:700;font-size:3.2vw;letter-spacing:-.02em;line-height:1;font-feature-settings:"tnum"}
+  .plat .sub{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.55;margin-top:.6vh}
+  .plat .fill{font-family:var(--sans-zh);font-weight:300;font-size:2.4vw;opacity:.28;letter-spacing:-.01em;line-height:1}
+
+  /* ============ Rowline（表格行） ============ */
+  .rowline{display:grid;grid-template-columns:1fr 2fr 1fr;gap:2vw;padding:2.2vh 0;border-top:1px solid currentColor;align-items:center;border-color:rgba(127,127,127,.25)}
+  .rowline:last-child{border-bottom:1px solid currentColor;border-color:rgba(127,127,127,.25)}
+  .rowline .k{font-family:var(--serif-zh);font-weight:700;font-size:1.7vw}
+  .rowline .v{font-family:var(--sans-zh);font-weight:400;font-size:max(14px,1.2vw);opacity:.85;line-height:1.55}
+  .rowline .m{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;justify-self:end}
+
+  /* ============ Pillar（支柱卡片） ============ */
+  .pillar{display:flex;flex-direction:column;gap:1.8vh}
+  .pillar .ic{font-family:var(--serif-en);font-style:italic;font-size:2.6vw;opacity:.45;font-weight:400}
+  .pillar .ic svg{width:2.8vw;height:2.8vw;stroke-width:1.2;opacity:.7}
+  .pillar .t{font-family:var(--serif-zh);font-weight:700;font-size:2.4vw;line-height:1.1}
+  .pillar .d{font-family:var(--sans-zh);font-weight:400;font-size:max(14px,1.1vw);opacity:.76;line-height:1.6}
+
+  /* ============ Signature / Highlight ============ */
+  .sign{font-family:var(--serif-en);font-style:italic;font-weight:500;font-size:2vw;opacity:.7}
+  .hi{position:relative;display:inline}
+  .slide.dark .hi::after{content:"";position:absolute;left:-.1em;right:-.1em;bottom:-.05em;height:.28em;background:rgba(var(--paper-rgb),.15);z-index:-1}
+  .slide.light .hi::after{content:"";position:absolute;left:-.1em;right:-.1em;bottom:-.05em;height:.28em;background:rgba(var(--ink-rgb),.08);z-index:-1}
+
+  /* ============ Icons（Lucide via CDN） ============ */
+  .ico{width:1em;height:1em;display:inline-block;vertical-align:-.12em;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  .ico-lg,.ico-md,.ico-sm{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+  .ico-lg{width:2.6vw;height:2.6vw;stroke-width:1.2;display:inline-block}
+  .ico-md{width:1.8vw;height:1.8vw;stroke-width:1.3;display:inline-block;vertical-align:-.4em}
+  .ico-sm{width:1.1vw;height:1.1vw;stroke-width:1.4;display:inline-block;vertical-align:-.15em;opacity:.7}
+
+  /* ============ 图片占位（虚线框，提示设计师位置） ============ */
+  .img-slot{border:1.5px dashed rgba(127,127,127,.4);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1vh;padding:2vh 2vw;font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;opacity:.55;position:relative;aspect-ratio:16/9;width:100%;max-height:56vh;margin-inline:auto;box-sizing:border-box}
+  .img-slot::before{content:"";position:absolute;inset:8px;border:1px solid currentColor;opacity:.2}
+  .img-slot .plus{font-size:2vw;font-weight:300;opacity:.5;letter-spacing:0}
+  .img-slot .label{position:relative;z-index:2;text-align:center}
+  .img-slot.r-4x3{aspect-ratio:4/3}
+  .img-slot.r-3x2{aspect-ratio:3/2}
+  .img-slot.r-1x1{aspect-ratio:1/1}
+
+  /* ============ 图片实填框（关键：固定高度 + 只裁底部） ============ */
+  .frame-img{overflow:hidden;position:relative;background:rgba(0,0,0,.04);box-sizing:border-box;width:100%;border-radius:4px}
+  .slide.dark .frame-img{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)}
+  .frame-img > img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+  .frame-cap{display:flex;justify-content:space-between;align-items:baseline;gap:1vw;margin-top:.8vh;font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.72}
+  .frame-cap .pf{font-family:var(--serif-zh);font-weight:600;font-size:max(13px,1vw);letter-spacing:.04em;text-transform:none;opacity:.94}
+  .frame-cap .nb{font-family:var(--serif-en);font-style:italic;font-size:max(15px,1.2vw);letter-spacing:.02em;text-transform:none;opacity:.88}
+  .frame-cap .idx{font-family:var(--mono);opacity:.5}
+  figure.tile{display:flex;flex-direction:column;margin:0;min-width:0}
+  figure.tile > .frame-img{flex:0 0 auto}
+
+  /* ============ 导航 ============ */
+  #nav{position:fixed;left:50%;bottom:2.6vh;transform:translateX(-50%);z-index:30;display:flex;gap:10px;padding:8px 14px;border-radius:999px;background:rgba(0,0,0,.18);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  #nav .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .3s ease;border:0;padding:0}
+  #nav .dot:hover{background:rgba(255,255,255,.5);transform:scale(1.15)}
+  #nav .dot.active{background:rgba(255,255,255,.95);width:22px;border-radius:999px}
+  body.light-bg #nav{background:rgba(255,255,255,.25)}
+  body.light-bg #nav .dot{background:rgba(var(--ink-rgb),.25)}
+  body.light-bg #nav .dot.active{background:rgba(var(--ink-rgb),.9)}
+  #hint{position:fixed;bottom:3vh;right:3vw;z-index:30;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.4;mix-blend-mode:difference;color:#aaa}
+
+  /* ============================================================
+     ============ LAYOUTS API · 面向 agent 的类（v2）============
+     ============================================================ */
+
+  /* ---------- .frame：每页主内容容器 ---------- */
+  .frame{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .frame.grid-2-7-5,
+  .frame.grid-2-6-6,
+  .frame.grid-2-8-4,
+  .frame.grid-3-3,
+  .frame.grid-6{display:grid}
+
+  /* ---------- 标题层级（API 名称，衬线为主） ---------- */
+  .h-hero{
+    font-family:var(--serif-zh);
+    font-weight:900;
+    font-size:10vw;
+    line-height:.96;
+    letter-spacing:-.02em;
+  }
+  .h-xl{
+    font-family:var(--serif-zh);
+    font-weight:700;
+    font-size:6.2vw;
+    line-height:1.08;
+    letter-spacing:-.01em;
+  }
+  .h-sub{
+    font-family:var(--serif-zh);
+    font-weight:500;
+    font-size:3.1vw;
+    line-height:1.25;
+    letter-spacing:0;
+    opacity:.7;
+  }
+  .h-md{
+    font-family:var(--serif-zh);
+    font-weight:600;
+    font-size:2.3vw;
+    line-height:1.3;
+  }
+  .h-hero-en,.h-xl-en{font-family:var(--serif-en);letter-spacing:-.025em}
+
+  /* ---------- lead 引语 ---------- */
+  .lead{
+    font-family:var(--serif-zh);
+    font-weight:400;
+    font-size:1.75vw;
+    line-height:1.5;
+    opacity:.86;
+  }
+
+  /* ---------- meta-row 底部元数据 ---------- */
+  .meta-row{
+    display:flex;
+    gap:1.2em;
+    align-items:baseline;
+    flex-wrap:wrap;
+    font-family:var(--mono);
+    font-size:max(12px,.92vw);
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    opacity:.6;
+  }
+
+  /* ---------- stat-card（数据大字报用） ---------- */
+  .stat-card{
+    display:flex;
+    flex-direction:column;
+    gap:.8vh;
+    align-items:flex-start;
+    padding-top:1.6vh;
+    border-top:1px solid currentColor;
+    border-color:rgba(127,127,127,.3);
+  }
+  .stat-card .stat-label{
+    font-family:var(--mono);
+    font-size:max(10px,.78vw);
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    opacity:.55;
+  }
+  .stat-card .stat-nb{
+    font-family:var(--serif-en);
+    font-weight:800;
+    font-size:5.8vw;
+    line-height:.9;
+    letter-spacing:-.03em;
+    font-feature-settings:"tnum";
+    margin-top:.4vh;
+  }
+  .stat-card .stat-nb .stat-unit{
+    font-family:var(--serif-zh);
+    font-weight:500;
+    font-size:.38em;
+    letter-spacing:0;
+    opacity:.72;
+    margin-left:.14em;
+  }
+  .stat-card .stat-note{
+    font-family:var(--sans-zh);
+    font-weight:400;
+    font-size:max(13px,1.05vw);
+    line-height:1.5;
+    opacity:.72;
+    margin-top:.6vh;
+  }
+  .grid-4 .stat-card .stat-nb{font-size:5vw}
+  .grid-3 .stat-card .stat-nb{font-size:6.8vw}
+
+  /* ---------- pipeline（流水线） ---------- */
+  .pipeline-section{
+    margin-top:4.4vh;
+    padding-top:2.8vh;
+    border-top:1px dashed rgba(127,127,127,.32);
+  }
+  .pipeline-section:first-of-type{
+    border-top:0;
+    padding-top:0;
+    margin-top:3vh;
+  }
+  .pipeline-label{
+    font-family:var(--mono);
+    font-size:max(11px,.85vw);
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    opacity:.62;
+    margin-bottom:2.2vh;
+  }
+  .pipeline{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:1.2vw;
+  }
+  .pipeline[data-cols="3"]{grid-template-columns:repeat(3,1fr)}
+  .pipeline[data-cols="4"]{grid-template-columns:repeat(4,1fr)}
+  .pipeline[data-cols="6"]{grid-template-columns:repeat(6,1fr)}
+  .step{
+    display:flex;
+    flex-direction:column;
+    gap:.8vh;
+    padding-top:1.4vh;
+    border-top:1px solid currentColor;
+    border-color:rgba(127,127,127,.35);
+  }
+  .step-nb{
+    font-family:var(--serif-en);
+    font-style:italic;
+    font-weight:500;
+    font-size:1.15vw;
+    opacity:.45;
+  }
+  .step-title{
+    font-family:var(--sans-zh);
+    font-weight:700;
+    font-size:1.55vw;
+    letter-spacing:.01em;
+    line-height:1.2;
+  }
+  .step-desc{
+    font-family:var(--sans-zh);
+    font-weight:400;
+    font-size:max(12px,.95vw);
+    line-height:1.45;
+    opacity:.72;
+  }
+
+  /* ---------- 网格（layouts.md 所用） ---------- */
+  .grid-2-7-5{display:grid;grid-template-columns:7fr 5fr;gap:3vw 4vh;align-items:start}
+  .grid-2-6-6{display:grid;grid-template-columns:1fr 1fr;gap:3vw 4vh;align-items:start}
+  .grid-2-8-4{display:grid;grid-template-columns:8fr 4fr;gap:3vw 4vh;align-items:start}
+  .grid-3-3{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    grid-auto-rows:minmax(0,1fr);
+    gap:2.4vh 2vw;
+  }
+
+  /* ---------- 图片 frame-img（layouts.md 主命名） ---------- */
+  figure.frame-img{margin:0;display:flex;flex-direction:column;min-width:0}
+  .img-cap{
+    display:block;
+    margin-top:.8vh;
+    font-family:var(--mono);
+    font-size:max(10px,.8vw);
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    opacity:.6;
+  }
+  .callout-src{
+    display:block;
+    margin-top:1.6vh;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    opacity:.6;
+  }
+
+  /* ---------- chrome & foot 补位（layouts.md 简单写法） ---------- */
+  .chrome{font-family:var(--mono);font-size:max(11px,.78vw);letter-spacing:.2em;text-transform:uppercase;opacity:.62}
+  .foot{font-family:var(--mono);font-size:max(11px,.78vw);letter-spacing:.18em;text-transform:uppercase;opacity:.5}
+
+  /* ---------- 响应式降级 ---------- */
+  @media (max-width:900px){
+    .display{font-size:16vw}
+    .display-zh{font-size:12vw}
+    .h1-zh{font-size:7vw}
+    .h-hero{font-size:14vw}
+    .h-xl{font-size:9vw}
+    .pipeline{grid-template-columns:repeat(2,1fr)}
+    .grid-2-7-5,.grid-2-6-6,.grid-2-8-4{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-dark" class="bg"></canvas>
+<canvas id="bg-light" class="bg"></canvas>
+<div id="hint">← → 翻页 · ESC 索引</div>
+
+<div id="deck">
+
+<!-- ====== 01 · 封面 ====== -->
+<section class="slide hero dark">
+  <div class="chrome">
+    <div>内训分享 · 2026</div>
+    <div>Vol.01</div>
+  </div>
+  <div class="frame" style="display:grid; gap:4vh; align-content:center; min-height:80vh">
+    <div class="kicker">Time Management</div>
+    <h1 class="h-hero" style="white-space:nowrap">时间管理</h1>
+    <h2 class="h-sub">一套可执行的个人效率系统</h2>
+    <p class="lead" style="max-width:60vw; opacity:.75">
+      从理解本质到借助 AI，建立不焦虑的注意力管理系统。
+    </p>
+    <div class="meta-row">
+      <span>内训材料</span><span>·</span><span>个人效率与 AI 赋能</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>时间管理 · 内训分享</div>
+    <div>— 2026 —</div>
+  </div>
+</section>
+
+<!-- ====== 02 · 第一部分幕封 ====== -->
+<section class="slide hero light">
+  <div class="chrome">
+    <div>第一部分 · 如何理解时间管理</div>
+    <div>Part I · 02 / 22</div>
+  </div>
+  <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
+    <div class="kicker">Part I</div>
+    <h1 class="h-hero" style="font-size:8vw">如何理解<br>时间管理</h1>
+    <p class="lead" style="max-width:55vw; opacity:.8">
+      先破除误区，再理解本质。
+    </p>
+  </div>
+  <div class="foot">
+    <div>第一部分引子</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- ====== 03 · 时间管理的本质（误区） ====== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>本质 · Part I</div>
+    <div>03 / 22</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker">The Myths · 三个误区</div>
+    <h2 class="h-xl">时间管理的本质</h2>
+    <div style="margin-top:5vh; display:flex; flex-direction:column; gap:3.5vh">
+      <div style="display:flex; gap:1.5vw; align-items:baseline; padding-bottom:2.5vh; border-bottom:1px solid rgba(var(--ink-rgb),.12)">
+        <span style="font-family:var(--serif-en); font-style:italic; font-size:2vw; opacity:.35; flex-shrink:0">01</span>
+        <p class="body-zh" style="margin:0">误区：不是管理时间，不是像甘特图一样把自己的时间看起来仅仅有条的发配出去</p>
+      </div>
+      <div style="display:flex; gap:1.5vw; align-items:baseline; padding-bottom:2.5vh; border-bottom:1px solid rgba(var(--ink-rgb),.12)">
+        <span style="font-family:var(--serif-en); font-style:italic; font-size:2vw; opacity:.35; flex-shrink:0">02</span>
+        <p class="body-zh" style="margin:0">误区：不是学习 GTD 工具本身</p>
+      </div>
+      <div style="display:flex; gap:1.5vw; align-items:baseline">
+        <span style="font-family:var(--serif-en); font-style:italic; font-size:2vw; opacity:.35; flex-shrink:0">03</span>
+        <p class="body-zh" style="margin:0">误区：工作，生活共享了我们作为一个人的时间和体能，因此时间管理一定是覆盖工作生活的一种习惯</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 03 · 本质与误区</div>
+    <div>Part I</div>
+  </div>
+</section>
+
+<!-- ====== 04 · 管理注意力（金句） ====== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>核心 · Part I</div>
+    <div>04 / 22</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker">The Essence · 核心本质</div>
+    <blockquote style="font-family:var(--serif-zh); font-weight:700; font-size:5.8vw; line-height:1.2; letter-spacing:-.01em; max-width:76vw">
+      注意力是<br>最稀缺的资源
+    </blockquote>
+    <div class="callout" style="max-width:64vw; border-left-width:2px">
+      <div class="q-big">时间管理的目的，是可以真的完成很多事情的同时，不附带焦虑；是在需要休息的时候，有自信去休息。</div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 04 · 管理注意力</div>
+    <div>Part I</div>
+  </div>
+</section>
+
+<!-- ====== 05 · 大脑是如何工作的 ====== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>大脑机制 · Part I</div>
+    <div>05 / 22</div>
+  </div>
+  <div class="frame grid-2-6-6" style="padding-top:6vh; gap:5vw">
+    <div style="display:flex; flex-direction:column; gap:3vh">
+      <div class="kicker">Dual Process · 双流理论</div>
+      <h3 class="h-md">创作和执行是两种"心境"</h3>
+      <p class="body-zh">频繁切换导致效率损失。创作需要发散、联想、灵感；执行需要专注、重复、完成。两者混为一谈，是痛苦的根源。</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:3vh">
+      <div class="kicker">Peak Theory · 峰值理论</div>
+      <h3 class="h-md">情绪过高和过低都会导致注意力下降</h3>
+      <p class="body-zh">要刻意去安排正反馈甚至负反馈控制整体的心境。维持在一个"刚刚好"的情绪水位，才能持续高效。</p>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 05 · 大脑工作机制</div>
+    <div>Part I</div>
+  </div>
+</section>
+
+<!-- ====== 06 · 局限 ====== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>边界 · Part I</div>
+    <div>06 / 22</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker">Boundary · 一个前提</div>
+    <h2 class="h-xl">局限</h2>
+    <p class="lead" style="max-width:58vw; opacity:.85">
+      我们这里假设的是人们体能精力恒定来讨论，健身和更好的休息节奏管理可以提高精力的上限。
+    </p>
+    <div class="meta-row" style="margin-top:2vh">
+      <span>体能是注意力系统的硬件</span><span>·</span><span>再好的软件也需要硬件支撑</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 06 · 局限与边界</div>
+    <div>Part I</div>
+  </div>
+</section>
+
+<!-- ====== 07 · 第二部分幕封 ====== -->
+<section class="slide hero dark">
+  <div class="chrome">
+    <div>第二部分 · 我的时间管理 1.0 时代</div>
+    <div>Part II · 07 / 22</div>
+  </div>
+  <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
+    <div class="kicker">Part II</div>
+    <h1 class="h-hero" style="font-size:7.5vw">我的时间管理<br>1.0 时代</h1>
+    <p class="lead" style="max-width:55vw; opacity:.8">
+      工具、习惯、任务拆解，以及一套可执行的方法论。
+    </p>
+  </div>
+  <div class="foot">
+    <div>第二部分开场</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- ====== 08 · 需要一个工具 ====== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>工具 · Part II</div>
+    <div>08 / 22</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker">Toolkit · 首先，终究还是需要一个工具</div>
+    <h2 class="h-xl">Get Things Done</h2>
+    <p class="lead" style="margin-top:2vh; margin-bottom:4vh">忘掉理论，选一个 Todo List 工具。嘀嗒清单，Todoist 皆可。</p>
+
+    <div style="display:flex; flex-direction:column; gap:2.5vh; max-width:70vw">
+      <div style="display:flex; align-items:baseline; gap:1.2vw">
+        <i data-lucide="check-circle" class="ico-sm"></i>
+        <span class="body-zh">在你方便的介质上可以访问（Web，手机，跨平台同步）</span>
+      </div>
+      <div style="display:flex; align-items:baseline; gap:1.2vw">
+        <i data-lucide="check-circle" class="ico-sm"></i>
+        <span class="body-zh">方便的往里扔东西：邮箱，微信，Cli - Agent</span>
+      </div>
+      <div style="display:flex; align-items:baseline; gap:1.2vw">
+        <i data-lucide="check-circle" class="ico-sm"></i>
+        <span class="body-zh">可选：我个人喜欢的自然语言识别功能</span>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 08 · GTD 工具选择</div>
+    <div>Part II</div>
+  </div>
+</section>
+
+<!-- ====== 09 · 养成习惯放进去 ====== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>习惯 · Part II</div>
+    <div>09 / 22</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker">Habit · 然后，如何让工作和生活进入你的注意力管理工具</div>
+    <h2 class="h-xl">养成习惯，<br>用起来</h2>
+    <div style="display:flex; flex-direction:column; gap:3vh; max-width:60vw">
+      <p class="lead">让生活和工作，都放进去，不要侥幸。</p>
+      <p class="lead">养成习惯，用起来。</p>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 09 · 养成习惯</div>
+    <div>Part II</div>
+  </div>
+</section>
+
+<!-- ====== 10 · 解构任务 ====== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>拆解 · Part II</div>
+    <div>10 / 22</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker">Deconstruct · 然后，解构你每一项任务</div>
+    <h2 class="h-xl">解构与降级</h2>
+    <p class="lead" style="margin-top:2vh; margin-bottom:4vh">
+      再复杂抽象的目标，都应该逐渐被解构，降级，最终变成可执行的「创造」或「执行」类 Task，然后按照自己的节奏放到日程里，留点余量。
+    </p>
+    <div class="callout" style="max-width:72vw">
+      <div class="q-big">MECE 原则，尽可能具体，是否完成是明确可衡量的，Size 尽可能小，维持能够持续关闭任务的正反馈。</div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 10 · 任务拆解</div>
+    <div>Part II</div>
+  </div>
+</section>
+
+<!-- ====== 11 · 坏例子 ====== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>反例 · Part II</div>
+    <div>11 / 22</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker">Bad Examples · 具体，举点显而易见的坏例子</div>
+    <h2 class="h-xl">坏任务的模样</h2>
+    <div style="margin-top:5vh; display:grid; grid-template-columns:1fr 1fr; gap:3vw 4vh">
+      <div style="padding:3vh 2vw; border:1px solid rgba(var(--paper-rgb),.15)">
+        <span style="font-family:var(--serif-en); font-style:italic; font-size:1.8vw; opacity:.35">01</span>
+        <p class="body-zh" style="margin-top:1.5vh">为考试而学习。</p>
+      </div>
+      <div style="padding:3vh 2vw; border:1px solid rgba(var(--paper-rgb),.15)">
+        <span style="font-family:var(--serif-en); font-style:italic; font-size:1.8vw; opacity:.35">02</span>
+        <p class="body-zh" style="margin-top:1.5vh">为项目做研究。</p>
+      </div>
+      <div style="padding:3vh 2vw; border:1px solid rgba(var(--paper-rgb),.15)">
+        <span style="font-family:var(--serif-en); font-style:italic; font-size:1.8vw; opacity:.35">03</span>
+        <p class="body-zh" style="margin-top:1.5vh">修改粗糙的草图。</p>
+      </div>
+      <div style="padding:3vh 2vw; border:1px solid rgba(var(--paper-rgb),.15)">
+        <span style="font-family:var(--serif-en); font-style:italic; font-size:1.8vw; opacity:.35">04</span>
+        <p class="body-zh" style="margin-top:1.5vh">开一个组团会议。</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 11 · 坏例子</div>
+    <div>Part II</div>
+  </div>
+</section>
+
+<!-- ====== 12 · 例子 1：减肥 10 斤 ====== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>案例 · Part II</div>
+    <div>12 / 22</div>
+  </div>
+  <div class="frame" style="padding-top:4vh">
+    <div class="kicker">Example 01 · 减肥 10 斤</div>
+    <h2 class="h-xl">好拆分 vs 坏拆分</h2>
+    <div class="grid-2-6-6" style="gap:4vw 3vh; margin-top:4vh">
+      <!-- 左：坏 -->
+      <div style="padding:3vh 2vw; border-left:3px solid rgba(var(--ink-rgb),.2); opacity:.6">
+        <div class="kicker" style="opacity:.9">Bad · 坏的拆分</div>
+        <h3 class="h-md" style="margin-top:2vh">设置一个定时任务：每天跑 5 KM</h3>
+        <div style="margin-top:3vh; display:flex; flex-direction:column; gap:1.6vh">
+          <p class="body-zh">「每天跑 5 公里」和「减肥」这两件事之间，是否一定存在必然的逻辑关系？</p>
+          <p class="body-zh">「每天跑 5 公里」本身并不是一件简单的任务，<span class="hi">甜度</span>不足会非常难以保证持续执行下去。</p>
+        </div>
+      </div>
+      <!-- 右：好 -->
+      <div style="padding:3vh 2vw; border-left:3px solid currentColor">
+        <div class="kicker" style="opacity:.9">Good · 好的任务管理</div>
+        <h3 class="h-md" style="margin-top:2vh">减肥 = 降低摄入 + 增加消耗 + 定期测量</h3>
+        <div style="margin-top:3vh; display:flex; flex-direction:column; gap:1.6vh">
+          <p class="body-zh">降低摄入：每日控制摄入在 XXX 以下</p>
+          <p class="body-zh">增加消耗：每日做 10 分钟 HIIT 或者 30 分钟长跑 + 每周做一次 1 小时的高强度锻炼</p>
+          <p class="body-zh">定期测量：每月测量体重和体脂，修正日常的规划</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 12 · 案例：减肥</div>
+    <div>Part II</div>
+  </div>
+</section>
+
+<!-- ====== 13 · 例子 2：写 PPT ====== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>案例 · Part II</div>
+    <div>13 / 22</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker">Example 02 · 写 PPT 材料</div>
+    <h2 class="h-xl">创意先行，执行跟上</h2>
+    <p class="lead" style="margin-top:2vh; margin-bottom:4vh">实际上写 PPT 的工作包含两部分：</p>
+    <div style="display:flex; flex-direction:column; gap:3vh; max-width:72vw">
+      <div class="callout">
+        <div class="q-big">「创意」部分</div>
+        <p class="body-zh" style="margin-top:1.2vh">理清楚脉络，故事线，关键信息，形成「成片感」（这部分纯费脑，耗时极不确定）</p>
+      </div>
+      <div class="callout">
+        <div class="q-big">「执行」部分</div>
+        <p class="body-zh" style="margin-top:1.2vh">有了「创意」骨架后，把内容展开，组织成 PPT 格式的材料（这部分费手，依靠熟练度，但总体耗时可控）</p>
+      </div>
+    </div>
+    <p class="body-zh" style="margin-top:4vh; opacity:.9">不要混在一起安排自己的时间：创意先行，甚至可以用跑步、游泳、睡觉前、带娃的时间思考；有了创意以后，再安排时间窗口去做具体的 PPT 创建。</p>
+  </div>
+  <div class="foot">
+    <div>Page 13 · 案例：写 PPT</div>
+    <div>Part II</div>
+  </div>
+</section>
+
+<!-- ====== 14 · Plan 和 Review ====== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>节奏 · Part II</div>
+    <div>14 / 22</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker">Rhythm · 事前想得越清楚，事情越可控</div>
+    <h2 class="h-xl">Plan & Review</h2>
+    <div style="display:flex; flex-direction:column; gap:4vh; max-width:64vw">
+      <div style="display:flex; align-items:baseline; gap:1.5vw">
+        <span style="font-family:var(--serif-en); font-style:italic; font-size:2.2vw; opacity:.35">Plan</span>
+        <p class="lead" style="margin:0">给自己留出 Plan 的时间，很重要，先想明白。</p>
+      </div>
+      <div style="display:flex; align-items:baseline; gap:1.5vw">
+        <span style="font-family:var(--serif-en); font-style:italic; font-size:2.2vw; opacity:.35">Review</span>
+        <p class="lead" style="margin:0">给自己留出 Review 的时间，很重要，不漏事儿。</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 14 · Plan & Review</div>
+    <div>Part II</div>
+  </div>
+</section>
+
+<!-- ====== 15 · 其他需求 ====== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>补充 · Part II</div>
+    <div>15 / 22</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker">Extras · 还有一些其他类型的需求</div>
+    <h2 class="h-xl">提醒与跟踪</h2>
+    <div class="grid-2-6-6" style="gap:5vw 4vh; margin-top:5vh">
+      <div style="display:flex; flex-direction:column; gap:2.5vh">
+        <div style="display:flex; align-items:center; gap:1vw">
+          <i data-lucide="bell" class="ico-md"></i>
+          <h3 class="h-md">提醒</h3>
+        </div>
+        <p class="body-zh">重要日子（结婚纪念，生日），生活习惯（喝水），不可忘记的周期性任务（信用卡还款，贷款还款，保险续费等等）</p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:2.5vh">
+        <div style="display:flex; align-items:center; gap:1vw">
+          <i data-lucide="eye" class="ico-md"></i>
+          <h3 class="h-md">跟踪</h3>
+        </div>
+        <p class="body-zh">有一些事情你希望持续追踪，但不是自己去完成的：有趣的新闻追后续，下属的一些关键工作内容，外部依赖的定期追踪。</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 15 · 提醒与跟踪</div>
+    <div>Part II</div>
+  </div>
+</section>
+
+<!-- ====== 16 · 成就 ====== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>收获 · Part II</div>
+    <div>16 / 22</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker">Reward · 最最最后的成就</div>
+    <blockquote style="font-family:var(--serif-zh); font-weight:700; font-size:5vw; line-height:1.22; letter-spacing:-.01em; max-width:76vw">
+      每关闭一个任务，<br>都有正反馈的快感
+    </blockquote>
+    <p class="lead" style="max-width:58vw; opacity:.75">
+      每天清空清单后，能自信今天没有漏掉别的，可以放心休息了。
+    </p>
+  </div>
+  <div class="foot">
+    <div>Page 16 · 最终成就</div>
+    <div>Part II</div>
+  </div>
+</section>
+
+<!-- ====== 17 · 第三部分幕封 ====== -->
+<section class="slide hero light">
+  <div class="chrome">
+    <div>第三部分 · 时间管理 2.0 时代</div>
+    <div>Part III · 17 / 22</div>
+  </div>
+  <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
+    <div class="kicker">Part III</div>
+    <h1 class="h-hero" style="font-size:7vw">时间管理 2.0<br>有 AI 了</h1>
+    <p class="lead" style="max-width:55vw; opacity:.8">
+      当创作与执行可以被 AI 分别赋能，时间管理的边界在哪里？
+    </p>
+  </div>
+  <div class="foot">
+    <div>第三部分开场</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- ====== 18 · 双流理论返场 ====== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>返场 · Part III</div>
+    <div>18 / 22</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker">Dual Process Returns · 双流理论返场</div>
+    <h2 class="h-xl">创作与执行，<br>AI 分别赋能</h2>
+    <div style="margin-top:4vh; display:flex; flex-direction:column; gap:3vh; max-width:70vw">
+      <p class="lead">大部分的工作如果拆成依赖创造性思维的「创作」和依赖行动力专注力的「执行」两类任务的组合，我们需要分别思考，AI 如何分别赋能他们。</p>
+      <p class="lead">就像「创作」和「执行」分不清楚，那么一个工作就很难推进，心境往往痛苦一样，一个「复合型」任务给 AI，AI 大概率做不好，人就会更痛苦，并浪费最稀缺的「注意力」。</p>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 18 · 双流返场</div>
+    <div>Part III</div>
+  </div>
+</section>
+
+<!-- ====== 19 · AI 赋能切入点 ====== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>切入点 · Part III</div>
+    <div>19 / 22</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker">AI Empowerment · AI 赋能的切入点</div>
+    <h2 class="h-xl">创作 + AI · 执行 + AI</h2>
+    <div class="grid-2-6-6" style="gap:5vw 4vh; margin-top:5vh">
+      <div style="display:flex; flex-direction:column; gap:2.5vh; padding:3vh 2vw; border-left:3px solid currentColor">
+        <div style="display:flex; align-items:center; gap:1vw">
+          <i data-lucide="sparkles" class="ico-md"></i>
+          <h3 class="h-md">「创作」+ AI</h3>
+        </div>
+        <p class="body-zh">提供标准思考逻辑，模板提示词，应该是以提供灵感，选项，或者大纲类的线索信息为目标的。因此不需要依赖复杂的 Agent + Skill 的 AI 工程环境，任何 ChatBot 其实都是好选择。</p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:2.5vh; padding:3vh 2vw; border-left:3px solid currentColor">
+        <div style="display:flex; align-items:center; gap:1vw">
+          <i data-lucide="zap" class="ico-md"></i>
+          <h3 class="h-md">「执行」+ AI</h3>
+        </div>
+        <p class="body-zh">追求全自动化，越少人工干预越好，理论上这部分不需要 AI 的通识智力，需要的是 AI 核心模型 + Tools 的输入产出能力。工具大概率需要：Coze，Qwen Studio，Agent（Claude Code 等）+ Skills，甚至龙虾。</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 19 · AI 赋能</div>
+    <div>Part III</div>
+  </div>
+</section>
+
+<!-- ====== 20 · 金句 ====== -->
+<section class="slide hero dark">
+  <div class="chrome">
+    <div>金句 · Part III</div>
+    <div>20 / 22</div>
+  </div>
+  <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
+    <div class="kicker">The Quote · 金句</div>
+    <h1 class="h-hero" style="font-size:6.5vw; line-height:1.15">
+      AI 的时代，<br>是时间碎片化的忙人，<br>最好的时代
+    </h1>
+    <p class="lead" style="max-width:50vw; opacity:.8">
+      「是的，我有个烦死人的儿子」
+    </p>
+  </div>
+  <div class="foot">
+    <div>Page 20 · 金句</div>
+    <div>Part III</div>
+  </div>
+</section>
+
+<!-- ====== 21 · 案例 ====== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>实证 · Part III</div>
+    <div>21 / 22</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker">Case Study · 本时间管理的 PPT 编写任务</div>
+    <h2 class="h-xl">一个真实的案例</h2>
+    <div style="margin-top:5vh; display:flex; flex-direction:column; gap:3vh">
+      <div style="display:flex; align-items:baseline; gap:2vw; padding:2.5vh 0; border-top:1px solid rgba(var(--ink-rgb),.18)">
+        <span style="font-family:var(--mono); font-size:max(11px,.85vw); letter-spacing:.24em; text-transform:uppercase; opacity:.55; width:18vw">手写大纲</span>
+        <span class="h-md">30 分钟左右</span>
+      </div>
+      <div style="display:flex; align-items:baseline; gap:2vw; padding:2.5vh 0; border-top:1px solid rgba(var(--ink-rgb),.18)">
+        <span style="font-family:var(--mono); font-size:max(11px,.85vw); letter-spacing:.24em; text-transform:uppercase; opacity:.55; width:18vw">AI 生成 PPT</span>
+        <span class="h-md">1 分钟</span>
+      </div>
+      <div style="display:flex; align-items:baseline; gap:2vw; padding:2.5vh 0; border-top:1px solid rgba(var(--ink-rgb),.18); border-bottom:1px solid rgba(var(--ink-rgb),.18)">
+        <span style="font-family:var(--mono); font-size:max(11px,.85vw); letter-spacing:.24em; text-transform:uppercase; opacity:.55; width:18vw">Review，修改</span>
+        <span class="h-md">10 分钟</span>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 21 · 案例实证</div>
+    <div>Part III</div>
+  </div>
+</section>
+
+<!-- ====== 22 · 参考资料 ====== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>参考资料</div>
+    <div>22 / 22</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker">References · 参考资料</div>
+    <h2 class="h-xl">推荐阅读</h2>
+    <div style="display:flex; flex-direction:column; gap:3vh; max-width:64vw">
+      <div style="display:flex; align-items:baseline; gap:2vw">
+        <span style="font-family:var(--serif-en); font-style:italic; font-size:1.8vw; opacity:.35">01</span>
+        <p class="lead">斯科特·扬（Scott Young）《超效率手册》（<em class="en">The Little Book of Productivity</em>）</p>
+      </div>
+      <div style="display:flex; align-items:baseline; gap:2vw">
+        <span style="font-family:var(--serif-en); font-style:italic; font-size:1.8vw; opacity:.35">02</span>
+        <p class="lead">David Allen《Get Things Done》</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 22 · 参考资料</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+</div>
+
+<div id="nav"></div>
+
+<script>
+/* =============== WebGL 双背景 =============== */
+const VS = `attribute vec2 position;void main(){gl_Position=vec4(position,0.0,1.0);}`;
+
+const FS_DARK = `precision highp float;
+uniform vec2 u_resolution;uniform float u_time;uniform vec2 u_mouse;
+vec3 palette(float t,vec3 a,vec3 b,vec3 c,vec3 d){return a+b*cos(6.28318*(c*t+d));}
+void main(){
+  vec2 uv=gl_FragCoord.xy/u_resolution.xy;
+  vec2 p=uv*2.0-1.0;p.x*=u_resolution.x/u_resolution.y;
+  vec2 m=u_mouse*2.0-1.0;m.x*=u_resolution.x/u_resolution.y;
+  float md=length(p-m);
+  float mr=sin(md*15.0-u_time*4.0)*exp(-md*3.0);p+=mr*0.08;
+  vec2 p0=p;
+  for(float i=1.0;i<4.0;i++){
+    p.x+=0.1/i*sin(i*3.0*p.y+u_time*0.4)+0.05;
+    p.y+=0.1/i*cos(i*2.0*p.x+u_time*0.3)-0.05;
+  }
+  float r=length(p);float ang=atan(p.y,p.x);
+  vec3 a=vec3(0.12,0.12,0.13);
+  vec3 b=vec3(0.03,0.04,0.05);
+  vec3 c=vec3(1.0,1.0,1.0);
+  vec3 d=vec3(0.1,0.2,0.4);
+  vec3 col=palette(r*1.5+p0.x*0.5+u_time*0.1,a,b,c,d);
+  float disp=sin(r*25.0-u_time*1.5+ang*2.0)*0.5+0.5;
+  col+=vec3(disp*0.015,disp*0.01,disp*0.02);
+  float hi=pow(sin(p.x*4.0+p.y*3.0+u_time)*0.5+0.5,8.0);
+  col+=hi*0.08;
+  vec3 base=vec3(0.05,0.05,0.06);
+  col=mix(base,col,0.85);
+  gl_FragColor=vec4(col,1.0);
+}`;
+
+const FS_LIGHT = `precision highp float;
+uniform vec2 u_resolution;uniform float u_time;uniform vec2 u_mouse;
+float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float noise(vec2 p){
+  vec2 i=floor(p),f=fract(p);
+  float a=hash(i),b=hash(i+vec2(1,0));
+  float c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));
+  vec2 u=f*f*(3.0-2.0*f);
+  return mix(a,b,u.x)+(c-a)*u.y*(1.0-u.x)+(d-b)*u.x*u.y;
+}
+float fbm(vec2 p){
+  float v=0.0,a=0.5;
+  mat2 m=mat2(0.80,0.60,-0.60,0.80);
+  for(int i=0;i<5;i++){v+=a*noise(p);p=m*p*2.02;a*=0.5;}
+  return v;
+}
+void main(){
+  vec2 uv=gl_FragCoord.xy/u_resolution.xy;
+  vec2 p=uv;p.x*=u_resolution.x/u_resolution.y;
+  vec2 m=u_mouse;m.x*=u_resolution.x/u_resolution.y;
+  vec2 md=p-m;float dl=length(md);
+  p+=normalize(md+vec2(0.0001))*exp(-dl*5.0)*0.03;
+  vec2 q=vec2(fbm(p*1.8+u_time*0.07),fbm(p*1.8+vec2(5.2,1.3)+u_time*0.06));
+  vec2 r=vec2(fbm(p*2.0+q*1.3+vec2(1.7,9.2)+u_time*0.05),
+              fbm(p*2.0+q*1.3+vec2(8.3,2.8)+u_time*0.04));
+  float f=fbm(p*2.2+r*1.5);
+  vec3 silverDark=vec3(0.86,0.85,0.84);
+  vec3 paper=vec3(0.955,0.945,0.925);
+  vec3 col=mix(silverDark,paper,f);
+  float ph=r.x*2.2+u_time*0.35;
+  col+=vec3(0.78,0.62,0.92)*sin(ph)*0.055;
+  col+=vec3(0.55,0.72,0.95)*sin(ph*0.8+2.0)*0.05;
+  float hl=smoothstep(0.48,0.92,f);
+  col+=hl*0.06;
+  gl_FragColor=vec4(col,1.0);
+}`;
+
+const mouse={x:0.5,y:0.5};
+addEventListener('mousemove',e=>{mouse.x=e.clientX/innerWidth;mouse.y=e.clientY/innerHeight});
+
+function bootGL(canvasId, fsSrc){
+  const canvas=document.getElementById(canvasId);
+  const gl=canvas.getContext('webgl',{alpha:false,antialias:true});
+  if(!gl) return ()=>false;
+  const mk=(t,s)=>{const sh=gl.createShader(t);gl.shaderSource(sh,s);gl.compileShader(sh);return sh};
+  const prog=gl.createProgram();
+  gl.attachShader(prog,mk(gl.VERTEX_SHADER,VS));
+  gl.attachShader(prog,mk(gl.FRAGMENT_SHADER,fsSrc));
+  gl.linkProgram(prog);gl.useProgram(prog);
+  const buf=gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+  const pos=gl.getAttribLocation(prog,'position');
+  gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
+  const lRes=gl.getUniformLocation(prog,'u_resolution');
+  const lT=gl.getUniformLocation(prog,'u_time');
+  const lM=gl.getUniformLocation(prog,'u_mouse');
+  const resize=()=>{
+    const d=Math.min(window.devicePixelRatio||1,2);
+    canvas.width=innerWidth*d;canvas.height=innerHeight*d;
+    gl.viewport(0,0,canvas.width,canvas.height);
+  };
+  addEventListener('resize',resize);resize();
+  return (tSec)=>{
+    gl.uniform2f(lRes,canvas.width,canvas.height);
+    gl.uniform1f(lT,tSec);
+    gl.uniform2f(lM,mouse.x,1-mouse.y);
+    gl.drawArrays(gl.TRIANGLES,0,6);
+    return true;
+  };
+}
+const drawDark=bootGL('bg-dark',FS_DARK);
+const drawLight=bootGL('bg-light',FS_LIGHT);
+const t0=Date.now();
+(function loop(){
+  const t=(Date.now()-t0)/1000;
+  drawDark(t);drawLight(t);
+  requestAnimationFrame(loop);
+})();
+
+// =============== 导航（翻页 / 圆点 / 键盘 / 滚轮 / 触屏） ===============
+const deck=document.getElementById('deck');
+const slides=deck.querySelectorAll('.slide');
+const nav=document.getElementById('nav');
+let idx=0,total=slides.length,lock=false;
+
+deck.style.width=(total*100)+'vw';
+
+slides.forEach((s,i)=>{
+  const b=document.createElement('button');
+  b.className='dot';b.dataset.i=i;b.setAttribute('aria-label','Page '+(i+1));
+  b.onclick=()=>go(i);
+  nav.appendChild(b);
+});
+
+function go(n){
+  if(lock)return;
+  idx=Math.max(0,Math.min(total-1,n));
+  deck.style.transform=`translateX(${-idx*100}vw)`;
+  nav.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+  const el=slides[idx];
+  const th=el.dataset.theme || (el.classList.contains('light')?'light':(el.classList.contains('dark')?'dark':'dark'));
+  document.body.classList.toggle('light-bg',th==='light');
+  lock=true;setTimeout(()=>lock=false,700);
+}
+
+/* =============== ESC 索引视图 =============== */
+let overviewOn=false;
+const ov=document.createElement('div');
+ov.id='overview';
+ov.style.cssText='position:fixed;inset:0;z-index:100;background:rgba(var(--ink-rgb),.92);backdrop-filter:blur(12px);display:none;overflow-y:auto;padding:4vh 4vw';
+document.body.appendChild(ov);
+
+function buildOverview(){
+  ov.innerHTML='';
+  const grid=document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:2vh 1.6vw;max-width:90vw;margin:0 auto';
+  slides.forEach((s,i)=>{
+    const card=document.createElement('div');
+    card.style.cssText='cursor:pointer;border-radius:6px;overflow:hidden;border:2px solid '+(i===idx?'rgba(var(--paper-rgb),.8)':'rgba(var(--paper-rgb),.15)')+';transition:border-color .2s';
+    card.onmouseenter=()=>card.style.borderColor='rgba(var(--paper-rgb),.6)';
+    card.onmouseleave=()=>card.style.borderColor=i===idx?'rgba(var(--paper-rgb),.8)':'rgba(var(--paper-rgb),.15)';
+    const wrap=document.createElement('div');
+    wrap.style.cssText='width:100%;aspect-ratio:16/9;overflow:hidden;position:relative;pointer-events:none;background:'+(s.classList.contains('light')?'var(--paper)':'var(--ink)');
+    const clone=s.cloneNode(true);
+    clone.style.cssText='width:100vw;height:100vh;transform:scale('+(1/4.5)+');transform-origin:top left;position:absolute;top:0;left:0;pointer-events:none';
+    wrap.appendChild(clone);
+    const label=document.createElement('div');
+    label.style.cssText='padding:6px 10px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper);opacity:.7';
+    label.textContent=(i+1)+' / '+total;
+    card.appendChild(wrap);
+    card.appendChild(label);
+    card.onclick=()=>{toggleOverview();go(i)};
+    grid.appendChild(card);
+  });
+  ov.appendChild(grid);
+}
+
+function toggleOverview(){
+  overviewOn=!overviewOn;
+  if(overviewOn){buildOverview();ov.style.display='block';}
+  else{ov.style.display='none';}
+}
+
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleOverview();return;}
+  if(overviewOn)return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '||e.key==='ArrowDown')go(idx+1);
+  if(e.key==='ArrowLeft'||e.key==='PageUp'||e.key==='ArrowUp')go(idx-1);
+  if(e.key==='Home')go(0);
+  if(e.key==='End')go(total-1);
+});
+
+let wheelTO=null,wheelAcc=0;
+addEventListener('wheel',e=>{
+  wheelAcc+=e.deltaY+e.deltaX;
+  if(Math.abs(wheelAcc)>50){go(idx+(wheelAcc>0?1:-1));wheelAcc=0;}
+  clearTimeout(wheelTO);wheelTO=setTimeout(()=>wheelAcc=0,150);
+},{passive:true});
+
+let tx=0,ty=0;
+addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+addEventListener('touchend',e=>{
+  const dx=(e.changedTouches[0].clientX-tx);
+  const dy=(e.changedTouches[0].clientY-ty);
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy))go(idx+(dx<0?1:-1));
+},{passive:true});
+
+go(0);
+</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

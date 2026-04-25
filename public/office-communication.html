@@ -3,26 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>时间管理 · 一套可执行的个人效率系统</title>
+<title>没有所谓的向上管理 · 职场沟通内训</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@300;400;500;600&family=Noto+Serif+SC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@300;400;500;600&family=Noto+Serif+SC:wght@300;400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* ============ 主题色(🌿 森林墨) ============ */
-    --ink:#1a2e1f;
-    --ink-rgb:26,46,31;
-    --paper:#f5f1e8;
-    --paper-rgb:245,241,232;
-    --paper-tint:#ece7da;
-    --ink-tint:#253d2c;
+    /* ============ 主题色(默认:🖋 墨水经典) ============
+       切换主题:从 references/themes.md 复制对应的 :root 块
+       整体替换这几行(--ink / --ink-rgb / --paper / --paper-rgb)
+       其他地方散落的 rgba() 都走 var(--ink-rgb) / var(--paper-rgb),无需逐处改 */
+    --ink:#0a0a0b;
+    --ink-rgb:10,10,11;
+    --paper:#f1efea;
+    --paper-rgb:241,239,234;
+    --paper-tint:#e8e5de;
+    --ink-tint:#18181a;
 
     /* ============ 字体(跨主题固定) ============ */
     --mono:"IBM Plex Mono",ui-monospace,monospace;
     --serif-en:"Playfair Display","Source Serif 4",Georgia,serif;
     --serif-body-en:"Source Serif 4",Georgia,serif;
     --serif-zh:"Noto Serif SC",source-han-serif-sc,serif;
-    --sans-zh:"Noto Serif SC",source-han-serif-sc,serif;
+    --sans-zh:"Noto Sans SC",source-han-sans-sc,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{width:100%;height:100%;overflow:hidden;background:var(--ink);color:var(--paper);font-family:var(--sans-zh);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
@@ -35,6 +38,7 @@
   body.light-bg canvas#bg-dark{opacity:0}
 
   /* ============ Deck 容器 + 翻页 ============ */
+  /* width: NSLIDES * 100vw，会在 JS 里动态矫正 */
   #deck{position:fixed;inset:0;width:10000vw;height:100vh;display:flex;flex-wrap:nowrap;transition:transform .9s cubic-bezier(.77,0,.175,1);z-index:10;will-change:transform}
   .slide{width:100vw;height:100vh;flex:0 0 100vw;position:relative;padding:6vh 6vw 10vh 6vw;display:flex;flex-direction:column;overflow:hidden}
   .slide.light{color:var(--ink)}
@@ -63,7 +67,11 @@
   .rule{width:100%;height:1px;background:currentColor;opacity:.25;margin:3vh 0}
   .rule.v{width:1px;height:100%;margin:0}
 
-  /* ============ 字体规则 ============ */
+  /* ============ 字体规则 ============
+     · 衬线（Noto Serif SC / Playfair）：大标题、重点金句、数字
+     · 非衬线（Noto Sans SC）：正文描述、body、补充说明
+     · 等宽（IBM Plex Mono）：kicker、meta 小标签、foot 右侧
+  */
   .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;opacity:.6;margin-bottom:2.6vh}
   .display{font-family:var(--serif-en);font-weight:700;font-size:11vw;line-height:.92;letter-spacing:-.025em}
   .display-zh{font-family:var(--serif-zh);font-weight:700;font-size:7.8vw;line-height:1.04;letter-spacing:-.005em}
@@ -151,7 +159,10 @@
   .img-slot.r-3x2{aspect-ratio:3/2}
   .img-slot.r-1x1{aspect-ratio:1/1}
 
-  /* ============ 图片实填框（关键：固定高度 + 只裁底部） ============ */
+  /* ============ 图片实填框（关键：固定高度 + 只裁底部） ============
+     重要约束：高度用内联 height:Nvh 精确控制，不要用 aspect-ratio（会撑破布局）
+     object-position:top center 保证严禁裁剪顶部和左右，只裁剪底部
+  */
   .frame-img{overflow:hidden;position:relative;background:rgba(0,0,0,.04);box-sizing:border-box;width:100%;border-radius:4px}
   .slide.dark .frame-img{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)}
   .frame-img > img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
@@ -174,10 +185,13 @@
 
   /* ============================================================
      ============ LAYOUTS API · 面向 agent 的类（v2）============
+     所有 layouts.md 中的骨架都基于下面这套命名。
+     如果你在 layouts.md 里看到某个类，它必须在下面有定义。
      ============================================================ */
 
   /* ---------- .frame：每页主内容容器 ---------- */
   .frame{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  /* 当 .frame 同时加了 grid 类时，grid 的 display:grid 覆盖 flex */
   .frame.grid-2-7-5,
   .frame.grid-2-6-6,
   .frame.grid-2-8-4,
@@ -213,6 +227,7 @@
     font-size:2.3vw;
     line-height:1.3;
   }
+  /* 英文标题专用（Playfair 衬线） */
   .h-hero-en,.h-xl-en{font-family:var(--serif-en);letter-spacing:-.025em}
 
   /* ---------- lead 引语 ---------- */
@@ -279,7 +294,9 @@
     opacity:.72;
     margin-top:.6vh;
   }
+  /* 当 stat-card 用于 grid-4（2x2），数字适度放大；若页面有标题+引文在上方，可内联 style 覆盖为更小值 */
   .grid-4 .stat-card .stat-nb{font-size:5vw}
+  /* 当只有 3 个，字也可以稍大 */
   .grid-3 .stat-card .stat-nb{font-size:6.8vw}
 
   /* ---------- pipeline（流水线） ---------- */
@@ -340,6 +357,7 @@
   }
 
   /* ---------- 网格（layouts.md 所用） ---------- */
+  /* 这些类独立挂到任何容器上都能生效，不依赖 .frame 复合选择器 */
   .grid-2-7-5{display:grid;grid-template-columns:7fr 5fr;gap:3vw 4vh;align-items:start}
   .grid-2-6-6{display:grid;grid-template-columns:1fr 1fr;gap:3vw 4vh;align-items:start}
   .grid-2-8-4{display:grid;grid-template-columns:8fr 4fr;gap:3vw 4vh;align-items:start}
@@ -349,8 +367,10 @@
     grid-auto-rows:minmax(0,1fr);
     gap:2.4vh 2vw;
   }
+  /* grid-6 已在旧样式里定义为 3x2，这里仅补 align */
 
   /* ---------- 图片 frame-img（layouts.md 主命名） ---------- */
+  /* 在旧样式里已定义，这里补 img-cap 命名别名与增强 */
   figure.frame-img{margin:0;display:flex;flex-direction:column;min-width:0}
   .img-cap{
     display:block;
@@ -361,6 +381,7 @@
     text-transform:uppercase;
     opacity:.6;
   }
+  /* callout src 命名别名 */
   .callout-src{
     display:block;
     margin-top:1.6vh;
@@ -395,561 +416,785 @@
 
 <div id="deck">
 
-<!-- ====== 01 · 封面 ====== -->
+<!-- ============================================================
+     SLIDES 插入区 · 在此处填充所有 <section class="slide ..."> 页面
+     每页模板参考 references/page-patterns.md
+     页面组件参考 references/components.md
+     ============================================================ -->
+
+<!-- ========== P1 · 封面 ========== -->
 <section class="slide hero dark">
   <div class="chrome">
-    <div>内训分享 · 2026</div>
+    <div>职场内训 · 向上管理与沟通</div>
     <div>Vol.01</div>
   </div>
   <div class="frame" style="display:grid; gap:4vh; align-content:center; min-height:80vh">
-    <div class="kicker">Time Management</div>
-    <h1 class="h-hero" style="white-space:nowrap">时间管理</h1>
-    <h2 class="h-sub">一套可执行的个人效率系统</h2>
-    <p class="lead" style="max-width:60vw; opacity:.75">
-      从理解本质到借助 AI，建立不焦虑的注意力管理系统。
+    <div class="kicker">一场关于资源与沟通的分享</div>
+    <h1 class="h-hero" style="font-size:8.2vw; line-height:1.08">
+      没有所谓的<br>向上管理
+    </h1>
+    <p class="lead" style="max-width:58vw">
+      一场关于职场沟通的系统性思考。打破向上管理的迷思，从资源视角重新理解组织中的关系。
     </p>
     <div class="meta-row">
-      <span>内训材料</span><span>·</span><span>个人效率与 AI 赋能</span>
+      <span>职场沟通方法论</span><span>·</span><span>内训材料</span>
     </div>
   </div>
   <div class="foot">
-    <div>时间管理 · 内训分享</div>
+    <div>资源视角 · 沟通基本功 · 信息密度 · 高阶策略</div>
     <div>— 2026 —</div>
   </div>
 </section>
 
-<!-- ====== 02 · 第一部分幕封 ====== -->
+<!-- ========== P2 · 开篇 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>开篇 · The Premise</div>
+    <div>02 / 23</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker">一切关系的本质</div>
+    <blockquote style="font-family:var(--serif-zh); font-weight:700; font-size:4.8vw; line-height:1.25; letter-spacing:-.01em; max-width:76vw">
+      "你和上司、下属、同事、公司的关系，<br>都是商业合作关系。"
+    </blockquote>
+    <p class="lead" style="max-width:55vw; opacity:.7">
+      它们都是你可以利用的资源。注意，你并不拥有和指挥他们，但你要学会利用他们。这套方法适用于和所有人的沟通，并「管理」他们。
+    </p>
+    <div class="meta-row">
+      <span>不是权力关系</span><span>·</span><span>是资源关系</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 02 · 开篇定调</div>
+    <div>Premise</div>
+  </div>
+</section>
+
+<!-- ========== P3 · 资源视角 ========== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>资源视角 · Resources</div>
+    <div>03 / 23</div>
+  </div>
+  <div class="frame" style="padding-top:6vh">
+    <div class="kicker">四种关系，一种逻辑</div>
+    <h2 class="h-xl" style="margin-bottom:5vh">所有人都是资源</h2>
+    <div class="grid-3" style="gap:4vw; margin-top:2vh">
+      <div class="pillar" style="padding:3vh 2vw; border:1px solid currentColor; border-color:rgba(127,127,127,.25)">
+        <div class="ic"><i data-lucide="user" class="ico-lg"></i></div>
+        <div class="t">上司</div>
+        <div class="d">不是指挥你的人，<br>是你需要利用的资源</div>
+      </div>
+      <div class="pillar" style="padding:3vh 2vw; border:1px solid currentColor; border-color:rgba(127,127,127,.25)">
+        <div class="ic"><i data-lucide="users" class="ico-lg"></i></div>
+        <div class="t">同事与 Peer</div>
+        <div class="d">不是竞争者，<br>是协作网络与外部背书</div>
+      </div>
+      <div class="pillar" style="padding:3vh 2vw; border:1px solid currentColor; border-color:rgba(127,127,127,.25)">
+        <div class="ic"><i data-lucide="building-2" class="ico-lg"></i></div>
+        <div class="t">公司与平台</div>
+        <div class="d">不是归属，<br>是积累技能、人脉、现金流的场域</div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:5vh; max-width:70vw">
+      <div class="q-big">你不是在管理任何人，而是在配置你能调动的所有资源。</div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 03 · 资源视角</div>
+    <div>Resources</div>
+  </div>
+</section>
+
+<!-- ========== P4 · 章节幕封：盘点全局 ========== -->
 <section class="slide hero light">
   <div class="chrome">
-    <div>第一部分 · 如何理解时间管理</div>
-    <div>Part I · 02 / 22</div>
+    <div>第一幕 · 盘点资源</div>
+    <div>Act I · 04 / 23</div>
   </div>
   <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
-    <div class="kicker">Part I</div>
-    <h1 class="h-hero" style="font-size:8vw">如何理解<br>时间管理</h1>
-    <p class="lead" style="max-width:55vw; opacity:.8">
-      先破除误区，再理解本质。
+    <div class="kicker">Act I</div>
+    <h1 class="h-hero" style="font-size:8.5vw">盘点全局地图</h1>
+    <p class="lead" style="max-width:55vw">
+      先画地图，再走路。很多人连自己在哪都不知道，就开始奔跑。
     </p>
   </div>
   <div class="foot">
-    <div>第一部分引子</div>
+    <div>第一幕 · 关系与地图</div>
     <div>— · —</div>
   </div>
 </section>
 
-<!-- ====== 03 · 时间管理的本质（误区） ====== -->
-<section class="slide light">
-  <div class="chrome">
-    <div>本质 · Part I</div>
-    <div>03 / 22</div>
-  </div>
-  <div class="frame" style="padding-top:5vh">
-    <div class="kicker">The Myths · 三个误区</div>
-    <h2 class="h-xl">时间管理的本质</h2>
-    <div style="margin-top:5vh; display:flex; flex-direction:column; gap:3.5vh">
-      <div style="display:flex; gap:1.5vw; align-items:baseline; padding-bottom:2.5vh; border-bottom:1px solid rgba(var(--ink-rgb),.12)">
-        <span style="font-family:var(--serif-en); font-style:italic; font-size:2vw; opacity:.35; flex-shrink:0">01</span>
-        <p class="body-zh" style="margin:0">误区：不是管理时间，不是像甘特图一样把自己的时间看起来仅仅有条的发配出去</p>
-      </div>
-      <div style="display:flex; gap:1.5vw; align-items:baseline; padding-bottom:2.5vh; border-bottom:1px solid rgba(var(--ink-rgb),.12)">
-        <span style="font-family:var(--serif-en); font-style:italic; font-size:2vw; opacity:.35; flex-shrink:0">02</span>
-        <p class="body-zh" style="margin:0">误区：不是学习 GTD 工具本身</p>
-      </div>
-      <div style="display:flex; gap:1.5vw; align-items:baseline">
-        <span style="font-family:var(--serif-en); font-style:italic; font-size:2vw; opacity:.35; flex-shrink:0">03</span>
-        <p class="body-zh" style="margin:0">误区：工作，生活共享了我们作为一个人的时间和体能，因此时间管理一定是覆盖工作生活的一种习惯</p>
-      </div>
-    </div>
-  </div>
-  <div class="foot">
-    <div>Page 03 · 本质与误区</div>
-    <div>Part I</div>
-  </div>
-</section>
-
-<!-- ====== 04 · 管理注意力（金句） ====== -->
+<!-- ========== P5 · 业务与架构 ========== -->
 <section class="slide dark">
   <div class="chrome">
-    <div>核心 · Part I</div>
-    <div>04 / 22</div>
+    <div>关系地图 · Map</div>
+    <div>Act I · 05 / 23</div>
   </div>
-  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
-    <div class="kicker">The Essence · 核心本质</div>
-    <blockquote style="font-family:var(--serif-zh); font-weight:700; font-size:5.8vw; line-height:1.2; letter-spacing:-.01em; max-width:76vw">
-      注意力是<br>最稀缺的资源
-    </blockquote>
-    <div class="callout" style="max-width:64vw; border-left-width:2px">
-      <div class="q-big">时间管理的目的，是可以真的完成很多事情的同时，不附带焦虑；是在需要休息的时候，有自信去休息。</div>
-    </div>
-  </div>
-  <div class="foot">
-    <div>Page 04 · 管理注意力</div>
-    <div>Part I</div>
-  </div>
-</section>
-
-<!-- ====== 05 · 大脑是如何工作的 ====== -->
-<section class="slide light">
-  <div class="chrome">
-    <div>大脑机制 · Part I</div>
-    <div>05 / 22</div>
-  </div>
-  <div class="frame grid-2-6-6" style="padding-top:6vh; gap:5vw">
-    <div style="display:flex; flex-direction:column; gap:3vh">
-      <div class="kicker">Dual Process · 双流理论</div>
-      <h3 class="h-md">创作和执行是两种"心境"</h3>
-      <p class="body-zh">频繁切换导致效率损失。创作需要发散、联想、灵感；执行需要专注、重复、完成。两者混为一谈，是痛苦的根源。</p>
-    </div>
-    <div style="display:flex; flex-direction:column; gap:3vh">
-      <div class="kicker">Peak Theory · 峰值理论</div>
-      <h3 class="h-md">情绪过高和过低都会导致注意力下降</h3>
-      <p class="body-zh">要刻意去安排正反馈甚至负反馈控制整体的心境。维持在一个"刚刚好"的情绪水位，才能持续高效。</p>
-    </div>
-  </div>
-  <div class="foot">
-    <div>Page 05 · 大脑工作机制</div>
-    <div>Part I</div>
-  </div>
-</section>
-
-<!-- ====== 06 · 局限 ====== -->
-<section class="slide dark">
-  <div class="chrome">
-    <div>边界 · Part I</div>
-    <div>06 / 22</div>
-  </div>
-  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
-    <div class="kicker">Boundary · 一个前提</div>
-    <h2 class="h-xl">局限</h2>
-    <p class="lead" style="max-width:58vw; opacity:.85">
-      我们这里假设的是人们体能精力恒定来讨论，健身和更好的休息节奏管理可以提高精力的上限。
+  <div class="frame" style="padding-top:6vh">
+    <div class="kicker">你的全局坐标</div>
+    <h2 class="h-xl" style="margin-bottom:3vh">看清五层关系</h2>
+    <p class="lead" style="margin-bottom:5vh; max-width:70vw">
+      在动手之前，先画出你和组织的全局地图。不知道地图的人，永远在迷路。
     </p>
-    <div class="meta-row" style="margin-top:2vh">
-      <span>体能是注意力系统的硬件</span><span>·</span><span>再好的软件也需要硬件支撑</span>
+    <div class="rowline">
+      <div class="k">公司</div>
+      <div class="v">业务方向、组织架构、预算周期</div>
+      <div class="m">L1</div>
+    </div>
+    <div class="rowline">
+      <div class="k">老板</div>
+      <div class="v">他的目标、压力、信息缺口</div>
+      <div class="m">L2</div>
+    </div>
+    <div class="rowline">
+      <div class="k">你 & 老板</div>
+      <div class="v">信任度、信息差、目标对齐度</div>
+      <div class="m">L3</div>
+    </div>
+    <div class="rowline">
+      <div class="k">Peer</div>
+      <div class="v">协作边界、利益交集、外部背书</div>
+      <div class="m">L4</div>
+    </div>
+    <div class="rowline">
+      <div class="k">团队</div>
+      <div class="v">能力分布、交付节奏、培养潜力</div>
+      <div class="m">L5</div>
+    </div>
+    <div class="callout" style="margin-top:4vh; max-width:70vw">
+      <div class="q-big">画完地图之后，真正的能力在于敢于承认自己不知道的部分。</div>
     </div>
   </div>
   <div class="foot">
-    <div>Page 06 · 局限与边界</div>
-    <div>Part I</div>
+    <div>Page 05 · 关系地图</div>
+    <div>Act I</div>
   </div>
 </section>
 
-<!-- ====== 07 · 第二部分幕封 ====== -->
+<!-- ========== P6 · 五种关系盘点 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>关系盘点 · Relations</div>
+    <div>Act I · 06 / 23</div>
+  </div>
+  <div class="frame">
+    <div class="kicker">Pipeline · 五层关系</div>
+    <h2 class="h-xl">盘点你的资源网络</h2>
+    <div class="pipeline-section">
+      <div class="pipeline-label">从内到外 · 逐层扫描</div>
+      <div class="pipeline" data-cols="5">
+        <div class="step">
+          <div class="step-nb">01</div>
+          <div class="step-title">公司业务</div>
+          <div class="step-desc">战略方向、核心指标、组织变动</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">02</div>
+          <div class="step-title">你的老板</div>
+          <div class="step-desc">他的 KPI、他老板对他的期望</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">03</div>
+          <div class="step-title">你 & 老板</div>
+          <div class="step-desc">目标是否一致、信息差有多大、信任地基是否稳固</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">04</div>
+          <div class="step-title">Peer 关系</div>
+          <div class="step-desc">协作网络、互相背书的可能</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">05</div>
+          <div class="step-title">你的团队</div>
+          <div class="step-desc">承上启下、放大你的影响力</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:5vh">
+      <div class="q-big">地图画完了，下一步不是赶路，是确认方向。</div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 06 · 关系盘点</div>
+    <div>Act I</div>
+  </div>
+</section>
+
+<!-- ========== P7 · 升职加薪是假象 ========== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>真相 · Truth</div>
+    <div>Act I · 07 / 23</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker">一个反直觉的事实</div>
+    <blockquote style="font-family:var(--serif-zh); font-weight:700; font-size:5.2vw; line-height:1.2; letter-spacing:-.01em; max-width:72vw">
+      "升职加薪是假象，<br>是结果，不应该是原因。"
+    </blockquote>
+    <p class="lead" style="max-width:55vw; opacity:.72">
+      不要以「我要升职加薪」作为做事的出发点。积累技能、积累人脉、保持现金流，才是底层逻辑。问题是：尽量少干活，还是尽量多产出？
+    </p>
+    <div class="meta-row">
+      <span>结果导向</span><span>·</span><span>不是目标导向</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 07 · 真相</div>
+    <div>Truth</div>
+  </div>
+</section>
+
+<!-- ========== P8 · 章节幕封：利用好老板 ========== -->
 <section class="slide hero dark">
   <div class="chrome">
-    <div>第二部分 · 我的时间管理 1.0 时代</div>
-    <div>Part II · 07 / 22</div>
+    <div>第二幕 · 老板是资源</div>
+    <div>Act II · 08 / 23</div>
   </div>
   <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
-    <div class="kicker">Part II</div>
-    <h1 class="h-hero" style="font-size:7.5vw">我的时间管理<br>1.0 时代</h1>
-    <p class="lead" style="max-width:55vw; opacity:.8">
-      工具、习惯、任务拆解，以及一套可执行的方法论。
+    <div class="kicker">Act II</div>
+    <h1 class="h-hero" style="font-size:8.5vw">利用好老板</h1>
+    <p class="lead" style="max-width:55vw">
+      老板不是你的上级，是你最重要的资源接口。
     </p>
   </div>
   <div class="foot">
-    <div>第二部分开场</div>
+    <div>第二幕 · 向上管理的核心</div>
     <div>— · —</div>
   </div>
 </section>
 
-<!-- ====== 08 · 需要一个工具 ====== -->
+<!-- ========== P9 · 老板注意力 ========== -->
 <section class="slide light">
   <div class="chrome">
-    <div>工具 · Part II</div>
-    <div>08 / 22</div>
-  </div>
-  <div class="frame" style="padding-top:5vh">
-    <div class="kicker">Toolkit · 首先，终究还是需要一个工具</div>
-    <h2 class="h-xl">Get Things Done</h2>
-    <p class="lead" style="margin-top:2vh; margin-bottom:4vh">忘掉理论，选一个 Todo List 工具。嘀嗒清单，Todoist 皆可。</p>
-
-    <div style="display:flex; flex-direction:column; gap:2.5vh; max-width:70vw">
-      <div style="display:flex; align-items:baseline; gap:1.2vw">
-        <i data-lucide="check-circle" class="ico-sm"></i>
-        <span class="body-zh">在你方便的介质上可以访问（Web，手机，跨平台同步）</span>
-      </div>
-      <div style="display:flex; align-items:baseline; gap:1.2vw">
-        <i data-lucide="check-circle" class="ico-sm"></i>
-        <span class="body-zh">方便的往里扔东西：邮箱，微信，Cli - Agent</span>
-      </div>
-      <div style="display:flex; align-items:baseline; gap:1.2vw">
-        <i data-lucide="check-circle" class="ico-sm"></i>
-        <span class="body-zh">可选：我个人喜欢的自然语言识别功能</span>
-      </div>
-    </div>
-  </div>
-  <div class="foot">
-    <div>Page 08 · GTD 工具选择</div>
-    <div>Part II</div>
-  </div>
-</section>
-
-<!-- ====== 09 · 养成习惯放进去 ====== -->
-<section class="slide dark">
-  <div class="chrome">
-    <div>习惯 · Part II</div>
-    <div>09 / 22</div>
+    <div>金句 · Quote</div>
+    <div>Act II · 09 / 23</div>
   </div>
   <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
-    <div class="kicker">Habit · 然后，如何让工作和生活进入你的注意力管理工具</div>
-    <h2 class="h-xl">养成习惯，<br>用起来</h2>
-    <div style="display:flex; flex-direction:column; gap:3vh; max-width:60vw">
-      <p class="lead">让生活和工作，都放进去，不要侥幸。</p>
-      <p class="lead">养成习惯，用起来。</p>
-    </div>
-  </div>
-  <div class="foot">
-    <div>Page 09 · 养成习惯</div>
-    <div>Part II</div>
-  </div>
-</section>
-
-<!-- ====== 10 · 解构任务 ====== -->
-<section class="slide light">
-  <div class="chrome">
-    <div>拆解 · Part II</div>
-    <div>10 / 22</div>
-  </div>
-  <div class="frame" style="padding-top:5vh">
-    <div class="kicker">Deconstruct · 然后，解构你每一项任务</div>
-    <h2 class="h-xl">解构与降级</h2>
-    <p class="lead" style="margin-top:2vh; margin-bottom:4vh">
-      再复杂抽象的目标，都应该逐渐被解构，降级，最终变成可执行的「创造」或「执行」类 Task，然后按照自己的节奏放到日程里，留点余量。
-    </p>
-    <div class="callout" style="max-width:72vw">
-      <div class="q-big">MECE 原则，尽可能具体，是否完成是明确可衡量的，Size 尽可能小，维持能够持续关闭任务的正反馈。</div>
-    </div>
-  </div>
-  <div class="foot">
-    <div>Page 10 · 任务拆解</div>
-    <div>Part II</div>
-  </div>
-</section>
-
-<!-- ====== 11 · 坏例子 ====== -->
-<section class="slide dark">
-  <div class="chrome">
-    <div>反例 · Part II</div>
-    <div>11 / 22</div>
-  </div>
-  <div class="frame" style="padding-top:5vh">
-    <div class="kicker">Bad Examples · 具体，举点显而易见的坏例子</div>
-    <h2 class="h-xl">坏任务的模样</h2>
-    <div style="margin-top:5vh; display:grid; grid-template-columns:1fr 1fr; gap:3vw 4vh">
-      <div style="padding:3vh 2vw; border:1px solid rgba(var(--paper-rgb),.15)">
-        <span style="font-family:var(--serif-en); font-style:italic; font-size:1.8vw; opacity:.35">01</span>
-        <p class="body-zh" style="margin-top:1.5vh">为考试而学习。</p>
-      </div>
-      <div style="padding:3vh 2vw; border:1px solid rgba(var(--paper-rgb),.15)">
-        <span style="font-family:var(--serif-en); font-style:italic; font-size:1.8vw; opacity:.35">02</span>
-        <p class="body-zh" style="margin-top:1.5vh">为项目做研究。</p>
-      </div>
-      <div style="padding:3vh 2vw; border:1px solid rgba(var(--paper-rgb),.15)">
-        <span style="font-family:var(--serif-en); font-style:italic; font-size:1.8vw; opacity:.35">03</span>
-        <p class="body-zh" style="margin-top:1.5vh">修改粗糙的草图。</p>
-      </div>
-      <div style="padding:3vh 2vw; border:1px solid rgba(var(--paper-rgb),.15)">
-        <span style="font-family:var(--serif-en); font-style:italic; font-size:1.8vw; opacity:.35">04</span>
-        <p class="body-zh" style="margin-top:1.5vh">开一个组团会议。</p>
-      </div>
-    </div>
-  </div>
-  <div class="foot">
-    <div>Page 11 · 坏例子</div>
-    <div>Part II</div>
-  </div>
-</section>
-
-<!-- ====== 12 · 例子 1：减肥 10 斤 ====== -->
-<section class="slide light">
-  <div class="chrome">
-    <div>案例 · Part II</div>
-    <div>12 / 22</div>
-  </div>
-  <div class="frame" style="padding-top:4vh">
-    <div class="kicker">Example 01 · 减肥 10 斤</div>
-    <h2 class="h-xl">好拆分 vs 坏拆分</h2>
-    <div class="grid-2-6-6" style="gap:4vw 3vh; margin-top:4vh">
-      <!-- 左：坏 -->
-      <div style="padding:3vh 2vw; border-left:3px solid rgba(var(--ink-rgb),.2); opacity:.6">
-        <div class="kicker" style="opacity:.9">Bad · 坏的拆分</div>
-        <h3 class="h-md" style="margin-top:2vh">设置一个定时任务：每天跑 5 KM</h3>
-        <div style="margin-top:3vh; display:flex; flex-direction:column; gap:1.6vh">
-          <p class="body-zh">「每天跑 5 公里」和「减肥」这两件事之间，是否一定存在必然的逻辑关系？</p>
-          <p class="body-zh">「每天跑 5 公里」本身并不是一件简单的任务，<span class="hi">甜度</span>不足会非常难以保证持续执行下去。</p>
-        </div>
-      </div>
-      <!-- 右：好 -->
-      <div style="padding:3vh 2vw; border-left:3px solid currentColor">
-        <div class="kicker" style="opacity:.9">Good · 好的任务管理</div>
-        <h3 class="h-md" style="margin-top:2vh">减肥 = 降低摄入 + 增加消耗 + 定期测量</h3>
-        <div style="margin-top:3vh; display:flex; flex-direction:column; gap:1.6vh">
-          <p class="body-zh">降低摄入：每日控制摄入在 XXX 以下</p>
-          <p class="body-zh">增加消耗：每日做 10 分钟 HIIT 或者 30 分钟长跑 + 每周做一次 1 小时的高强度锻炼</p>
-          <p class="body-zh">定期测量：每月测量体重和体脂，修正日常的规划</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="foot">
-    <div>Page 12 · 案例：减肥</div>
-    <div>Part II</div>
-  </div>
-</section>
-
-<!-- ====== 13 · 例子 2：写 PPT ====== -->
-<section class="slide dark">
-  <div class="chrome">
-    <div>案例 · Part II</div>
-    <div>13 / 22</div>
-  </div>
-  <div class="frame" style="padding-top:5vh">
-    <div class="kicker">Example 02 · 写 PPT 材料</div>
-    <h2 class="h-xl">创意先行，执行跟上</h2>
-    <p class="lead" style="margin-top:2vh; margin-bottom:4vh">实际上写 PPT 的工作包含两部分：</p>
-    <div style="display:flex; flex-direction:column; gap:3vh; max-width:72vw">
-      <div class="callout">
-        <div class="q-big">「创意」部分</div>
-        <p class="body-zh" style="margin-top:1.2vh">理清楚脉络，故事线，关键信息，形成「成片感」（这部分纯费脑，耗时极不确定）</p>
-      </div>
-      <div class="callout">
-        <div class="q-big">「执行」部分</div>
-        <p class="body-zh" style="margin-top:1.2vh">有了「创意」骨架后，把内容展开，组织成 PPT 格式的材料（这部分费手，依靠熟练度，但总体耗时可控）</p>
-      </div>
-    </div>
-    <p class="body-zh" style="margin-top:4vh; opacity:.9">不要混在一起安排自己的时间：创意先行，甚至可以用跑步、游泳、睡觉前、带娃的时间思考；有了创意以后，再安排时间窗口去做具体的 PPT 创建。</p>
-  </div>
-  <div class="foot">
-    <div>Page 13 · 案例：写 PPT</div>
-    <div>Part II</div>
-  </div>
-</section>
-
-<!-- ====== 14 · Plan 和 Review ====== -->
-<section class="slide light">
-  <div class="chrome">
-    <div>节奏 · Part II</div>
-    <div>14 / 22</div>
-  </div>
-  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
-    <div class="kicker">Rhythm · 事前想得越清楚，事情越可控</div>
-    <h2 class="h-xl">Plan & Review</h2>
-    <div style="display:flex; flex-direction:column; gap:4vh; max-width:64vw">
-      <div style="display:flex; align-items:baseline; gap:1.5vw">
-        <span style="font-family:var(--serif-en); font-style:italic; font-size:2.2vw; opacity:.35">Plan</span>
-        <p class="lead" style="margin:0">给自己留出 Plan 的时间，很重要，先想明白。</p>
-      </div>
-      <div style="display:flex; align-items:baseline; gap:1.5vw">
-        <span style="font-family:var(--serif-en); font-style:italic; font-size:2.2vw; opacity:.35">Review</span>
-        <p class="lead" style="margin:0">给自己留出 Review 的时间，很重要，不漏事儿。</p>
-      </div>
-    </div>
-  </div>
-  <div class="foot">
-    <div>Page 14 · Plan & Review</div>
-    <div>Part II</div>
-  </div>
-</section>
-
-<!-- ====== 15 · 其他需求 ====== -->
-<section class="slide dark">
-  <div class="chrome">
-    <div>补充 · Part II</div>
-    <div>15 / 22</div>
-  </div>
-  <div class="frame" style="padding-top:5vh">
-    <div class="kicker">Extras · 还有一些其他类型的需求</div>
-    <h2 class="h-xl">提醒与跟踪</h2>
-    <div class="grid-2-6-6" style="gap:5vw 4vh; margin-top:5vh">
-      <div style="display:flex; flex-direction:column; gap:2.5vh">
-        <div style="display:flex; align-items:center; gap:1vw">
-          <i data-lucide="bell" class="ico-md"></i>
-          <h3 class="h-md">提醒</h3>
-        </div>
-        <p class="body-zh">重要日子（结婚纪念，生日），生活习惯（喝水），不可忘记的周期性任务（信用卡还款，贷款还款，保险续费等等）</p>
-      </div>
-      <div style="display:flex; flex-direction:column; gap:2.5vh">
-        <div style="display:flex; align-items:center; gap:1vw">
-          <i data-lucide="eye" class="ico-md"></i>
-          <h3 class="h-md">跟踪</h3>
-        </div>
-        <p class="body-zh">有一些事情你希望持续追踪，但不是自己去完成的：有趣的新闻追后续，下属的一些关键工作内容，外部依赖的定期追踪。</p>
-      </div>
-    </div>
-  </div>
-  <div class="foot">
-    <div>Page 15 · 提醒与跟踪</div>
-    <div>Part II</div>
-  </div>
-</section>
-
-<!-- ====== 16 · 成就 ====== -->
-<section class="slide light">
-  <div class="chrome">
-    <div>收获 · Part II</div>
-    <div>16 / 22</div>
-  </div>
-  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
-    <div class="kicker">Reward · 最最最后的成就</div>
-    <blockquote style="font-family:var(--serif-zh); font-weight:700; font-size:5vw; line-height:1.22; letter-spacing:-.01em; max-width:76vw">
-      每关闭一个任务，<br>都有正反馈的快感
+    <div class="kicker">企业里最重要的资源</div>
+    <blockquote style="font-family:var(--serif-zh); font-weight:700; font-size:6vw; line-height:1.18; letter-spacing:-.01em; max-width:70vw">
+      "企业里最重要的资源，<br>是老板的注意力。"
     </blockquote>
-    <p class="lead" style="max-width:58vw; opacity:.75">
-      每天清空清单后，能自信今天没有漏掉别的，可以放心休息了。
+    <p class="lead" style="max-width:55vw; opacity:.7">
+      注意力稀缺意味着：谁能有效占据老板的信息带宽，谁就能影响决策。这不是操纵，是专业协作。
     </p>
+    <div class="meta-row">
+      <span>资源稀缺性</span><span>·</span><span>Attention Economy</span>
+    </div>
   </div>
   <div class="foot">
-    <div>Page 16 · 最终成就</div>
-    <div>Part II</div>
+    <div>Page 09 · 金句</div>
+    <div>Act II</div>
   </div>
 </section>
 
-<!-- ====== 17 · 第三部分幕封 ====== -->
+<!-- ========== P10 · 利用老板三个维度 ========== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>策略 · Strategy</div>
+    <div>Act II · 10 / 23</div>
+  </div>
+  <div class="frame">
+    <div class="kicker">三个认知维度</div>
+    <h2 class="h-xl">管理老板的决策</h2>
+    <div class="pipeline-section">
+      <div class="pipeline-label">认知 → 信息 → 决策</div>
+      <div class="pipeline" data-cols="3">
+        <div class="step">
+          <div class="step-nb">01</div>
+          <div class="step-title">知道什么</div>
+          <div class="step-desc">知道老板知道什么，不知道什么。填补信息差。</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">02</div>
+          <div class="step-title">需要什么</div>
+          <div class="step-desc">知道老板需要知道什么，不需要知道什么。大忌：信息过载。</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">03</div>
+          <div class="step-title">管理决策</div>
+          <div class="step-desc">决策由信息和注意力共同塑造，控制输入就能影响输出。</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:5vh">
+      <div class="q-big">信息差就是权力差。谁能决定老板知道什么，谁就能影响他做出什么决定。</div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 10 · 三个维度</div>
+    <div>Act II</div>
+  </div>
+</section>
+
+<!-- ========== P11 · 目标一致 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>路径设计 · Alignment</div>
+    <div>Act II · 11 / 23</div>
+  </div>
+  <div class="frame grid-2-6-6" style="padding-top:6vh">
+    <div style="padding:3vh 2vw; border-left:3px solid currentColor">
+      <div class="kicker" style="opacity:.9">你的目的</div>
+      <h3 class="h-md" style="margin-top:2vh">技能、人脉、现金流</h3>
+      <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55; opacity:.82">
+        <li>积累可迁移的专业技能</li>
+        <li>建立跨部门信任网络</li>
+        <li>保持健康的现金流</li>
+      </ul>
+    </div>
+    <div style="padding:3vh 2vw; border-left:3px solid currentColor">
+      <div class="kicker" style="opacity:.9">老板的目的</div>
+      <h3 class="h-md" style="margin-top:2vh">团队产出、KPI、晋升</h3>
+      <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55; opacity:.82">
+        <li>团队目标达成</li>
+        <li>向上交付可量化的结果</li>
+        <li>减少管理成本</li>
+      </ul>
+    </div>
+    <div style="grid-column:1 / -1; margin-top:3vh">
+      <div class="callout">
+        <div class="q-big">最高效的向上管理，是让你的 KPI 和老板的 OKR 天然重叠。</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 11 · 路径设计</div>
+    <div>Alignment</div>
+  </div>
+</section>
+
+<!-- ========== P12 · 章节幕封：沟通基本功 ========== -->
 <section class="slide hero light">
   <div class="chrome">
-    <div>第三部分 · 时间管理 2.0 时代</div>
-    <div>Part III · 17 / 22</div>
+    <div>第三幕 · 沟通基本功</div>
+    <div>Act III · 12 / 23</div>
   </div>
   <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
-    <div class="kicker">Part III</div>
-    <h1 class="h-hero" style="font-size:7vw">时间管理 2.0<br>有 AI 了</h1>
-    <p class="lead" style="max-width:55vw; opacity:.8">
-      当创作与执行可以被 AI 分别赋能，时间管理的边界在哪里？
+    <div class="kicker">Act III</div>
+    <h1 class="h-hero" style="font-size:8.5vw">沟通基本功</h1>
+    <p class="lead" style="max-width:55vw">
+      沟通不是天赋，是可以训练的系统能力。
     </p>
   </div>
   <div class="foot">
-    <div>第三部分开场</div>
+    <div>第三幕 · 底层沟通能力</div>
     <div>— · —</div>
   </div>
 </section>
 
-<!-- ====== 18 · 双流理论返场 ====== -->
+<!-- ========== P13 · 沟通六原则 ========== -->
 <section class="slide dark">
   <div class="chrome">
-    <div>返场 · Part III</div>
-    <div>18 / 22</div>
+    <div>基本功 · Fundamentals</div>
+    <div>Act III · 13 / 23</div>
   </div>
-  <div class="frame" style="padding-top:5vh">
-    <div class="kicker">Dual Process Returns · 双流理论返场</div>
-    <h2 class="h-xl">创作与执行，<br>AI 分别赋能</h2>
-    <div style="margin-top:4vh; display:flex; flex-direction:column; gap:3vh; max-width:70vw">
-      <p class="lead">大部分的工作如果拆成依赖创造性思维的「创作」和依赖行动力专注力的「执行」两类任务的组合，我们需要分别思考，AI 如何分别赋能他们。</p>
-      <p class="lead">就像「创作」和「执行」分不清楚，那么一个工作就很难推进，心境往往痛苦一样，一个「复合型」任务给 AI，AI 大概率做不好，人就会更痛苦，并浪费最稀缺的「注意力」。</p>
+  <div class="frame">
+    <div class="kicker">六条铁律</div>
+    <h2 class="h-xl">沟通六原则</h2>
+    <div class="pipeline-section">
+      <div class="pipeline-label">原则 01–03</div>
+      <div class="pipeline" data-cols="3">
+        <div class="step">
+          <div class="step-nb">01</div>
+          <div class="step-title">笃定 · 节奏 · 不啰嗦</div>
+          <div class="step-desc">语气要有说服力，控制信息密度</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">02</div>
+          <div class="step-title">明确 · 闭环 · 有回响</div>
+          <div class="step-desc">给领导的、给同事的，都要闭环</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">03</div>
+          <div class="step-title">不拒绝，问，给出路</div>
+          <div class="step-desc">即使无法解决，也要给出替代方案</div>
+        </div>
+      </div>
+    </div>
+    <div class="pipeline-section">
+      <div class="pipeline-label">原则 04–06</div>
+      <div class="pipeline" data-cols="3">
+        <div class="step">
+          <div class="step-nb">04</div>
+          <div class="step-title">不确定，就明确问</div>
+          <div class="step-desc">要有问的勇气，要有自己不知道的勇气</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">05</div>
+          <div class="step-title">给方案，不给开放问题</div>
+          <div class="step-desc">带着选项去沟通，而不是带着问题去求助</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">06</div>
+          <div class="step-title">定期 1v1</div>
+          <div class="step-desc">建立固定沟通节奏，不要等出事才沟通</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:4vh">
+      <div class="q-big">同事关系是非常重要的资源。因为往上走，一定会需要外部背书和评价。</div>
     </div>
   </div>
   <div class="foot">
-    <div>Page 18 · 双流返场</div>
-    <div>Part III</div>
+    <div>Page 13 · 六原则</div>
+    <div>Act III</div>
   </div>
 </section>
 
-<!-- ====== 19 · AI 赋能切入点 ====== -->
+<!-- ========== P14 · 降低沟通成本 ========== -->
 <section class="slide light">
   <div class="chrome">
-    <div>切入点 · Part III</div>
-    <div>19 / 22</div>
+    <div>成本 · Cost</div>
+    <div>Act III · 14 / 23</div>
   </div>
-  <div class="frame" style="padding-top:5vh">
-    <div class="kicker">AI Empowerment · AI 赋能的切入点</div>
-    <h2 class="h-xl">创作 + AI · 执行 + AI</h2>
-    <div class="grid-2-6-6" style="gap:5vw 4vh; margin-top:5vh">
-      <div style="display:flex; flex-direction:column; gap:2.5vh; padding:3vh 2vw; border-left:3px solid currentColor">
-        <div style="display:flex; align-items:center; gap:1vw">
-          <i data-lucide="sparkles" class="ico-md"></i>
-          <h3 class="h-md">「创作」+ AI</h3>
-        </div>
-        <p class="body-zh">提供标准思考逻辑，模板提示词，应该是以提供灵感，选项，或者大纲类的线索信息为目标的。因此不需要依赖复杂的 Agent + Skill 的 AI 工程环境，任何 ChatBot 其实都是好选择。</p>
+  <div class="frame grid-2-7-5" style="padding-top:6vh">
+    <div style="display:flex; flex-direction:column; justify-content:space-between; gap:3vh">
+      <div>
+        <div class="kicker">降低摩擦</div>
+        <h2 class="h-xl" style="white-space:nowrap">降低沟通成本</h2>
+        <p class="lead" style="margin-top:3vh">
+          沟通的成本不在说话本身，而在反复确认、信息失真和决策延迟。
+        </p>
       </div>
-      <div style="display:flex; flex-direction:column; gap:2.5vh; padding:3vh 2vw; border-left:3px solid currentColor">
-        <div style="display:flex; align-items:center; gap:1vw">
-          <i data-lucide="zap" class="ico-md"></i>
-          <h3 class="h-md">「执行」+ AI</h3>
-        </div>
-        <p class="body-zh">追求全自动化，越少人工干预越好，理论上这部分不需要 AI 的通识智力，需要的是 AI 核心模型 + Tools 的输入产出能力。工具大概率需要：Coze，Qwen Studio，Agent（Claude Code 等）+ Skills，甚至龙虾。</p>
+      <div class="callout">
+        <div class="q-big">"老板不给反馈，就往前推一步再问。不要在同样的状态下，过一阵再追问。"</div>
+      </div>
+    </div>
+    <div>
+      <div class="rowline">
+        <div class="k">给方案</div>
+        <div class="v">用选项代替疑问，降低对方的认知负担</div>
+        <div class="m">01</div>
+      </div>
+      <div class="rowline">
+        <div class="k">往前推</div>
+        <div class="v">老板不回复，推一步再问，不要空等</div>
+        <div class="m">02</div>
+      </div>
+      <div class="rowline">
+        <div class="k">定期 1v1</div>
+        <div class="v">建立固定节奏，预防问题而非救火</div>
+        <div class="m">03</div>
+      </div>
+      <div class="rowline">
+        <div class="k">有回响</div>
+        <div class="v">即使无法解决，也要给出替代出路</div>
+        <div class="m">04</div>
       </div>
     </div>
   </div>
   <div class="foot">
-    <div>Page 19 · AI 赋能</div>
-    <div>Part III</div>
+    <div>Page 14 · 降低沟通成本</div>
+    <div>Act III</div>
   </div>
 </section>
 
-<!-- ====== 20 · 金句 ====== -->
+<!-- ========== P15 · 超出预期 ========== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>预期 · Expectation</div>
+    <div>Act III · 15 / 23</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker">两个办法</div>
+    <blockquote style="font-family:var(--serif-zh); font-weight:700; font-size:5vw; line-height:1.2; letter-spacing:-.01em; max-width:74vw">
+      "好好干的同时，<br>降低预期。"
+    </blockquote>
+    <div style="display:flex; flex-direction:column; gap:2.4vh; max-width:60vw">
+      <p class="lead" style="opacity:.75">
+        <span class="hi">不重要的事</span>，不要低于预期。维持基本交付即可。
+      </p>
+      <p class="lead" style="opacity:.75">
+        <span class="hi">重要的事、关键节点、最开始的印象</span>，一定要超出预期很多。
+      </p>
+    </div>
+    <div class="meta-row">
+      <span>管理预期</span><span>·</span><span>超预期交付</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 15 · 预期管理</div>
+    <div>Expectation</div>
+  </div>
+</section>
+
+<!-- ========== P16 · 章节幕封：信息密度 ========== -->
 <section class="slide hero dark">
   <div class="chrome">
-    <div>金句 · Part III</div>
-    <div>20 / 22</div>
+    <div>第四幕 · 信息密度</div>
+    <div>Act IV · 16 / 23</div>
   </div>
   <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
-    <div class="kicker">The Quote · 金句</div>
-    <h1 class="h-hero" style="font-size:6.5vw; line-height:1.15">
-      AI 的时代，<br>是时间碎片化的忙人，<br>最好的时代
+    <div class="kicker">Act IV</div>
+    <h1 class="h-hero" style="font-size:8vw">信息密度<br>与偏好管理</h1>
+    <p class="lead" style="max-width:55vw">
+      大多数人汇报失败，不是因为内容差，是因为密度太低。
+    </p>
+  </div>
+  <div class="foot">
+    <div>第四幕 · 进阶沟通</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- ========== P17 · 信息密度原则 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>密度 · Density</div>
+    <div>Act IV · 17 / 23</div>
+  </div>
+  <div class="frame grid-2-6-6" style="padding-top:5vh">
+    <div style="padding:3vh 2vw; border-left:3px solid currentColor; opacity:.55">
+      <div class="kicker" style="opacity:.9">错误示范</div>
+      <h3 class="h-md" style="margin-top:2vh">三种常见错误</h3>
+      <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55">
+        <li>堆叠工作，不做提炼</li>
+        <li>先铺垫，再结论</li>
+        <li>甩锅，不给方案</li>
+      </ul>
+    </div>
+    <div style="padding:3vh 2vw; border-left:3px solid currentColor">
+      <div class="kicker" style="opacity:.9">正确示范</div>
+      <h3 class="h-md" style="margin-top:2vh">结论先行，信息致密</h3>
+      <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55">
+        <li>有结论，先说结论</li>
+        <li>信息密度要大，不要稀释</li>
+        <li>过滤噪音，只传递决策必需的信息</li>
+      </ul>
+    </div>
+    <div style="grid-column:1 / -1; margin-top:3vh">
+      <div class="callout">
+        <div class="q-big">汇报的价值不在于你说了多少，而在于对方需要听多少。</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 17 · 信息密度</div>
+    <div>Act IV</div>
+  </div>
+</section>
+
+<!-- ========== P18 · 报问题 vs 要决策 ========== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>框架 · Framework</div>
+    <div>Act IV · 18 / 23</div>
+  </div>
+  <div class="frame">
+    <div class="kicker">两个沟通模板</div>
+    <h2 class="h-xl">报问题 vs 要决策</h2>
+    <div class="pipeline-section">
+      <div class="pipeline-label">报问题时的顺序</div>
+      <div class="pipeline" data-cols="4">
+        <div class="step">
+          <div class="step-nb">01</div>
+          <div class="step-title">问题</div>
+          <div class="step-desc">快速说问题</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">02</div>
+          <div class="step-title">影响</div>
+          <div class="step-desc">说问题的影响</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">03</div>
+          <div class="step-title">办法</div>
+          <div class="step-desc">说你的解决办法</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">04</div>
+          <div class="step-title">原因（可选）</div>
+          <div class="step-desc">最后说问题的原因</div>
+        </div>
+      </div>
+    </div>
+    <div class="pipeline-section">
+      <div class="pipeline-label">要决策时的顺序</div>
+      <div class="pipeline" data-cols="4">
+        <div class="step">
+          <div class="step-nb">01</div>
+          <div class="step-title">内容</div>
+          <div class="step-desc">需要决策的内容</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">02</div>
+          <div class="step-title">选择</div>
+          <div class="step-desc">给出明确选项</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">03</div>
+          <div class="step-title">利弊</div>
+          <div class="step-desc">分析各选项利弊</div>
+        </div>
+        <div class="step">
+          <div class="step-nb">04</div>
+          <div class="step-title">偏好</div>
+          <div class="step-desc">给出你的偏好</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:4vh">
+      <div class="q-big">要决策的本质：需要老板背锅，或需要老板有你无法决策的资源、知识、信息。否则不需要老板决策。</div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 18 · 沟通框架</div>
+    <div>Act IV</div>
+  </div>
+</section>
+
+<!-- ========== P19 · 章节幕封：邪修 ========== -->
+<section class="slide hero light">
+  <div class="chrome">
+    <div>第五幕 · 邪修</div>
+    <div>Act V · 19 / 23</div>
+  </div>
+  <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
+    <div class="kicker">Act V</div>
+    <h1 class="h-hero" style="font-size:10vw">邪修</h1>
+    <p class="lead" style="max-width:55vw">
+      光明正大之外，还有另一条路。
+    </p>
+  </div>
+  <div class="foot">
+    <div>第五幕 · 高阶策略</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- ========== P20 · 邪修三招 ========== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>高阶 · Advanced</div>
+    <div>Act V · 20 / 23</div>
+  </div>
+  <div class="frame grid-2-6-6" style="padding-top:5vh">
+    <div>
+      <div class="kicker">植入观点</div>
+      <h2 class="h-xl" style="font-size:5.2vw; margin-bottom:3vh">老板不可被说服</h2>
+      <p class="lead" style="margin-bottom:3vh">
+        老板注意力稀缺，有固有思维方式和观点，很难改变。直接说服往往适得其反。
+      </p>
+      <div class="callout">
+        <div class="q-big">"不要试图改变老板的想法，要把你的想法变成他的。"</div>
+      </div>
+    </div>
+    <div>
+      <div class="kicker">控制对手方</div>
+      <h3 class="h-md" style="margin-bottom:2vh">控制表达方式</h3>
+      <p class="body-zh" style="margin-bottom:3vh">
+        设计例外流程、预埋决策路径，让对手方在有限的选项中做出对你有利的决定。
+      </p>
+      <div class="kicker" style="margin-top:4vh">风险管理</div>
+      <h3 class="h-md" style="margin-bottom:2vh">识别风险，插旗子</h3>
+      <p class="body-zh">
+        提前识别风险并留下书面痕迹（"I told you so"），或及时救火，建立可靠形象。
+      </p>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 20 · 高阶策略</div>
+    <div>Act V</div>
+  </div>
+</section>
+
+<!-- ========== P21 · 汇报时机 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>时机 · Timing</div>
+    <div>Act V · 21 / 23</div>
+  </div>
+  <div class="frame" style="padding-top:6vh">
+    <div class="kicker">节奏感</div>
+    <h2 class="h-xl">汇报的时机</h2>
+    <p class="lead" style="margin-bottom:5vh; max-width:65vw">
+      同样的话，在不同的时间点说，效果完全不同。掌握组织的节奏，比掌握措辞更重要。
+    </p>
+    <div class="grid-3" style="gap:4vw">
+      <div class="pillar" style="padding:3vh 2vw; border:1px solid currentColor; border-color:rgba(127,127,127,.25)">
+        <div class="ic"><i data-lucide="calendar" class="ico-lg"></i></div>
+        <div class="t">预算周期</div>
+        <div class="d">公司做预算的时间点，是争取资源的黄金窗口</div>
+      </div>
+      <div class="pillar" style="padding:3vh 2vw; border:1px solid currentColor; border-color:rgba(127,127,127,.25)">
+        <div class="ic"><i data-lucide="landmark" class="ico-lg"></i></div>
+        <div class="t">董事会</div>
+        <div class="d">董事会前后的信息传递，影响战略优先级</div>
+      </div>
+      <div class="pillar" style="padding:3vh 2vw; border:1px solid currentColor; border-color:rgba(127,127,127,.25)">
+        <div class="ic"><i data-lucide="file-check" class="ico-lg"></i></div>
+        <div class="t">绩效评估</div>
+        <div class="d">绩效定稿前的评估期，是校准印象的关键</div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:5vh">
+      <div class="q-big">如果一件事老板几乎一定会同意，那么就不应该请示。请示 = 消耗注意力 + 暴露不自信。</div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 21 · 汇报时机</div>
+    <div>Act V</div>
+  </div>
+</section>
+
+<!-- ========== P22 · 总结 ========== -->
+<section class="slide hero dark">
+  <div class="chrome">
+    <div>终章 · Close</div>
+    <div>22 / 23</div>
+  </div>
+  <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
+    <div class="kicker">The Close</div>
+    <h1 class="h-hero" style="font-size:7.5vw; line-height:1.12">
+      站在比老板<br>更高的维度
     </h1>
-    <p class="lead" style="max-width:50vw; opacity:.8">
-      「是的，我有个烦死人的儿子」
+    <p class="lead" style="max-width:58vw">
+      理解老板甚至老板的老板的目标、困难，站过去。把自己拔到高纬度去，建立上帝视角。沟通清晰，明确，主动推，不要等。放长线。
     </p>
+    <div class="meta-row">
+      <span>高维视角</span><span>·</span><span>主动推进</span><span>·</span><span>长期主义</span>
+    </div>
   </div>
   <div class="foot">
-    <div>Page 20 · 金句</div>
-    <div>Part III</div>
+    <div>终章 · 总结</div>
+    <div>— · —</div>
   </div>
 </section>
 
-<!-- ====== 21 · 案例 ====== -->
+<!-- ========== P23 · 书籍推荐 ========== -->
 <section class="slide light">
   <div class="chrome">
-    <div>实证 · Part III</div>
-    <div>21 / 22</div>
+    <div>延伸阅读 · Reading</div>
+    <div>23 / 23</div>
   </div>
-  <div class="frame" style="padding-top:5vh">
-    <div class="kicker">Case Study · 本时间管理的 PPT 编写任务</div>
-    <h2 class="h-xl">一个真实的案例</h2>
-    <div style="margin-top:5vh; display:flex; flex-direction:column; gap:3vh">
-      <div style="display:flex; align-items:baseline; gap:2vw; padding:2.5vh 0; border-top:1px solid rgba(var(--ink-rgb),.18)">
-        <span style="font-family:var(--mono); font-size:max(11px,.85vw); letter-spacing:.24em; text-transform:uppercase; opacity:.55; width:18vw">手写大纲</span>
-        <span class="h-md">30 分钟左右</span>
+  <div class="frame" style="padding-top:6vh">
+    <div class="kicker">Further Reading</div>
+    <h2 class="h-xl">三本书</h2>
+    <div class="grid-3" style="gap:4vw; margin-top:5vh">
+      <div class="pillar" style="padding:3vh 2vw; border:1px solid currentColor; border-color:rgba(127,127,127,.25)">
+        <div class="ic">01</div>
+        <div class="t">别让猴子<br>跳回背上</div>
+        <div class="d">管理者如何不替下属背责任，把主动性还给团队</div>
       </div>
-      <div style="display:flex; align-items:baseline; gap:2vw; padding:2.5vh 0; border-top:1px solid rgba(var(--ink-rgb),.18)">
-        <span style="font-family:var(--mono); font-size:max(11px,.85vw); letter-spacing:.24em; text-transform:uppercase; opacity:.55; width:18vw">AI 生成 PPT</span>
-        <span class="h-md">1 分钟</span>
+      <div class="pillar" style="padding:3vh 2vw; border:1px solid currentColor; border-color:rgba(127,127,127,.25)">
+        <div class="ic">02</div>
+        <div class="t">谈判力</div>
+        <div class="d">原则式谈判方法论，在利益冲突中找到共赢路径</div>
       </div>
-      <div style="display:flex; align-items:baseline; gap:2vw; padding:2.5vh 0; border-top:1px solid rgba(var(--ink-rgb),.18); border-bottom:1px solid rgba(var(--ink-rgb),.18)">
-        <span style="font-family:var(--mono); font-size:max(11px,.85vw); letter-spacing:.24em; text-transform:uppercase; opacity:.55; width:18vw">Review，修改</span>
-        <span class="h-md">10 分钟</span>
+      <div class="pillar" style="padding:3vh 2vw; border:1px solid currentColor; border-color:rgba(127,127,127,.25)">
+        <div class="ic">03</div>
+        <div class="t">说服的瞬间</div>
+        <div class="d">理解认知偏差与心理触发器，让观点自然被接受</div>
       </div>
+    </div>
+    <div class="meta-row" style="margin-top:6vh; justify-content:center">
+      <span>感谢聆听</span><span>·</span><span>职场沟通与向上管理</span>
     </div>
   </div>
   <div class="foot">
-    <div>Page 21 · 案例实证</div>
-    <div>Part III</div>
-  </div>
-</section>
-
-<!-- ====== 22 · 参考资料 ====== -->
-<section class="slide dark">
-  <div class="chrome">
-    <div>参考资料</div>
-    <div>22 / 22</div>
-  </div>
-  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
-    <div class="kicker">References · 参考资料</div>
-    <h2 class="h-xl">推荐阅读</h2>
-    <div style="display:flex; flex-direction:column; gap:3vh; max-width:64vw">
-      <div style="display:flex; align-items:baseline; gap:2vw">
-        <span style="font-family:var(--serif-en); font-style:italic; font-size:1.8vw; opacity:.35">01</span>
-        <p class="lead">斯科特·扬（Scott Young）《超效率手册》（<em class="en">The Little Book of Productivity</em>）</p>
-      </div>
-      <div style="display:flex; align-items:baseline; gap:2vw">
-        <span style="font-family:var(--serif-en); font-style:italic; font-size:1.8vw; opacity:.35">02</span>
-        <p class="lead">David Allen《Get Things Done》</p>
-      </div>
-    </div>
-  </div>
-  <div class="foot">
-    <div>Page 22 · 参考资料</div>
-    <div>— · —</div>
+    <div>Page 23 · 书籍推荐</div>
+    <div>The End</div>
   </div>
 </section>
 
@@ -958,7 +1203,11 @@
 <div id="nav"></div>
 
 <script>
-/* =============== WebGL 双背景 =============== */
+/* =============== WebGL 双背景 ===============
+   深色页：Holographic Dispersion（全息色散 · 钛金暗流）—— 彩虹微扰、鼠标径向涟漪
+   浅色页：Spiral Vortex（旋转涡流 · 银色珍珠）—— domain-warp 流动、无中心
+   修改风格请参考 references/webgl-backgrounds.md
+*/
 const VS = `attribute vec2 position;void main(){gl_Position=vec4(position,0.0,1.0);}`;
 
 const FS_DARK = `precision highp float;
@@ -1076,6 +1325,7 @@ const slides=deck.querySelectorAll('.slide');
 const nav=document.getElementById('nav');
 let idx=0,total=slides.length,lock=false;
 
+// 关键：矫正 deck 宽度为 total * 100vw，否则翻页会错位
 deck.style.width=(total*100)+'vw';
 
 slides.forEach((s,i)=>{
@@ -1090,6 +1340,7 @@ function go(n){
   idx=Math.max(0,Math.min(total-1,n));
   deck.style.transform=`translateX(${-idx*100}vw)`;
   nav.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+  /* 主题切换：优先读 data-theme，其次从 class（light/dark）推断 */
   const el=slides[idx];
   const th=el.dataset.theme || (el.classList.contains('light')?'light':(el.classList.contains('dark')?'dark':'dark'));
   document.body.classList.toggle('light-bg',th==='light');

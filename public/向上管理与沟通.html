@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>职场向上管理与沟通</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===========================================
+       CSS CUSTOM PROPERTIES (THEME)
+       温暖纸墨风 · 全部思源宋体
+       =========================================== */
+    :root {
+      --bg-cream: #f5f3ee;
+      --bg-dark: #1a1a1a;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666666;
+      --text-light: #f5f3ee;
+      --accent: #8b3a3a;
+      --accent-light: #c49a8c;
+      --border-light: rgba(26, 26, 26, 0.12);
+      --border-dark: rgba(245, 243, 238, 0.15);
+
+      --font-display: "Noto Serif SC", serif;
+      --font-body: "Noto Serif SC", serif;
+
+      --title-size: clamp(2rem, 5vw, 4rem);
+      --subtitle-size: clamp(1rem, 2.5vw, 1.75rem);
+      --body-size: clamp(0.85rem, 1.5vw, 1.125rem);
+      --small-size: clamp(0.75rem, 1.2vw, 0.95rem);
+
+      --slide-padding: clamp(1.5rem, 5vw, 4rem);
+      --content-gap: clamp(1rem, 2.5vw, 2rem);
+      --element-gap: clamp(0.5rem, 1.2vw, 1rem);
+
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --duration-normal: 0.7s;
+    }
+
+    /* ===========================================
+       BASE STYLES
+       =========================================== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      background: var(--bg-cream);
+    }
+
+    html {
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    /* ===========================================
+       VIEWPORT BASE (MANDATORY)
+       =========================================== */
+    .slide {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .slide-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-height: 100%;
+      overflow: hidden;
+      padding: var(--slide-padding);
+    }
+
+    .card, .container, .content-box {
+      max-width: min(90vw, 1000px);
+      max-height: min(80vh, 700px);
+    }
+
+    .feature-list, .bullet-list {
+      gap: clamp(0.5rem, 1.2vh, 1rem);
+    }
+
+    .feature-list li, .bullet-list li {
+      font-size: var(--body-size);
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+      gap: clamp(0.5rem, 1.5vw, 1rem);
+    }
+
+    img, .image-container {
+      max-width: 100%;
+      max-height: min(50vh, 400px);
+      object-fit: contain;
+    }
+
+    @media (max-height: 700px) {
+      :root {
+        --slide-padding: clamp(1rem, 3vw, 2.5rem);
+        --content-gap: clamp(0.6rem, 1.5vw, 1.2rem);
+        --title-size: clamp(1.5rem, 4.5vw, 3rem);
+        --subtitle-size: clamp(0.9rem, 2vw, 1.4rem);
+      }
+    }
+
+    @media (max-height: 600px) {
+      :root {
+        --slide-padding: clamp(0.75rem, 2.5vw, 1.5rem);
+        --content-gap: clamp(0.4rem, 1vw, 0.8rem);
+        --title-size: clamp(1.3rem, 4vw, 2.2rem);
+        --body-size: clamp(0.75rem, 1.2vw, 0.9rem);
+      }
+      .nav-dots, .keyboard-hint, .decorative {
+        display: none;
+      }
+    }
+
+    @media (max-height: 500px) {
+      :root {
+        --slide-padding: clamp(0.5rem, 2vw, 1rem);
+        --title-size: clamp(1.1rem, 3.5vw, 1.6rem);
+        --subtitle-size: clamp(0.8rem, 2vw, 1.1rem);
+        --body-size: clamp(0.7rem, 1vw, 0.85rem);
+      }
+    }
+
+    @media (max-width: 600px) {
+      :root {
+        --title-size: clamp(1.5rem, 7vw, 2.5rem);
+      }
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+      }
+      html { scroll-behavior: auto; }
+    }
+
+    /* ===========================================
+       ANIMATIONS
+       =========================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity var(--duration-normal) var(--ease-out-expo),
+                  transform var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .slide.visible .reveal {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal:nth-child(1) { transition-delay: 0.1s; }
+    .reveal:nth-child(2) { transition-delay: 0.2s; }
+    .reveal:nth-child(3) { transition-delay: 0.3s; }
+    .reveal:nth-child(4) { transition-delay: 0.4s; }
+    .reveal:nth-child(5) { transition-delay: 0.5s; }
+    .reveal:nth-child(6) { transition-delay: 0.6s; }
+    .reveal:nth-child(7) { transition-delay: 0.7s; }
+
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity var(--duration-normal) var(--ease-out-expo),
+                  transform var(--duration-normal) var(--ease-out-expo);
+    }
+    .slide.visible .reveal-scale {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity var(--duration-normal) var(--ease-out-expo),
+                  transform var(--duration-normal) var(--ease-out-expo);
+    }
+    .slide.visible .reveal-left {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ===========================================
+       PROGRESS BAR
+       =========================================== */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: var(--accent);
+      width: 0%;
+      z-index: 1000;
+      transition: width 0.3s ease;
+    }
+
+    /* ===========================================
+       NAV DOTS
+       =========================================== */
+    .nav-dots {
+      position: fixed;
+      right: clamp(1rem, 2vw, 2rem);
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border-light);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0;
+    }
+
+    .nav-dot.active {
+      background: var(--accent);
+      transform: scale(1.3);
+    }
+
+    .dark-slide ~ .nav-dots .nav-dot,
+    .dark-slide ~ .nav-dots .nav-dot {
+      background: var(--border-dark);
+    }
+    .dark-slide ~ .nav-dots .nav-dot.active,
+    .dark-slide ~ .nav-dots .nav-dot.active {
+      background: var(--accent-light);
+    }
+
+    /* ===========================================
+       COMMON COMPONENTS
+       =========================================== */
+    .chapter-number {
+      font-size: var(--small-size);
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: var(--element-gap);
+    }
+
+    .chapter-number.light {
+      color: var(--accent-light);
+    }
+
+    .slide-title {
+      font-size: var(--title-size);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: var(--content-gap);
+    }
+
+    .slide-subtitle {
+      font-size: var(--subtitle-size);
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      margin-bottom: var(--content-gap);
+    }
+
+    .slide-body {
+      font-size: var(--body-size);
+      line-height: 1.8;
+      color: var(--text-secondary);
+    }
+
+    .divider {
+      width: 48px;
+      height: 2px;
+      background: var(--accent);
+      margin: var(--content-gap) 0;
+    }
+
+    .divider.light {
+      background: var(--accent-light);
+    }
+
+    /* Quote style */
+    .quote-block {
+      font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+      font-weight: 600;
+      line-height: 1.6;
+      color: var(--text-primary);
+      padding-left: clamp(1rem, 2vw, 1.5rem);
+      border-left: 3px solid var(--accent);
+      margin: var(--content-gap) 0;
+    }
+
+    .quote-block.light {
+      color: var(--text-light);
+      border-left-color: var(--accent-light);
+    }
+
+    /* Bullet list */
+    .styled-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.6rem, 1.2vh, 1rem);
+    }
+
+    .styled-list li {
+      position: relative;
+      padding-left: clamp(1.2rem, 2vw, 1.5rem);
+      font-size: var(--body-size);
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    .styled-list li::before {
+      content: "·";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* Two column */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(1.5rem, 3vw, 3rem);
+    }
+
+    @media (max-width: 768px) {
+      .two-col { grid-template-columns: 1fr; }
+    }
+
+    /* Card */
+    .info-card {
+      background: rgba(26, 26, 26, 0.03);
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      padding: clamp(1rem, 2vw, 1.5rem);
+    }
+
+    .info-card h4 {
+      font-size: var(--body-size);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+
+    .info-card p {
+      font-size: var(--small-size);
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    /* Dark slide overrides */
+    .dark-slide {
+      background: var(--bg-dark);
+      color: var(--text-light);
+    }
+
+    .dark-slide .slide-title,
+    .dark-slide .slide-body,
+    .dark-slide .styled-list li {
+      color: var(--text-light);
+    }
+
+    .dark-slide .slide-subtitle {
+      color: rgba(245, 243, 238, 0.65);
+    }
+
+    .dark-slide .styled-list li::before {
+      color: var(--accent-light);
+    }
+
+    /* Decorative shapes */
+    .deco-circle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.06;
+      pointer-events: none;
+    }
+
+    .deco-line {
+      position: absolute;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.2;
+      pointer-events: none;
+    }
+
+    /* Keyword highlight */
+    .keyword {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .dark-slide .keyword {
+      color: var(--accent-light);
+    }
+
+    /* Small note */
+    .note {
+      font-size: var(--small-size);
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-top: var(--content-gap);
+      opacity: 0.8;
+    }
+
+    .dark-slide .note {
+      color: rgba(245, 243, 238, 0.5);
+    }
+
+    /* Book list */
+    .book-list {
+      display: flex;
+      gap: clamp(1rem, 2vw, 2rem);
+      flex-wrap: wrap;
+      margin-top: var(--content-gap);
+    }
+
+    .book-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+    }
+
+    .book-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 3px;
+      background: var(--accent);
+      opacity: 0.8;
+      flex-shrink: 0;
+    }
+
+    .book-item span {
+      font-size: var(--body-size);
+      font-weight: 600;
+    }
+
+    /* Page number */
+    .page-num {
+      position: absolute;
+      bottom: clamp(1rem, 2vw, 1.5rem);
+      right: clamp(1rem, 2vw, 1.5rem);
+      font-size: var(--small-size);
+      color: var(--text-secondary);
+      opacity: 0.5;
+    }
+
+    .dark-slide .page-num {
+      color: rgba(245, 243, 238, 0.4);
+    }
+
+    /* End mark */
+    .end-mark {
+      width: 40px;
+      height: 2px;
+      background: var(--accent);
+      margin: var(--content-gap) auto 0;
+    }
+
+    .dark-slide .end-mark {
+      background: var(--accent-light);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+  <nav class="nav-dots" id="navDots"></nav>
+
+  <!-- ==================== SLIDE 1: Title ==================== -->
+  <section class="slide dark-slide" id="slide-1">
+    <div class="deco-circle" style="width: 60vh; height: 60vh; top: -20vh; right: -15vh; background: var(--accent-light);"></div>
+    <div class="deco-circle" style="width: 40vh; height: 40vh; bottom: -10vh; left: -10vh; background: var(--accent);"></div>
+    <div class="slide-content" style="align-items: center; text-align: center;">
+      <p class="reveal chapter-number light" style="margin-bottom: calc(var(--content-gap) * 1.5);">内训材料</p>
+      <h1 class="reveal slide-title" style="font-size: clamp(2.2rem, 6vw, 5rem); font-weight: 900;">职场向上管理与沟通</h1>
+      <div class="reveal divider light" style="margin: var(--content-gap) auto;"></div>
+      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.6);">把所有人变成你的资源</p>
+      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 1 —</p>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 2: 开篇核心 ==================== -->
+  <section class="slide" id="slide-2">
+    <div class="slide-content">
+      <p class="reveal chapter-number">开篇</p>
+      <h2 class="reveal slide-title">没有所谓的向上管理</h2>
+      <div class="reveal divider"></div>
+      <p class="reveal slide-body" style="max-width: 700px;">
+        职场中常听到"向上管理"这个词，但它本质上是一个伪命题。
+        真正重要的不是"管理老板"，而是理解你与周围所有人的关系本质。
+      </p>
+    </div>
+    <span class="page-num">2</span>
+  </section>
+
+  <!-- ==================== SLIDE 3: 商业合作 ==================== -->
+  <section class="slide" id="slide-3">
+    <div class="slide-content">
+      <p class="reveal chapter-number">开篇 · 核心认知</p>
+      <h2 class="reveal slide-title">都是商业合作关系</h2>
+      <div class="reveal divider"></div>
+      <ul class="reveal styled-list" style="max-width: 720px;">
+        <li>你和<span class="keyword">上司</span>的关系，是商业合作</li>
+        <li>你和<span class="keyword">下属</span>的关系，是商业合作</li>
+        <li>你和<span class="keyword">同事</span>的关系，是商业合作</li>
+        <li>你和<span class="keyword">公司</span>的关系，也是商业合作</li>
+      </ul>
+      <p class="reveal note">它们不是情感关系，不是依附关系，而是平等的资源交换关系。</p>
+    </div>
+    <span class="page-num">3</span>
+  </section>
+
+  <!-- ==================== SLIDE 4: 资源视角 ==================== -->
+  <section class="slide" id="slide-4">
+    <div class="slide-content">
+      <p class="reveal chapter-number">开篇 · 资源视角</p>
+      <h2 class="reveal slide-title">所有人都是你的资源</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 720px;">
+        <p class="slide-body" style="margin-bottom: var(--content-gap);">
+          注意：你<span class="keyword">并不拥有</span>他们，也<span class="keyword">不能指挥</span>他们。
+          但你要学会<span class="keyword">管理住</span>他们——调动、借力、共赢。
+        </p>
+        <div class="quote-block">
+          "沟通与管理的目标，都是优化资源利用，实现利人利己利公司。"
+        </div>
+        <p class="slide-body" style="margin-top: var(--content-gap);">
+          这套方法适用于和<span class="keyword">所有人</span>的沟通，并"管理"（调动）他们。
+        </p>
+      </div>
+    </div>
+    <span class="page-num">4</span>
+  </section>
+
+  <!-- ==================== SLIDE 5: Ch1 Title ==================== -->
+  <section class="slide dark-slide" id="slide-5">
+    <div class="deco-line" style="width: 30%; top: 33%; left: 0;"></div>
+    <div class="deco-line" style="width: 20%; bottom: 33%; right: 0;"></div>
+    <div class="slide-content" style="align-items: center; text-align: center;">
+      <p class="reveal chapter-number light">第一章</p>
+      <h2 class="reveal slide-title" style="font-size: clamp(2rem, 5vw, 4rem);">盘点你和老板<br/>与公司的全局地图</h2>
+      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.5);">盘点资源，是行动的前提</p>
+      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 5 —</p>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 6: 全局地图 ==================== -->
+  <section class="slide" id="slide-6">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第一章 · 盘点资源</p>
+      <h2 class="reveal slide-title">先画一张全局地图</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal two-col" style="max-width: 900px;">
+        <div>
+          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem;">公司业务</h4>
+          <p class="slide-body">公司在做什么？核心商业模式是什么？收入来源与成本结构？</p>
+        </div>
+        <div>
+          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem;">组织架构</h4>
+          <p class="slide-body">各部门如何分工？决策链怎么跑？你的位置在哪里？</p>
+        </div>
+      </div>
+      <p class="reveal note" style="margin-top: var(--content-gap);">理解公司业务与组织架构，是你一切判断的底层坐标系。</p>
+    </div>
+    <span class="page-num">6</span>
+  </section>
+
+  <!-- ==================== SLIDE 7: 关系网 ==================== -->
+  <section class="slide" id="slide-7">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第一章 · 关系网络</p>
+      <h2 class="reveal slide-title">厘清四种关键关系</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal grid" style="max-width: 900px; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 2vw, 1.5rem);">
+        <div class="info-card">
+          <h4>你的老板</h4>
+          <p>他的目标、压力、偏好、决策风格是什么？</p>
+        </div>
+        <div class="info-card">
+          <h4>你的 Peer</h4>
+          <p>他们的能力边界、利益诉求、合作历史？</p>
+        </div>
+        <div class="info-card">
+          <h4>你的团队</h4>
+          <p>如果有团队，他们的状态、能力、动机如何？</p>
+        </div>
+        <div class="info-card">
+          <h4>你自己</h4>
+          <p>你的优势、短板、当前阶段的核心诉求？</p>
+        </div>
+      </div>
+    </div>
+    <span class="page-num">7</span>
+  </section>
+
+  <!-- ==================== SLIDE 8: 信息即自信 ==================== -->
+  <section class="slide" id="slide-8">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第一章 · 认知升级</p>
+      <h2 class="reveal slide-title">信息即自信</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 720px;">
+        <p class="slide-body" style="margin-bottom: var(--content-gap);">
+          当你把上述地图画完，你会发现：日常里，<span class="keyword">你不知道的事情会很少</span>。
+        </p>
+        <div class="quote-block">
+          "因此，你才应该有自信自己不知道一些事情的勇气。"
+        </div>
+        <p class="slide-body" style="margin-top: var(--content-gap);">
+          真正的自信不是假装全知，而是清楚知道自己知道什么、不知道什么。
+        </p>
+      </div>
+    </div>
+    <span class="page-num">8</span>
+  </section>
+
+  <!-- ==================== SLIDE 9: 升职加薪 ==================== -->
+  <section class="slide" id="slide-9">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第一章 · 核心洞察</p>
+      <h2 class="reveal slide-title">升职加薪是假象</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 720px;">
+        <p class="slide-body" style="margin-bottom: var(--content-gap);">
+          升职加薪是<span class="keyword">结果</span>，不应该是<span class="keyword">原因</span>。
+        </p>
+        <p class="slide-body">
+          如果你把工作目标设定为"升职加薪"，你的动作会变形。<br/>
+          真正该问的是：当前这份工作，你当前这个阶段，<span class="keyword">最核心的目的是什么</span>？
+        </p>
+        <ul class="styled-list" style="margin-top: var(--content-gap);">
+          <li>积累技能？</li>
+          <li>积累人脉？</li>
+          <li>保持现金流，同时尽量少干活、有余闲？</li>
+        </ul>
+      </div>
+    </div>
+    <span class="page-num">9</span>
+  </section>
+
+  <!-- ==================== SLIDE 10: Ch2 Title ==================== -->
+  <section class="slide dark-slide" id="slide-10">
+    <div class="deco-line" style="width: 25%; top: 40%; left: 0;"></div>
+    <div class="deco-line" style="width: 15%; bottom: 35%; right: 0;"></div>
+    <div class="slide-content" style="align-items: center; text-align: center;">
+      <p class="reveal chapter-number light">第二章</p>
+      <h2 class="reveal slide-title">向上管理的目标<br/>是利用好老板</h2>
+      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.5);">老板是你最重要的资源</p>
+      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 10 —</p>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 11: 金句 ==================== -->
+  <section class="slide" id="slide-11">
+    <div class="slide-content" style="align-items: center; text-align: center;">
+      <p class="reveal chapter-number">第二章 · 核心金句</p>
+      <div class="reveal" style="max-width: 800px;">
+        <div class="quote-block" style="border-left: none; padding-left: 0; text-align: center; font-size: clamp(1.4rem, 3.5vw, 2.2rem); font-weight: 700;">
+          "企业里最重要的资源，<br/>是老板的注意力。"
+        </div>
+        <div class="divider" style="margin: var(--content-gap) auto;"></div>
+        <p class="reveal slide-body" style="text-align: center;">
+          注意力是稀缺品。谁拿到了老板的注意力，谁就拿到了资源、支持与晋升的通道。
+        </p>
+      </div>
+    </div>
+    <span class="page-num">11</span>
+  </section>
+
+  <!-- ==================== SLIDE 12: 利用老板 ==================== -->
+  <section class="slide" id="slide-12">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第二章 · 策略</p>
+      <h2 class="reveal slide-title">让老板为你的目的服务</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 720px;">
+        <p class="slide-body" style="margin-bottom: var(--content-gap);">
+          "利用老板"不是贬义词。它的意思是：<span class="keyword">设计一条路径，让你的目的和老板的目的一致。</span>
+        </p>
+        <p class="slide-body">
+          当老板觉得推进你的事就是在推进他的事，资源、授权、背书都会自然流向你。
+        </p>
+      </div>
+    </div>
+    <span class="page-num">12</span>
+  </section>
+
+  <!-- ==================== SLIDE 13: 知道什么 ==================== -->
+  <section class="slide" id="slide-13">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第二章 · 信息边界</p>
+      <h2 class="reveal slide-title">知道老板知道什么，<br/>不知道什么</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal two-col" style="max-width: 900px;">
+        <div>
+          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem; color: var(--accent);">老板知道什么</h4>
+          <p class="slide-body">他的信息源、他的判断依据、他的固有认知——这是你沟通的起点。</p>
+        </div>
+        <div>
+          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem; color: var(--accent);">老板不知道什么</h4>
+          <p class="slide-body">信息差就是你的价值空间。补上这个差，你就不可替代。</p>
+        </div>
+      </div>
+    </div>
+    <span class="page-num">13</span>
+  </section>
+
+  <!-- ==================== SLIDE 14: 两个错误 ==================== -->
+  <section class="slide" id="slide-14">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第二章 · 常见错误</p>
+      <h2 class="reveal slide-title">两个致命的信息错误</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal grid" style="max-width: 900px; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 2vw, 1.5rem);">
+        <div class="info-card" style="border-color: rgba(139,58,58,0.2);">
+          <h4 style="color: var(--accent);">错误一 · 该报没报</h4>
+          <p>需要老板知道的事，没有及时让老板知道。等老板从别的渠道知道，你就失去了主动权。</p>
+        </div>
+        <div class="info-card" style="border-color: rgba(139,58,58,0.2);">
+          <h4 style="color: var(--accent);">错误二 · 不该报乱报</h4>
+          <p>不需要老板知道的事，汇报给他——这是在浪费企业最稀缺的注意力资源。</p>
+        </div>
+      </div>
+    </div>
+    <span class="page-num">14</span>
+  </section>
+
+  <!-- ==================== SLIDE 15: 管理决策 ==================== -->
+  <section class="slide" id="slide-15">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第二章 · 核心逻辑</p>
+      <h2 class="reveal slide-title">管理信息 = 管理决策</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 720px;">
+        <p class="slide-body" style="margin-bottom: var(--content-gap);">
+          管理信息，管理注意力，就能<span class="keyword">管理老板的决策</span>。
+        </p>
+        <p class="slide-body">
+          老板每天接收的信息量极大。你控制他接收什么、何时接收、以什么形式接收，
+          就在一定程度上控制了他的认知和判断。
+        </p>
+      </div>
+    </div>
+    <span class="page-num">15</span>
+  </section>
+
+  <!-- ==================== SLIDE 16: 本职内外 ==================== -->
+  <section class="slide" id="slide-16">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第二章 · 行动指南</p>
+      <h2 class="reveal slide-title">本职之内与之外</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal two-col" style="max-width: 900px;">
+        <div>
+          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem;">本职工作内</h4>
+          <p class="slide-body">优先级相对容易理解——把分内事做到超出预期。</p>
+        </div>
+        <div>
+          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem;">本职工作外</h4>
+          <p class="slide-body">主动做更多对老板重要的、甚至老板都不知道怎么办的事——这是你的<span class="keyword">超额价值</span>。</p>
+        </div>
+      </div>
+    </div>
+    <span class="page-num">16</span>
+  </section>
+
+  <!-- ==================== SLIDE 17: Ch3 Title ==================== -->
+  <section class="slide dark-slide" id="slide-17">
+    <div class="deco-line" style="width: 20%; top: 30%; right: 0;"></div>
+    <div class="deco-line" style="width: 30%; bottom: 40%; left: 0;"></div>
+    <div class="slide-content" style="align-items: center; text-align: center;">
+      <p class="reveal chapter-number light">第三章</p>
+      <h2 class="reveal slide-title">沟通基本功</h2>
+      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.5);">和老板沟通失效，代价最大</p>
+      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 17 —</p>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 18: 语气 ==================== -->
+  <section class="slide" id="slide-18">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第三章 · 语气与原则</p>
+      <h2 class="reveal slide-title">语气：笃定、节奏、不啰嗦</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 720px;">
+        <p class="slide-body" style="margin-bottom: var(--content-gap);">
+          不光是跟老板，跟<span class="keyword">所有人</span>的沟通，都应该遵循同一套原则。
+          之所以专门在这里提，是因为如果和老板沟通效果差，对个人的负面影响更大。
+        </p>
+        <ul class="styled-list">
+          <li><span style="color: var(--text-primary); font-weight: 700;">笃定</span> — 不要犹豫、摇摆、自我否定</li>
+          <li><span style="color: var(--text-primary); font-weight: 700;">节奏</span> — 有快有慢，重点停顿</li>
+          <li><span style="color: var(--text-primary); font-weight: 700;">不啰嗦</span> — 每一句话都要有价值</li>
+          <li><span style="color: var(--text-primary); font-weight: 700;">有说服力</span> — 用事实和逻辑说话，不用情绪</li>
+        </ul>
+      </div>
+    </div>
+    <span class="page-num">18</span>
+  </section>
+
+  <!-- ==================== SLIDE 19: 明确闭环 ==================== -->
+  <section class="slide" id="slide-19">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第三章 · 核心原则</p>
+      <h2 class="reveal slide-title">明确 · 闭环 · 有回响</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 720px;">
+        <p class="slide-body" style="margin-bottom: var(--content-gap);">
+          任何沟通——包括给领导，也包括给同事——都要做到这三点。
+        </p>
+        <div class="two-col" style="gap: clamp(1rem, 2vw, 2rem);">
+          <div class="info-card">
+            <h4>给领导</h4>
+            <p>交代的事要有进度反馈，有问题及时同步，完成时明确告知结果。</p>
+          </div>
+          <div class="info-card">
+            <h4>给同事</h4>
+            <p>即使无法解决，也要给出路——不要只丢问题，丢方案或方向。</p>
+          </div>
+        </div>
+        <p class="note">同事关系是非常重要的资源。往上走，一定会需要外部背书和评价。</p>
+      </div>
+    </div>
+    <span class="page-num">19</span>
+  </section>
+
+  <!-- ==================== SLIDE 20: 不拒绝问出路 ==================== -->
+  <section class="slide" id="slide-20">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第三章 · 行动准则</p>
+      <h2 class="reveal slide-title">不拒绝，问，永远给出路</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 720px;">
+        <p class="slide-body" style="margin-bottom: var(--content-gap);">
+          遇到做不到的事，不要直接说"不"。<br/>
+          要问清楚需求，然后<span class="keyword">给出替代方案或路径</span>。
+        </p>
+        <div class="quote-block">
+          "任何不确定：明确问，要有问的勇气，要有自己不知道的勇气，绝对不要装懂。"
+        </div>
+      </div>
+    </div>
+    <span class="page-num">20</span>
+  </section>
+
+  <!-- ==================== SLIDE 21: 不确定就问 ==================== -->
+  <section class="slide" id="slide-21">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第三章 · 诚实策略</p>
+      <h2 class="reveal slide-title">不懂就问，比装懂安全</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal two-col" style="max-width: 900px;">
+        <div>
+          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem; color: var(--accent);">事前说不懂</h4>
+          <p class="slide-body">老板会降低预期。最后交付时，哪怕只是达到基础水平，也在预期之内。</p>
+        </div>
+        <div>
+          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem; color: var(--accent);">装懂</h4>
+          <p class="slide-body">老板会提高预期。一旦交付不及预期，失望后的损失远高于"提前示弱"。</p>
+        </div>
+      </div>
+    </div>
+    <span class="page-num">21</span>
+  </section>
+
+  <!-- ==================== SLIDE 22: 降低沟通成本 ==================== -->
+  <section class="slide" id="slide-22">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第三章 · 效率</p>
+      <h2 class="reveal slide-title">降低沟通成本</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 800px;">
+        <ul class="styled-list">
+          <li><span style="color: var(--text-primary); font-weight: 700;">永远给方案，给选择，不给开放问题。</span><br/><span style="font-size: var(--small-size);">适用于向上沟通，也适用于一切沟通。</span></li>
+          <li><span style="color: var(--text-primary); font-weight: 700;">老板不给反馈，就往前推一步再问。</span><br/><span style="font-size: var(--small-size);">比如细化一点点，补充参考信息。不要在同样的状态下过一阵再追问。</span></li>
+          <li><span style="color: var(--text-primary); font-weight: 700;">定期 1v1。</span><br/><span style="font-size: var(--small-size);">把零散沟通收束到固定节奏里，减少随机打扰，提高信息密度。</span></li>
+        </ul>
+      </div>
+    </div>
+    <span class="page-num">22</span>
+  </section>
+
+  <!-- ==================== SLIDE 23: Ch4 Title ==================== -->
+  <section class="slide dark-slide" id="slide-23">
+    <div class="deco-line" style="width: 25%; top: 35%; left: 0;"></div>
+    <div class="deco-line" style="width: 18%; bottom: 38%; right: 0;"></div>
+    <div class="slide-content" style="align-items: center; text-align: center;">
+      <p class="reveal chapter-number light">第四章</p>
+      <h2 class="reveal slide-title">信息密度与偏好管理</h2>
+      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.5);">让每一次汇报都值钱</p>
+      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 23 —</p>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 24: 原则与错误 ==================== -->
+  <section class="slide" id="slide-24">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第四章 · 原则与错误</p>
+      <h2 class="reveal slide-title">有结论，高密度，只说该说的</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 800px;">
+        <p class="slide-body" style="margin-bottom: var(--content-gap);">
+          原则：<span class="keyword">有结论</span>，信息密度要<span class="keyword">大</span>，只提作为一个老板<span class="keyword">需要知道</span>的部分。
+        </p>
+        <div class="grid" style="grid-template-columns: 1fr 1fr 1fr; gap: clamp(0.75rem, 1.5vw, 1rem); margin-top: var(--content-gap);">
+          <div class="info-card" style="border-color: rgba(139,58,58,0.15);">
+            <h4 style="color: var(--accent); font-size: var(--small-size);">错误一</h4>
+            <p style="font-size: var(--small-size);">堆叠工作——把做的事罗列出来，没有结论。</p>
+          </div>
+          <div class="info-card" style="border-color: rgba(139,58,58,0.15);">
+            <h4 style="color: var(--accent); font-size: var(--small-size);">错误二</h4>
+            <p style="font-size: var(--small-size);">先铺垫再结论——老板时间宝贵，不要绕弯子。</p>
+          </div>
+          <div class="info-card" style="border-color: rgba(139,58,58,0.15);">
+            <h4 style="color: var(--accent); font-size: var(--small-size);">错误三</h4>
+            <p style="font-size: var(--small-size);">甩锅，不给方案——老板请你来是解决问题的。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <span class="page-num">24</span>
+  </section>
+
+  <!-- ==================== SLIDE 25: 报问题 ==================== -->
+  <section class="slide" id="slide-25">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第四章 · 报问题</p>
+      <h2 class="reveal slide-title">报问题的正确结构</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 720px;">
+        <ol class="styled-list" style="list-style: none; counter-reset: item;">
+          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">① 快速说问题</span> — 一句话讲清楚发生了什么</li>
+          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">② 说问题的影响</span> — 对业务、对团队、对时间线的影响</li>
+          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">③ 说你的解决办法</span> — 至少准备一个方案</li>
+          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">④ 可选说原因</span> — 如果需要追责或复盘，再补充</li>
+        </ol>
+      </div>
+    </div>
+    <span class="page-num">25</span>
+  </section>
+
+  <!-- ==================== SLIDE 26: 要决策 ==================== -->
+  <section class="slide" id="slide-26">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第四章 · 要决策</p>
+      <h2 class="reveal slide-title">要决策的正确结构</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 800px;">
+        <ol class="styled-list" style="list-style: none; counter-reset: item;">
+          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">① 快速说需要决策的内容</span></li>
+          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">② 说选择</span> — 不要只有一个选项</li>
+          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">③ 说利弊</span> — 每个选项的得失</li>
+          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">④ 说你的偏好</span> — 让老板做选择题，不是开放题</li>
+        </ol>
+        <p class="note" style="margin-top: calc(var(--content-gap) * 1.2);">
+          要决策的本质：需要老板背锅，或需要老板独有的资源、知识、信息。否则不需要老板决策。
+        </p>
+      </div>
+    </div>
+    <span class="page-num">26</span>
+  </section>
+
+  <!-- ==================== SLIDE 27: Ch5 Title ==================== -->
+  <section class="slide dark-slide" id="slide-27">
+    <div class="deco-line" style="width: 22%; top: 32%; right: 0;"></div>
+    <div class="deco-line" style="width: 28%; bottom: 36%; left: 0;"></div>
+    <div class="slide-content" style="align-items: center; text-align: center;">
+      <p class="reveal chapter-number light">第五章</p>
+      <h2 class="reveal slide-title">邪修</h2>
+      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.5);">高阶心法与暗黑技巧</p>
+      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 27 —</p>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 28: 影响老板 ==================== -->
+  <section class="slide" id="slide-28">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第五章 · 植入观点</p>
+      <h2 class="reveal slide-title">如何影响老板</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 720px;">
+        <p class="slide-body" style="margin-bottom: var(--content-gap);">
+          老板注意力稀缺，有固有思维方式和观点，<span class="keyword">很难被说服</span>。
+        </p>
+        <div class="quote-block">
+          "老板是不可以被说服的。但观点是可以植入的——放长线，做长局。"
+        </div>
+        <p class="slide-body" style="margin-top: var(--content-gap);">
+          不要试图在一次对话里改变老板。重复、渗透、让想法变成"他自己想到的"。
+        </p>
+      </div>
+    </div>
+    <span class="page-num">28</span>
+  </section>
+
+  <!-- ==================== SLIDE 29: 控制对手方 ==================== -->
+  <section class="slide" id="slide-29">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第五章 · 博弈</p>
+      <h2 class="reveal slide-title">控制对手方</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 720px;">
+        <p class="slide-body" style="margin-bottom: var(--content-gap);">
+          <span class="keyword">表达方式决定了对方可能的反馈范围。</span>
+        </p>
+        <p class="slide-body">
+          你怎么提问题，对方就只能在你框定的选项里回答。<br/>
+          精心设计你的表达，就是设计对方的回应空间。
+        </p>
+      </div>
+    </div>
+    <span class="page-num">29</span>
+  </section>
+
+  <!-- ==================== SLIDE 30: 识别风险 ==================== -->
+  <section class="slide" id="slide-30">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第五章 · 风控</p>
+      <h2 class="reveal slide-title">识别风险，插旗子，或救火</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal two-col" style="max-width: 900px;">
+        <div>
+          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem;">插旗子</h4>
+          <p class="slide-body">提前预警风险，留下书面记录。出事时可以"I told you so"，保护你自己。</p>
+        </div>
+        <div>
+          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem;">及时救火</h4>
+          <p class="slide-body">风险爆发时，冲在最前面解决——这是你建立信任和展示价值的关键时刻。</p>
+        </div>
+      </div>
+    </div>
+    <span class="page-num">30</span>
+  </section>
+
+  <!-- ==================== SLIDE 31: 预期管理上 ==================== -->
+  <section class="slide" id="slide-31">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第五章 · 预期管理</p>
+      <h2 class="reveal slide-title">如何不瞎卷：预期管理</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 800px;">
+        <ul class="styled-list">
+          <li><span style="color: var(--text-primary); font-weight: 700;">好好干的同时，降低预期。</span><br/><span style="font-size: var(--small-size);">降低预期的事要做在最前面。</span></li>
+          <li><span style="color: var(--text-primary); font-weight: 700;">超出预期的结果，要放在关键的时间。</span><br/><span style="font-size: var(--small-size);">不要在日常小事上过度消耗惊喜感。</span></li>
+          <li><span style="color: var(--text-primary); font-weight: 700;">不重要的事，不要低于预期。</span><br/><span style="font-size: var(--small-size);">维持基本信任线。</span></li>
+        </ul>
+      </div>
+    </div>
+    <span class="page-num">31</span>
+  </section>
+
+  <!-- ==================== SLIDE 32: 预期管理下 ==================== -->
+  <section class="slide" id="slide-32">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第五章 · 预期管理</p>
+      <h2 class="reveal slide-title">关键节点，一定要超出预期</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 720px;">
+        <div class="quote-block">
+          "重要的事，关键的节点，最开始的印象，一定要超出预期很多。"
+        </div>
+        <p class="slide-body" style="margin-top: var(--content-gap);">
+          预期管理不是躺平。它是把有限的精力和注意力，<span class="keyword">精准投放到高杠杆的时刻</span>。
+        </p>
+      </div>
+    </div>
+    <span class="page-num">32</span>
+  </section>
+
+  <!-- ==================== SLIDE 33: 汇报时机 ==================== -->
+  <section class="slide" id="slide-33">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第五章 · 时机</p>
+      <h2 class="reveal slide-title">汇报要看准时机</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 800px;">
+        <p class="slide-body" style="margin-bottom: var(--content-gap);">
+          不是准备好了就汇报，而是<span class="keyword">在正确的时间窗口</span>汇报。
+        </p>
+        <ul class="styled-list">
+          <li>公司做预算的时间</li>
+          <li>董事会的时间</li>
+          <li>绩效定稿评估的时间</li>
+          <li>项目里程碑的关键节点</li>
+        </ul>
+        <p class="note">在这些时间点之前布局、铺垫、出结果，才能最大化你的曝光价值。</p>
+      </div>
+    </div>
+    <span class="page-num">33</span>
+  </section>
+
+  <!-- ==================== SLIDE 34: Ch6 Title ==================== -->
+  <section class="slide dark-slide" id="slide-34">
+    <div class="deco-line" style="width: 30%; top: 38%; left: 0;"></div>
+    <div class="deco-line" style="width: 20%; bottom: 33%; right: 0;"></div>
+    <div class="slide-content" style="align-items: center; text-align: center;">
+      <p class="reveal chapter-number light">第六章</p>
+      <h2 class="reveal slide-title">总结</h2>
+      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.5);">把地图装在心里</p>
+      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 34 —</p>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 35: 上帝视角 ==================== -->
+  <section class="slide" id="slide-35">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第六章 · 终极心法</p>
+      <h2 class="reveal slide-title">建立上帝视角</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 720px;">
+        <p class="slide-body" style="margin-bottom: var(--content-gap);">
+          理解老板甚至老板的老板的目标、困难，站过去，<span class="keyword">把自己拔到高维度去</span>——甚至比老板更高。
+        </p>
+        <p class="slide-body">
+          当你能用老板的老板的视角看问题，你的建议自然有分量，你的判断自然准确，你的价值自然稀缺。
+        </p>
+      </div>
+    </div>
+    <span class="page-num">35</span>
+  </section>
+
+  <!-- ==================== SLIDE 36: 放长线 ==================== -->
+  <section class="slide" id="slide-36">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第六章 · 时间维度</p>
+      <h2 class="reveal slide-title">越是大的地方，越要放长线</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal" style="max-width: 720px;">
+        <p class="slide-body" style="margin-bottom: var(--content-gap);">
+          大厂、大领导、大组织——决策周期长，人际关系复杂，短期博弈收益低。
+        </p>
+        <div class="quote-block">
+          "越是大厂、大领导，越要放长线。"
+        </div>
+        <p class="slide-body" style="margin-top: var(--content-gap);">
+          用半年、一年、三年的时间尺度去经营关系、积累信任、等待窗口。
+        </p>
+      </div>
+    </div>
+    <span class="page-num">36</span>
+  </section>
+
+  <!-- ==================== SLIDE 37: 书籍推荐 ==================== -->
+  <section class="slide" id="slide-37">
+    <div class="slide-content">
+      <p class="reveal chapter-number">第六章 · 延伸阅读</p>
+      <h2 class="reveal slide-title">推荐三本书</h2>
+      <div class="reveal divider"></div>
+      <div class="reveal book-list" style="justify-content: center;">
+        <div class="book-item">
+          <div class="book-icon"></div>
+          <span>《猴子》</span>
+        </div>
+        <div class="book-item">
+          <div class="book-icon"></div>
+          <span>《谈判的逻辑》</span>
+        </div>
+        <div class="book-item">
+          <div class="book-icon"></div>
+          <span>《说服的瞬间》</span>
+        </div>
+      </div>
+      <p class="reveal note" style="text-align: center;">这三本书分别对应责任边界、博弈策略、影响技巧。</p>
+    </div>
+    <span class="page-num">37</span>
+  </section>
+
+  <!-- ==================== SLIDE 38: End ==================== -->
+  <section class="slide dark-slide" id="slide-38">
+    <div class="deco-circle" style="width: 50vh; height: 50vh; top: -15vh; left: -10vh; background: var(--accent-light);"></div>
+    <div class="deco-circle" style="width: 35vh; height: 35vh; bottom: -10vh; right: -10vh; background: var(--accent);"></div>
+    <div class="slide-content" style="align-items: center; text-align: center;">
+      <h2 class="reveal slide-title" style="font-size: clamp(1.8rem, 4.5vw, 3.5rem); font-weight: 700;">把所有人变成你的资源</h2>
+      <div class="reveal divider light" style="margin: var(--content-gap) auto;"></div>
+      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.5);">职场向上管理与沟通</p>
+      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 完 —</p>
+    </div>
+  </section>
+
+  <script>
+    /* ===========================================
+       SLIDE PRESENTATION CONTROLLER
+       =========================================== */
+    class SlidePresentation {
+      constructor() {
+        this.slides = document.querySelectorAll(".slide");
+        this.currentSlide = 0;
+        this.isScrolling = false;
+        this.scrollTimeout = null;
+        this.setupIntersectionObserver();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+        this.setupProgressBar();
+        this.setupNavDots();
+        this.updateDarkSlideDots();
+      }
+
+      setupIntersectionObserver() {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                this.currentSlide = Array.from(this.slides).indexOf(entry.target);
+                this.updateNavDots();
+                this.updateProgressBar();
+                this.updateDarkSlideDots();
+              }
+            });
+          },
+          { threshold: 0.5 }
+        );
+        this.slides.forEach((slide) => observer.observe(slide));
+      }
+
+      setupKeyboardNav() {
+        document.addEventListener("keydown", (e) => {
+          if (e.target.getAttribute("contenteditable")) return;
+          switch (e.key) {
+            case "ArrowDown":
+            case "ArrowRight":
+            case " ":
+            case "PageDown":
+              e.preventDefault();
+              this.nextSlide();
+              break;
+            case "ArrowUp":
+            case "ArrowLeft":
+            case "PageUp":
+              e.preventDefault();
+              this.prevSlide();
+              break;
+            case "Home":
+              e.preventDefault();
+              this.goToSlide(0);
+              break;
+            case "End":
+              e.preventDefault();
+              this.goToSlide(this.slides.length - 1);
+              break;
+          }
+        });
+      }
+
+      setupTouchNav() {
+        let startY = 0;
+        let startTime = 0;
+        document.addEventListener("touchstart", (e) => {
+          startY = e.touches[0].clientY;
+          startTime = Date.now();
+        }, { passive: true });
+        document.addEventListener("touchend", (e) => {
+          const endY = e.changedTouches[0].clientY;
+          const diff = startY - endY;
+          const duration = Date.now() - startTime;
+          if (duration < 500 && Math.abs(diff) > 50) {
+            if (diff > 0) this.nextSlide();
+            else this.prevSlide();
+          }
+        }, { passive: true });
+      }
+
+      setupWheelNav() {
+        let wheelTimeout = null;
+        document.addEventListener("wheel", (e) => {
+          if (wheelTimeout) return;
+          wheelTimeout = setTimeout(() => {
+            wheelTimeout = null;
+          }, 600);
+          if (e.deltaY > 30) this.nextSlide();
+          else if (e.deltaY < -30) this.prevSlide();
+        }, { passive: true });
+      }
+
+      nextSlide() {
+        if (this.currentSlide < this.slides.length - 1) {
+          this.goToSlide(this.currentSlide + 1);
+        }
+      }
+
+      prevSlide() {
+        if (this.currentSlide > 0) {
+          this.goToSlide(this.currentSlide - 1);
+        }
+      }
+
+      goToSlide(index) {
+        this.slides[index].scrollIntoView({ behavior: "smooth" });
+      }
+
+      setupProgressBar() {
+        this.progressBar = document.getElementById("progressBar");
+      }
+
+      updateProgressBar() {
+        const pct = ((this.currentSlide + 1) / this.slides.length) * 100;
+        this.progressBar.style.width = pct + "%";
+      }
+
+      setupNavDots() {
+        this.navDotsContainer = document.getElementById("navDots");
+        this.navDotsContainer.innerHTML = "";
+        this.slides.forEach((_, i) => {
+          const dot = document.createElement("button");
+          dot.className = "nav-dot";
+          dot.setAttribute("aria-label", `Go to slide ${i + 1}`);
+          dot.addEventListener("click", () => this.goToSlide(i));
+          this.navDotsContainer.appendChild(dot);
+        });
+        this.dots = this.navDotsContainer.querySelectorAll(".nav-dot");
+        this.updateNavDots();
+      }
+
+      updateNavDots() {
+        if (!this.dots) return;
+        this.dots.forEach((dot, i) => {
+          dot.classList.toggle("active", i === this.currentSlide);
+        });
+      }
+
+      updateDarkSlideDots() {
+        const current = this.slides[this.currentSlide];
+        if (current.classList.contains("dark-slide")) {
+          this.navDotsContainer.classList.add("on-dark");
+        } else {
+          this.navDotsContainer.classList.remove("on-dark");
+        }
+      }
+    }
+
+    new SlidePresentation();
+  </script>
+</body>
+</html>

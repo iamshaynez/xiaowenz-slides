@@ -13,8 +13,10 @@ _class:
 # 生产力和个人发展
 
 
-### [时间任务管理 All In One](/time-management.html)
+### [时间管理](/time-management.html)
+### [时间管理 V2](/时间管理.html)
 ### [向上管理](/office-communication.html)
+### [向上管理 V2](/向上管理与沟通.html)
 
 ---
 

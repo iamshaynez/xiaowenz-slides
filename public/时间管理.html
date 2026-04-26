@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>时间管理 — 内训材料</title>
+
+  <!-- Google Fonts: Noto Serif SC (思源宋体) — 全站统一使用 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===========================================
+       CSS CUSTOM PROPERTIES (THEME)
+       优雅简约 · 暖白深墨 · 砖红点缀
+       =========================================== */
+    :root {
+      /* Colors */
+      --bg-primary: #faf8f3;
+      --bg-secondary: #f0ece3;
+      --text-primary: #1a1a1a;
+      --text-secondary: #5c5c5c;
+      --text-muted: #8a8a8a;
+      --accent: #a23b3b;
+      --accent-light: #c45e5e;
+      --accent-glow: rgba(162, 59, 59, 0.12);
+
+      /* Typography — 全部思源宋体 */
+      --font-display: "Noto Serif SC", "Source Han Serif SC", serif;
+      --font-body: "Noto Serif SC", "Source Han Serif SC", serif;
+
+      /* Sizes with clamp() */
+      --title-size: clamp(2rem, 5.5vw, 4.5rem);
+      --subtitle-size: clamp(1rem, 2.2vw, 1.75rem);
+      --h2-size: clamp(1.25rem, 3.2vw, 2.25rem);
+      --h3-size: clamp(1rem, 2.2vw, 1.5rem);
+      --body-size: clamp(0.8rem, 1.4vw, 1.125rem);
+      --small-size: clamp(0.7rem, 1vw, 0.9rem);
+
+      /* Spacing */
+      --slide-padding: clamp(1.5rem, 4vw, 4rem);
+      --content-gap: clamp(1rem, 2.5vw, 2.5rem);
+      --element-gap: clamp(0.5rem, 1.2vw, 1rem);
+
+      /* Animation */
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --duration-normal: 0.7s;
+      --duration-slow: 1s;
+    }
+
+    /* ===========================================
+       BASE STYLES
+       =========================================== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===========================================
+       VIEWPORT FITTING: MANDATORY BASE STYLES
+       =========================================== */
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    html {
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    .slide {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .slide-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-height: 100%;
+      overflow: hidden;
+      padding: var(--slide-padding);
+    }
+
+    .card, .container, .content-box {
+      max-width: min(90vw, 1000px);
+      max-height: min(80vh, 700px);
+    }
+
+    .feature-list, .bullet-list {
+      gap: clamp(0.4rem, 1vh, 1rem);
+    }
+
+    .feature-list li, .bullet-list li {
+      font-size: var(--body-size);
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+      gap: clamp(0.5rem, 1.5vw, 1rem);
+    }
+
+    img, .image-container {
+      max-width: 100%;
+      max-height: min(50vh, 400px);
+      object-fit: contain;
+    }
+
+    /* Responsive breakpoints */
+    @media (max-height: 700px) {
+      :root {
+        --slide-padding: clamp(0.75rem, 3vw, 2rem);
+        --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+        --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+        --h2-size: clamp(1rem, 3vw, 1.75rem);
+      }
+    }
+
+    @media (max-height: 600px) {
+      :root {
+        --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+        --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+        --title-size: clamp(1.1rem, 4vw, 2rem);
+        --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+      }
+      .nav-dots, .keyboard-hint, .decorative {
+        display: none;
+      }
+    }
+
+    @media (max-height: 500px) {
+      :root {
+        --slide-padding: clamp(0.4rem, 2vw, 1rem);
+        --title-size: clamp(1rem, 3.5vw, 1.5rem);
+        --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+        --body-size: clamp(0.65rem, 1vw, 0.85rem);
+      }
+    }
+
+    @media (max-width: 600px) {
+      :root {
+        --title-size: clamp(1.25rem, 7vw, 2.5rem);
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+      }
+      html {
+        scroll-behavior: auto;
+      }
+    }
+
+    /* ===========================================
+       ANIMATIONS
+       =========================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition:
+        opacity var(--duration-normal) var(--ease-out-expo),
+        transform var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .slide.visible .reveal {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal:nth-child(1) { transition-delay: 0.1s; }
+    .reveal:nth-child(2) { transition-delay: 0.2s; }
+    .reveal:nth-child(3) { transition-delay: 0.3s; }
+    .reveal:nth-child(4) { transition-delay: 0.4s; }
+    .reveal:nth-child(5) { transition-delay: 0.5s; }
+    .reveal:nth-child(6) { transition-delay: 0.6s; }
+
+    /* Scale reveal for chapter pages */
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity var(--duration-slow) var(--ease-out-expo),
+                  transform var(--duration-slow) var(--ease-out-expo);
+    }
+    .slide.visible .reveal-scale {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Fade only for subtle elements */
+    .reveal-fade {
+      opacity: 0;
+      transition: opacity var(--duration-normal) var(--ease-out-expo);
+    }
+    .slide.visible .reveal-fade {
+      opacity: 1;
+    }
+
+    /* ===========================================
+       PROGRESS BAR
+       =========================================== */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: var(--accent);
+      z-index: 9999;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    /* ===========================================
+       NAVIGATION DOTS
+       =========================================== */
+    .nav-dots {
+      position: fixed;
+      right: clamp(1rem, 2.5vw, 2rem);
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 9998;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      opacity: 0.4;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      padding: 0;
+    }
+
+    .nav-dot.active {
+      opacity: 1;
+      background: var(--accent);
+      transform: scale(1.3);
+    }
+
+    .nav-dot:hover {
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      .nav-dots {
+        display: none;
+      }
+    }
+
+    /* ===========================================
+       DECORATIVE ELEMENTS
+       =========================================== */
+    .deco-line {
+      width: 60px;
+      height: 2px;
+      background: var(--accent);
+      margin: var(--element-gap) 0;
+    }
+
+    .deco-line-light {
+      width: 40px;
+      height: 1px;
+      background: var(--text-muted);
+      opacity: 0.5;
+      margin: var(--element-gap) 0;
+    }
+
+    .chapter-number {
+      font-size: var(--small-size);
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .section-label {
+      font-size: var(--small-size);
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      margin-bottom: var(--element-gap);
+    }
+
+    /* ===========================================
+       SLIDE LAYOUTS
+       =========================================== */
+
+    /* --- Title Slide --- */
+    .slide.title-slide {
+      background: var(--bg-primary);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .title-slide .slide-content {
+      align-items: center;
+      text-align: center;
+      max-width: min(85vw, 800px);
+    }
+
+    .title-slide h1 {
+      font-size: var(--title-size);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: var(--element-gap);
+      color: var(--text-primary);
+    }
+
+    .title-slide .subtitle {
+      font-size: var(--subtitle-size);
+      color: var(--text-secondary);
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .title-slide .tagline {
+      font-size: var(--small-size);
+      color: var(--text-muted);
+      margin-top: var(--content-gap);
+      letter-spacing: 0.05em;
+    }
+
+    /* --- Chapter Slide --- */
+    .slide.chapter-slide {
+      background: var(--bg-secondary);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .chapter-slide .slide-content {
+      align-items: center;
+      text-align: center;
+      max-width: min(85vw, 900px);
+    }
+
+    .chapter-slide h2 {
+      font-size: var(--title-size);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-top: var(--element-gap);
+    }
+
+    /* --- Content Slide --- */
+    .slide.content-slide {
+      background: var(--bg-primary);
+    }
+
+    .content-slide .slide-content {
+      max-width: min(90vw, 900px);
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .content-slide h2 {
+      font-size: var(--h2-size);
+      font-weight: 700;
+      margin-bottom: var(--element-gap);
+      line-height: 1.3;
+    }
+
+    .content-slide h3 {
+      font-size: var(--h3-size);
+      font-weight: 600;
+      margin-bottom: var(--element-gap);
+      color: var(--text-secondary);
+    }
+
+    .content-slide p,
+    .content-slide li {
+      font-size: var(--body-size);
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .content-slide .bullet-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.5rem, 1.2vh, 0.9rem);
+    }
+
+    .content-slide .bullet-list li {
+      position: relative;
+      padding-left: 1.5em;
+    }
+
+    .content-slide .bullet-list li::before {
+      content: "·";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.2em;
+      line-height: 1.3;
+    }
+
+    .content-slide .bullet-list li.indent {
+      padding-left: 2.5em;
+      font-size: var(--small-size);
+      color: var(--text-muted);
+    }
+
+    .content-slide .bullet-list li.indent::before {
+      content: "→";
+      left: 1em;
+      color: var(--text-muted);
+      font-size: 0.9em;
+    }
+
+    /* --- Quote Slide --- */
+    .slide.quote-slide {
+      background: var(--bg-secondary);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .quote-slide .slide-content {
+      align-items: center;
+      text-align: center;
+      max-width: min(85vw, 800px);
+    }
+
+    .quote-slide blockquote {
+      font-size: clamp(1.1rem, 2.8vw, 2rem);
+      font-weight: 600;
+      line-height: 1.6;
+      color: var(--text-primary);
+      font-style: normal;
+      margin-bottom: var(--content-gap);
+    }
+
+    .quote-slide .attribution {
+      font-size: var(--small-size);
+      color: var(--text-muted);
+    }
+
+    /* --- Two Column Slide --- */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--content-gap);
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* --- Highlight Box --- */
+    .highlight-box {
+      background: var(--accent-glow);
+      border-left: 3px solid var(--accent);
+      padding: clamp(0.75rem, 1.5vw, 1.25rem);
+      margin: var(--element-gap) 0;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .highlight-box p {
+      margin: 0;
+      font-size: var(--body-size);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* --- Card Grid --- */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+      gap: clamp(0.75rem, 1.5vw, 1.25rem);
+      width: 100%;
+    }
+
+    .info-card {
+      background: var(--bg-secondary);
+      padding: clamp(0.75rem, 1.5vw, 1.25rem);
+      border-radius: 8px;
+    }
+
+    .info-card h4 {
+      font-size: var(--small-size);
+      color: var(--accent);
+      margin-bottom: 0.3em;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .info-card p {
+      font-size: var(--body-size);
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* --- Closing Slide --- */
+    .slide.closing-slide {
+      background: var(--bg-primary);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .closing-slide .slide-content {
+      align-items: center;
+      text-align: center;
+    }
+
+    .closing-slide h2 {
+      font-size: var(--title-size);
+      font-weight: 700;
+      margin-bottom: var(--element-gap);
+    }
+
+    .closing-slide p {
+      font-size: var(--body-size);
+      color: var(--text-secondary);
+    }
+
+    /* --- Background subtle texture --- */
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .slide-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===========================================
+       KEYBOARD HINT
+       =========================================== */
+    .keyboard-hint {
+      position: fixed;
+      bottom: clamp(0.75rem, 2vw, 1.5rem);
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: var(--small-size);
+      color: var(--text-muted);
+      opacity: 0.5;
+      z-index: 9997;
+      pointer-events: none;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <!-- Progress bar -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- Navigation dots -->
+  <nav class="nav-dots" id="navDots" aria-label="幻灯片导航"></nav>
+
+  <!-- Keyboard hint -->
+  <div class="keyboard-hint">← → 或空格键切换</div>
+
+  <!-- ===========================================
+       SLIDES START
+       =========================================== -->
+
+  <!-- ===== Slide 0: Title ===== -->
+  <section class="slide title-slide" id="slide-0">
+    <div class="slide-content">
+      <p class="reveal chapter-number">内训材料</p>
+      <div class="reveal deco-line" style="margin: var(--element-gap) auto;"></div>
+      <h1 class="reveal">时间管理</h1>
+      <p class="reveal subtitle">如何真正掌控你的注意力与生活</p>
+      <p class="reveal tagline">从理解本质到 AI 赋能的实践路径</p>
+    </div>
+  </section>
+
+  <!-- ===== Slide 1: Part 1 Chapter ===== -->
+  <section class="slide chapter-slide" id="slide-1">
+    <div class="slide-content">
+      <p class="reveal-scale chapter-number">第一部分</p>
+      <div class="reveal-scale deco-line" style="margin: var(--element-gap) auto;"></div>
+      <h2 class="reveal-scale">如何理解时间管理</h2>
+    </div>
+  </section>
+
+  <!-- ===== Slide 2: 时间管理的本质 — 误区 ===== -->
+  <section class="slide content-slide" id="slide-2">
+    <div class="slide-content">
+      <p class="reveal section-label">时间管理的本质</p>
+      <h2 class="reveal">三个常见误区</h2>
+      <ul class="reveal bullet-list" style="margin-top: var(--content-gap);">
+        <li>不是管理时间，不是像甘特图一样把自己的时间看起来井井有条地发配出去</li>
+        <li>不是学习 GTD 工具本身</li>
+        <li>工作、生活共享了我们作为一个人的时间和体能，因此时间管理一定是覆盖工作生活的一种习惯</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== Slide 3: 管理注意力 — 金句 ===== -->
+  <section class="slide quote-slide" id="slide-3">
+    <div class="slide-content">
+      <p class="reveal chapter-number" style="margin-bottom: var(--content-gap);">核心认知</p>
+      <blockquote class="reveal">
+        注意力是最稀缺的资源
+      </blockquote>
+      <div class="reveal deco-line-light" style="margin: var(--content-gap) auto;"></div>
+      <blockquote class="reveal" style="font-size: clamp(0.95rem, 2.2vw, 1.5rem);">
+        时间管理的目的，是可以真的完成很多事情的同时，不附带焦虑；是在需要休息的时候，有自信去休息。
+      </blockquote>
+      <p class="reveal attribution" style="margin-top: var(--content-gap);">— 时间管理的本质：管理注意力</p>
+    </div>
+  </section>
+
+  <!-- ===== Slide 4: 大脑是如何工作的 ===== -->
+  <section class="slide content-slide" id="slide-4">
+    <div class="slide-content">
+      <p class="reveal section-label">认知科学视角</p>
+      <h2 class="reveal">大脑是如何工作的</h2>
+      <div class="card-grid" style="margin-top: var(--content-gap);">
+        <div class="reveal info-card">
+          <h4>双流理论</h4>
+          <p>创作和执行是两种「心境」，频繁切换导致效率损失</p>
+        </div>
+        <div class="reveal info-card">
+          <h4>峰值理论</h4>
+          <p>情绪过高和过低都会导致注意力下降，要刻意安排正反馈甚至负反馈控制整体心境</p>
+        </div>
+      </div>
+      <div class="reveal highlight-box" style="margin-top: var(--content-gap);">
+        <p>假设：人们体能精力恒定来讨论，健身和更好的休息节奏管理可以提高精力的上限</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Slide 5: Part 2 Chapter ===== -->
+  <section class="slide chapter-slide" id="slide-5">
+    <div class="slide-content">
+      <p class="reveal-scale chapter-number">第二部分</p>
+      <div class="reveal-scale deco-line" style="margin: var(--element-gap) auto;"></div>
+      <h2 class="reveal-scale">我的时间管理 1.0 时代</h2>
+    </div>
+  </section>
+
+  <!-- ===== Slide 6: 终究还是需要一个工具 ===== -->
+  <section class="slide content-slide" id="slide-6">
+    <div class="slide-content">
+      <p class="reveal section-label">第一步</p>
+      <h2 class="reveal">首先，终究还是需要一个工具</h2>
+      <div class="reveal highlight-box" style="margin-top: var(--content-gap);">
+        <p>Get Things Done 工具（忘掉理论）</p>
+      </div>
+      <p class="reveal" style="margin-top: var(--element-gap); color: var(--text-secondary);">
+        Todo List 工具（嘀嗒清单，Todoist）
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== Slide 7: 工具至少应该具备 ===== -->
+  <section class="slide content-slide" id="slide-7">
+    <div class="slide-content">
+      <p class="reveal section-label">工具选型</p>
+      <h2 class="reveal">这个工具至少应该具备</h2>
+      <ul class="reveal bullet-list" style="margin-top: var(--content-gap);">
+        <li>在你方便的介质上可以访问（Web，手机，跨平台同步）</li>
+        <li>方便的往里扔东西：邮箱，微信，Cli - Agent</li>
+        <li>可选：我个人喜欢的自然语言识别功能</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== Slide 8: 让工作和生活进入工具 ===== -->
+  <section class="slide content-slide" id="slide-8">
+    <div class="slide-content">
+      <p class="reveal section-label">养成习惯</p>
+      <h2 class="reveal">让工作和生活进入你的注意力管理工具</h2>
+      <ul class="reveal bullet-list" style="margin-top: var(--content-gap);">
+        <li>养成习惯，用起来</li>
+        <li>让生活和工作，都放进去，不要侥幸</li>
+        <li>养成习惯，用起来</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== Slide 9: 解构每一项任务 ===== -->
+  <section class="slide content-slide" id="slide-9">
+    <div class="slide-content">
+      <p class="reveal section-label">任务拆解</p>
+      <h2 class="reveal">然后，解构你每一项任务</h2>
+      <div class="reveal highlight-box" style="margin-top: var(--content-gap);">
+        <p>再复杂抽象的目标，都应该逐渐被解构，降级，最终变成可执行的「创造」或「执行」类 Task，然后按照自己的节奏放到日程里，留点余量</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Slide 10: 核心原则 ===== -->
+  <section class="slide content-slide" id="slide-10">
+    <div class="slide-content">
+      <p class="reveal section-label">任务拆解原则</p>
+      <h2 class="reveal">MECE 原则</h2>
+      <ul class="reveal bullet-list" style="margin-top: var(--content-gap);">
+        <li>尽可能具体</li>
+        <li>是否完成是明确可衡量的</li>
+        <li>Size 尽可能小</li>
+        <li>维持能够持续关闭任务的正反馈</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== Slide 11: 显而易见的坏例子 ===== -->
+  <section class="slide content-slide" id="slide-11">
+    <div class="slide-content">
+      <p class="reveal section-label">反面教材</p>
+      <h2 class="reveal">显而易见的坏例子</h2>
+      <ul class="reveal bullet-list" style="margin-top: var(--content-gap);">
+        <li>为考试而学习</li>
+        <li>为项目做研究</li>
+        <li>修改粗糙的草图</li>
+        <li>开一个组团会议</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== Slide 12: 例子1 — 减肥10斤 ===== -->
+  <section class="slide content-slide" id="slide-12">
+    <div class="slide-content">
+      <p class="reveal section-label">案例一</p>
+      <h2 class="reveal">我有一个目标：减肥 10 斤</h2>
+      <div class="reveal highlight-box" style="margin-top: var(--content-gap); background: rgba(180, 120, 120, 0.08); border-left-color: #b47878;">
+        <p style="color: #8a4a4a;">坏的拆分方式：设置一个定时任务 — 每天跑 5 KM</p>
+      </div>
+      <ul class="reveal bullet-list" style="margin-top: var(--element-gap);">
+        <li class="indent">「每天跑5公里」和「减肥」这两件事之间，是否一定存在必然的逻辑关系？</li>
+        <li class="indent">「每天跑5公里」本身并不是一件简单的任务，甜度不足会非常难以保证持续执行下去</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== Slide 13: 好的任务管理 — 减肥 ===== -->
+  <section class="slide content-slide" id="slide-13">
+    <div class="slide-content">
+      <p class="reveal section-label">案例一 · 正确做法</p>
+      <h2 class="reveal">好的任务管理</h2>
+      <div class="reveal highlight-box" style="margin-top: var(--content-gap);">
+        <p>思考：减肥 = 降低摄入 + 增加消耗 + 定期测量</p>
+      </div>
+      <div class="card-grid" style="margin-top: var(--content-gap);">
+        <div class="reveal info-card">
+          <h4>降低摄入</h4>
+          <p>每日控制摄入在 XXX 以下</p>
+        </div>
+        <div class="reveal info-card">
+          <h4>增加消耗</h4>
+          <p>每日做 10 分钟 HIIT 或 30 分钟长跑 + 每周做一次 1 小时高强度锻炼</p>
+        </div>
+        <div class="reveal info-card">
+          <h4>定期测量</h4>
+          <p>每月测量体重和体脂，修正日常规划</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Slide 14: 例子2 — 写PPT ===== -->
+  <section class="slide content-slide" id="slide-14">
+    <div class="slide-content">
+      <p class="reveal section-label">案例二</p>
+      <h2 class="reveal">写 PPT 材料</h2>
+      <p class="reveal" style="color: var(--text-secondary); margin-top: var(--element-gap);">实际上写 PPT 的工作包含两部分：</p>
+      <div class="card-grid" style="margin-top: var(--content-gap);">
+        <div class="reveal info-card">
+          <h4>「创意」部分</h4>
+          <p>理清楚脉络，故事线，关键信息，形成「成片感」（这部分纯费脑，耗时极不确定）</p>
+        </div>
+        <div class="reveal info-card">
+          <h4>「执行」部分</h4>
+          <p>有了骨架后，把内容展开，组织成 PPT 格式的材料（这部分费手，依靠熟练度，但总体耗时可控）</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Slide 15: 写PPT — 不要混在一起 ===== -->
+  <section class="slide content-slide" id="slide-15">
+    <div class="slide-content">
+      <p class="reveal section-label">案例二 · 关键洞察</p>
+      <h2 class="reveal">不要混在一起安排自己的时间</h2>
+      <ul class="reveal bullet-list" style="margin-top: var(--content-gap);">
+        <li>创意先行，甚至可以用跑步、游泳、睡觉前、带娃的时间思考</li>
+        <li>有了创意以后，再安排时间窗口去做具体的 PPT 创建</li>
+      </ul>
+      <div class="reveal highlight-box" style="margin-top: var(--content-gap);">
+        <p>事前想的越清楚，事情就会可控，浪费的心智就越少</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Slide 16: 留出 Plan 和 Review 的时间 ===== -->
+  <section class="slide content-slide" id="slide-16">
+    <div class="slide-content">
+      <p class="reveal section-label">关键习惯</p>
+      <h2 class="reveal">留出专门的时间</h2>
+      <div class="card-grid" style="margin-top: var(--content-gap);">
+        <div class="reveal info-card">
+          <h4>Plan</h4>
+          <p>给自己留出 Plan 的时间，很重要，先想明白</p>
+        </div>
+        <div class="reveal info-card">
+          <h4>Review</h4>
+          <p>给自己留出 Review 的时间，很重要，不漏事儿</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Slide 17: 其他类型的需求 ===== -->
+  <section class="slide content-slide" id="slide-17">
+    <div class="slide-content">
+      <p class="reveal section-label">全面覆盖</p>
+      <h2 class="reveal">其他类型的需求，也应该放到工具内</h2>
+      <div class="card-grid" style="margin-top: var(--content-gap);">
+        <div class="reveal info-card">
+          <h4>提醒</h4>
+          <p>重要日子（结婚纪念，生日），生活习惯（喝水），不可忘记的周期性任务（信用卡还款，贷款还款，保险续费等等）</p>
+        </div>
+        <div class="reveal info-card">
+          <h4>跟踪</h4>
+          <p>有一些事情你希望持续追踪，但不是自己去完成的</p>
+        </div>
+      </div>
+      <ul class="reveal bullet-list" style="margin-top: var(--content-gap);">
+        <li class="indent">有趣的新闻追后续</li>
+        <li class="indent">下属的一些关键工作内容（安排的长周期任务）</li>
+        <li class="indent">外部依赖的定期追踪（合作方，供应商）</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== Slide 18: 最最最后的成就 ===== -->
+  <section class="slide quote-slide" id="slide-18">
+    <div class="slide-content">
+      <p class="reveal chapter-number" style="margin-bottom: var(--content-gap);">成就感</p>
+      <blockquote class="reveal" style="font-size: clamp(1rem, 2.5vw, 1.75rem);">
+        每关闭一个任务，都有正反馈的快感
+      </blockquote>
+      <div class="reveal deco-line-light" style="margin: var(--content-gap) auto;"></div>
+      <blockquote class="reveal" style="font-size: clamp(1rem, 2.5vw, 1.75rem);">
+        每天清空清单后，能自信今天没有漏掉别的，可以放心休息了
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- ===== Slide 19: Part 3 Chapter ===== -->
+  <section class="slide chapter-slide" id="slide-19">
+    <div class="slide-content">
+      <p class="reveal-scale chapter-number">第三部分</p>
+      <div class="reveal-scale deco-line" style="margin: var(--element-gap) auto;"></div>
+      <h2 class="reveal-scale">时间管理 2.0 时代</h2>
+      <p class="reveal-scale subtitle" style="margin-top: var(--element-gap); font-size: var(--h3-size); color: var(--text-secondary);">有 AI 了</p>
+    </div>
+  </section>
+
+  <!-- ===== Slide 20: 双流理论返场 ===== -->
+  <section class="slide content-slide" id="slide-20">
+    <div class="slide-content">
+      <p class="reveal section-label">理论回顾</p>
+      <h2 class="reveal">双流理论返场</h2>
+      <div class="reveal highlight-box" style="margin-top: var(--content-gap);">
+        <p>大部分的工作如果拆成依赖创造性思维的「创作」和依赖行动力专注力的「执行」两类任务的组合，我们需要分别思考，AI 如何分别赋能它们</p>
+      </div>
+      <p class="reveal" style="margin-top: var(--content-gap); color: var(--text-secondary);">
+        就像「创作」和「执行」分不清楚，那么一个工作就很难推进，心境往往痛苦一样，一个「复合型」任务给 AI，AI 大概率做不好，人就会更痛苦，并浪费最稀缺的「注意力」。
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== Slide 21: AI 赋能的切入点 ===== -->
+  <section class="slide content-slide" id="slide-21">
+    <div class="slide-content">
+      <p class="reveal section-label">实践方法</p>
+      <h2 class="reveal">AI 赋能的切入点</h2>
+      <div class="card-grid" style="margin-top: var(--content-gap);">
+        <div class="reveal info-card">
+          <h4>「创作」+ AI</h4>
+          <p>提供标准思考逻辑，模板提示词，以提供灵感、选项、或者大纲类的线索信息为目标</p>
+          <p style="margin-top: 0.5em; font-size: var(--small-size); color: var(--text-muted);">不需要依赖复杂的 Agent + Skill 环境，任何 ChatBot 都是好选择</p>
+        </div>
+        <div class="reveal info-card">
+          <h4>「执行」+ AI</h4>
+          <p>追求全自动化，越少人工干预越好，需要的是 AI 核心模型 + Tools 的输入产出能力</p>
+          <p style="margin-top: 0.5em; font-size: var(--small-size); color: var(--text-muted);">工具：Coze，Qwen Studio，Agent（Claude Code 等）+ Skills，甚至龙虾</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Slide 22: 金句 ===== -->
+  <section class="slide quote-slide" id="slide-22">
+    <div class="slide-content">
+      <p class="reveal chapter-number" style="margin-bottom: var(--content-gap);">金句</p>
+      <blockquote class="reveal">
+        AI 的时代，是时间碎片化的忙人，最好的时代
+      </blockquote>
+      <p class="reveal attribution" style="margin-top: var(--content-gap);">— 「是的，我有个烦死人的儿子」</p>
+    </div>
+  </section>
+
+  <!-- ===== Slide 23: 案例 ===== -->
+  <section class="slide content-slide" id="slide-23">
+    <div class="slide-content">
+      <p class="reveal section-label">真实案例</p>
+      <h2 class="reveal">本时间管理 PPT 的编写任务</h2>
+      <div class="card-grid" style="margin-top: var(--content-gap);">
+        <div class="reveal info-card">
+          <h4>手写大纲</h4>
+          <p>30 分钟左右</p>
+        </div>
+        <div class="reveal info-card">
+          <h4>AI 生成 PPT</h4>
+          <p>1 分钟</p>
+        </div>
+        <div class="reveal info-card">
+          <h4>Review，修改</h4>
+          <p>10 分钟</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Slide 24: 参考资料 ===== -->
+  <section class="slide content-slide" id="slide-24">
+    <div class="slide-content">
+      <p class="reveal section-label">延伸阅读</p>
+      <h2 class="reveal">参考资料</h2>
+      <ul class="reveal bullet-list" style="margin-top: var(--content-gap);">
+        <li>斯科特·扬（Scott Young）《超效率手册》（<em>The Little Book of Productivity</em>）</li>
+        <li>David Allen《Get Things Done》</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== Slide 25: Closing ===== -->
+  <section class="slide closing-slide" id="slide-25">
+    <div class="slide-content">
+      <div class="reveal deco-line" style="margin: 0 auto var(--content-gap);"></div>
+      <h2 class="reveal">谢谢</h2>
+      <p class="reveal" style="color: var(--text-secondary); margin-top: var(--element-gap);">
+        愿你的注意力，始终用在最重要的事上
+      </p>
+    </div>
+  </section>
+
+  <!-- ===========================================
+       JAVASCRIPT
+       =========================================== -->
+  <script>
+    (function() {
+      'use strict';
+
+      class SlidePresentation {
+        constructor() {
+          this.slides = document.querySelectorAll('.slide');
+          this.currentSlide = 0;
+          this.totalSlides = this.slides.length;
+          this.progressBar = document.getElementById('progressBar');
+          this.navDotsContainer = document.getElementById('navDots');
+
+          this.setupIntersectionObserver();
+          this.setupKeyboardNav();
+          this.setupTouchNav();
+          this.setupWheelNav();
+          this.setupProgressBar();
+          this.setupNavDots();
+        }
+
+        setupIntersectionObserver() {
+          const options = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.5
+          };
+
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                this.currentSlide = Array.from(this.slides).indexOf(entry.target);
+                this.updateNavDots();
+                this.updateProgressBar();
+              }
+            });
+          }, options);
+
+          this.slides.forEach(slide => observer.observe(slide));
+        }
+
+        setupKeyboardNav() {
+          document.addEventListener('keydown', (e) => {
+            if (e.target.getAttribute('contenteditable')) return;
+
+            switch(e.key) {
+              case 'ArrowRight':
+              case 'ArrowDown':
+              case ' ':
+              case 'PageDown':
+                e.preventDefault();
+                this.nextSlide();
+                break;
+              case 'ArrowLeft':
+              case 'ArrowUp':
+              case 'PageUp':
+                e.preventDefault();
+                this.prevSlide();
+                break;
+              case 'Home':
+                e.preventDefault();
+                this.goToSlide(0);
+                break;
+              case 'End':
+                e.preventDefault();
+                this.goToSlide(this.totalSlides - 1);
+                break;
+            }
+          });
+        }
+
+        setupTouchNav() {
+          let touchStartY = 0;
+          let touchEndY = 0;
+          const minSwipeDistance = 50;
+
+          document.addEventListener('touchstart', (e) => {
+            touchStartY = e.changedTouches[0].screenY;
+          }, { passive: true });
+
+          document.addEventListener('touchend', (e) => {
+            touchEndY = e.changedTouches[0].screenY;
+            const distance = touchStartY - touchEndY;
+
+            if (Math.abs(distance) > minSwipeDistance) {
+              if (distance > 0) {
+                this.nextSlide();
+              } else {
+                this.prevSlide();
+              }
+            }
+          }, { passive: true });
+        }
+
+        setupWheelNav() {
+          let wheelTimeout = null;
+          let accumulatedDelta = 0;
+          const threshold = 80;
+
+          document.addEventListener('wheel', (e) => {
+            if (wheelTimeout) return;
+
+            accumulatedDelta += e.deltaY;
+
+            if (Math.abs(accumulatedDelta) > threshold) {
+              if (accumulatedDelta > 0) {
+                this.nextSlide();
+              } else {
+                this.prevSlide();
+              }
+              accumulatedDelta = 0;
+              wheelTimeout = setTimeout(() => {
+                wheelTimeout = null;
+              }, 600);
+            }
+          }, { passive: true });
+        }
+
+        setupProgressBar() {
+          this.updateProgressBar();
+        }
+
+        setupNavDots() {
+          if (!this.navDotsContainer) return;
+          this.navDotsContainer.innerHTML = '';
+
+          this.slides.forEach((_, index) => {
+            const dot = document.createElement('button');
+            dot.className = 'nav-dot';
+            dot.setAttribute('aria-label', `跳转到第 ${index + 1} 页`);
+            dot.addEventListener('click', () => this.goToSlide(index));
+            this.navDotsContainer.appendChild(dot);
+          });
+
+          this.updateNavDots();
+        }
+
+        updateNavDots() {
+          if (!this.navDotsContainer) return;
+          const dots = this.navDotsContainer.querySelectorAll('.nav-dot');
+          dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === this.currentSlide);
+          });
+        }
+
+        updateProgressBar() {
+          if (!this.progressBar) return;
+          const progress = ((this.currentSlide + 1) / this.totalSlides) * 100;
+          this.progressBar.style.width = progress + '%';
+        }
+
+        nextSlide() {
+          if (this.currentSlide < this.totalSlides - 1) {
+            this.goToSlide(this.currentSlide + 1);
+          }
+        }
+
+        prevSlide() {
+          if (this.currentSlide > 0) {
+            this.goToSlide(this.currentSlide - 1);
+          }
+        }
+
+        goToSlide(index) {
+          if (index >= 0 && index < this.totalSlides) {
+            this.slides[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      }
+
+      new SlidePresentation();
+    })();
+  </script>
+</body>
+</html>

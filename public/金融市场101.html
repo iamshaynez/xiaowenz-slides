@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>金融市场 101</title>
+
+  <!-- Noto Serif SC — 思源宋体, as requested for all text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===========================================
+       CSS CUSTOM PROPERTIES (THEME)
+       Ink & Gold — dark editorial finance aesthetic
+       =========================================== */
+    :root {
+      --bg-primary: #0f1115;
+      --bg-secondary: #161920;
+      --text-primary: #f0ece4;
+      --text-secondary: #a8a29e;
+      --accent-gold: #c9a227;
+      --accent-gold-dim: rgba(201, 162, 39, 0.15);
+      --accent-warm: #d4a574;
+      --border-subtle: rgba(240, 236, 228, 0.08);
+
+      --font-display: "Noto Serif SC", "Source Han Serif SC", serif;
+      --font-body: "Noto Serif SC", "Source Han Serif SC", serif;
+
+      --title-size: clamp(1.8rem, 5vw, 3.5rem);
+      --subtitle-size: clamp(1rem, 2.5vw, 1.5rem);
+      --h2-size: clamp(1.4rem, 3.5vw, 2.2rem);
+      --h3-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      --body-size: clamp(0.85rem, 1.4vw, 1.05rem);
+      --small-size: clamp(0.75rem, 1vw, 0.9rem);
+
+      --slide-padding: clamp(1.5rem, 4vw, 3.5rem);
+      --content-gap: clamp(0.8rem, 2vw, 1.5rem);
+      --element-gap: clamp(0.4rem, 1vw, 0.8rem);
+
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --duration-normal: 0.7s;
+    }
+
+    /* ===========================================
+       BASE STYLES
+       =========================================== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      background: var(--bg-primary);
+    }
+
+    html {
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    /* ===========================================
+       VIEWPORT FITTING: MANDATORY BASE STYLES
+       Include this ENTIRE file in every presentation.
+       These styles ensure slides fit exactly in the viewport.
+       =========================================== */
+
+    /* 1. Lock html/body to viewport */
+    html, body {
+        height: 100%;
+        overflow-x: hidden;
+    }
+
+    html {
+        scroll-snap-type: y mandatory;
+        scroll-behavior: smooth;
+    }
+
+    /* 2. Each slide = exact viewport height */
+    .slide {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh; /* Dynamic viewport height for mobile browsers */
+        overflow: hidden; /* CRITICAL: Prevent ANY overflow */
+        scroll-snap-align: start;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    /* 3. Content container with flex for centering */
+    .slide-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        max-height: 100%;
+        overflow: hidden; /* Double-protection against overflow */
+        padding: var(--slide-padding);
+    }
+
+    /* 4. ALL typography uses clamp() for responsive scaling */
+    :root {
+        /* Titles scale from mobile to desktop */
+        --title-size: clamp(1.5rem, 5vw, 4rem);
+        --h2-size: clamp(1.25rem, 3.5vw, 2.5rem);
+        --h3-size: clamp(1rem, 2.5vw, 1.75rem);
+
+        /* Body text */
+        --body-size: clamp(0.75rem, 1.5vw, 1.125rem);
+        --small-size: clamp(0.65rem, 1vw, 0.875rem);
+
+        /* Spacing scales with viewport */
+        --slide-padding: clamp(1rem, 4vw, 4rem);
+        --content-gap: clamp(0.5rem, 2vw, 2rem);
+        --element-gap: clamp(0.25rem, 1vw, 1rem);
+    }
+
+    /* 5. Cards/containers use viewport-relative max sizes */
+    .card, .container, .content-box {
+        max-width: min(90vw, 1000px);
+        max-height: min(80vh, 700px);
+    }
+
+    /* 6. Lists auto-scale with viewport */
+    .feature-list, .bullet-list {
+        gap: clamp(0.4rem, 1vh, 1rem);
+    }
+
+    .feature-list li, .bullet-list li {
+        font-size: var(--body-size);
+        line-height: 1.4;
+    }
+
+    /* 7. Grids adapt to available space */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+        gap: clamp(0.5rem, 1.5vw, 1rem);
+    }
+
+    /* 8. Images constrained to viewport */
+    img, .image-container {
+        max-width: 100%;
+        max-height: min(50vh, 400px);
+        object-fit: contain;
+    }
+
+    /* ===========================================
+       RESPONSIVE BREAKPOINTS
+       Aggressive scaling for smaller viewports
+       =========================================== */
+
+    /* Short viewports (< 700px height) */
+    @media (max-height: 700px) {
+        :root {
+            --slide-padding: clamp(0.75rem, 3vw, 2rem);
+            --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+            --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+            --h2-size: clamp(1rem, 3vw, 1.75rem);
+        }
+    }
+
+    /* Very short viewports (< 600px height) */
+    @media (max-height: 600px) {
+        :root {
+            --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+            --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+            --title-size: clamp(1.1rem, 4vw, 2rem);
+            --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+        }
+
+        /* Hide non-essential elements */
+        .nav-dots, .keyboard-hint, .decorative {
+            display: none;
+        }
+    }
+
+    /* Extremely short (landscape phones, < 500px height) */
+    @media (max-height: 500px) {
+        :root {
+            --slide-padding: clamp(0.4rem, 2vw, 1rem);
+            --title-size: clamp(1rem, 3.5vw, 1.5rem);
+            --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+            --body-size: clamp(0.65rem, 1vw, 0.85rem);
+        }
+    }
+
+    /* Narrow viewports (< 600px width) */
+    @media (max-width: 600px) {
+        :root {
+            --title-size: clamp(1.25rem, 7vw, 2.5rem);
+        }
+
+        /* Stack grids vertically */
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ===========================================
+       REDUCED MOTION
+       Respect user preferences
+       =========================================== */
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.2s !important;
+        }
+
+        html {
+            scroll-behavior: auto;
+        }
+    }
+
+    /* ===========================================
+       THEME: INK & GOLD
+       =========================================== */
+
+    /* Subtle grid background pattern */
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(240, 236, 228, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(240, 236, 228, 0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Decorative corner accent */
+    .slide::after {
+      content: "";
+      position: absolute;
+      top: var(--slide-padding);
+      right: var(--slide-padding);
+      width: clamp(40px, 6vw, 80px);
+      height: clamp(40px, 6vw, 80px);
+      border-top: 1px solid var(--accent-gold);
+      border-right: 1px solid var(--accent-gold);
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Slide content sits above backgrounds */
+    .slide > * {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Alternate slide backgrounds */
+    .slide:nth-child(even) {
+      background: var(--bg-secondary);
+    }
+    .slide:nth-child(odd) {
+      background: var(--bg-primary);
+    }
+
+    /* ===========================================
+       TYPOGRAPHY
+       =========================================== */
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--text-primary);
+    }
+
+    h1 {
+      font-size: var(--title-size);
+      font-weight: 900;
+      letter-spacing: 0.02em;
+    }
+
+    h2 {
+      font-size: var(--h2-size);
+    }
+
+    h3 {
+      font-size: var(--h3-size);
+      color: var(--accent-gold);
+    }
+
+    p, li {
+      font-size: var(--body-size);
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    .subtitle {
+      font-size: var(--subtitle-size);
+      color: var(--accent-gold);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .tagline {
+      font-size: var(--body-size);
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    /* ===========================================
+       ANIMATIONS
+       =========================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition:
+        opacity var(--duration-normal) var(--ease-out-expo),
+        transform var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .slide.visible .reveal {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal:nth-child(1) { transition-delay: 0.08s; }
+    .reveal:nth-child(2) { transition-delay: 0.16s; }
+    .reveal:nth-child(3) { transition-delay: 0.24s; }
+    .reveal:nth-child(4) { transition-delay: 0.32s; }
+    .reveal:nth-child(5) { transition-delay: 0.40s; }
+    .reveal:nth-child(6) { transition-delay: 0.48s; }
+    .reveal:nth-child(7) { transition-delay: 0.56s; }
+    .reveal:nth-child(8) { transition-delay: 0.64s; }
+
+    /* Scale reveal for emphasis */
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);
+    }
+
+    .slide.visible .reveal-scale {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ===========================================
+       SLIDE-SPECIFIC LAYOUTS
+       =========================================== */
+
+    /* Title slide */
+    .title-slide .slide-content {
+      align-items: center;
+      text-align: center;
+      gap: var(--content-gap);
+    }
+
+    .title-slide h1 {
+      font-size: clamp(2.2rem, 7vw, 5rem);
+      color: var(--text-primary);
+    }
+
+    .title-slide .gold-line {
+      width: clamp(60px, 10vw, 120px);
+      height: 2px;
+      background: var(--accent-gold);
+      margin: var(--element-gap) 0;
+    }
+
+    /* Section divider / chapter cover */
+    .chapter-slide .slide-content {
+      align-items: center;
+      text-align: center;
+      gap: var(--content-gap);
+    }
+
+    .chapter-number {
+      font-size: clamp(3rem, 10vw, 7rem);
+      font-weight: 900;
+      color: var(--accent-gold-dim);
+      line-height: 1;
+    }
+
+    /* Standard content slide */
+    .content-slide .slide-content {
+      max-width: min(90vw, 900px);
+      margin: 0 auto;
+      width: 100%;
+      gap: var(--content-gap);
+    }
+
+    .content-slide h2 {
+      margin-bottom: var(--element-gap);
+      padding-bottom: var(--element-gap);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* Bullet list styling */
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.5rem, 1.2vh, 1rem);
+    }
+
+    .bullet-list li {
+      position: relative;
+      padding-left: clamp(1.2rem, 2vw, 1.8rem);
+    }
+
+    .bullet-list li::before {
+      content: "◆";
+      position: absolute;
+      left: 0;
+      color: var(--accent-gold);
+      font-size: 0.6em;
+      top: 0.35em;
+    }
+
+    /* Blockquote / highlight box */
+    .highlight-box {
+      border-left: 3px solid var(--accent-gold);
+      padding-left: clamp(1rem, 2vw, 1.5rem);
+      margin: var(--content-gap) 0;
+      background: var(--accent-gold-dim);
+      padding: clamp(0.8rem, 1.5vw, 1.2rem) clamp(1rem, 2vw, 1.5rem);
+      border-radius: 0 6px 6px 0;
+    }
+
+    .highlight-box p {
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    /* Formula display */
+    .formula {
+      font-family: var(--font-display);
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      color: var(--accent-gold);
+      text-align: center;
+      padding: var(--content-gap);
+      background: var(--accent-gold-dim);
+      border-radius: 8px;
+      letter-spacing: 0.03em;
+    }
+
+    /* Card grid for feature/overview slides */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: clamp(0.6rem, 1.5vw, 1.2rem);
+      margin-top: var(--content-gap);
+    }
+
+    @media (max-width: 600px) {
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .info-card {
+      background: rgba(240, 236, 228, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: clamp(0.8rem, 1.5vw, 1.2rem);
+      transition: border-color 0.3s ease, background 0.3s ease;
+    }
+
+    .info-card:hover {
+      border-color: var(--accent-gold);
+      background: rgba(201, 162, 39, 0.05);
+    }
+
+    .info-card .card-number {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 900;
+      color: var(--accent-gold);
+      opacity: 0.5;
+      line-height: 1;
+      margin-bottom: var(--element-gap);
+    }
+
+    .info-card h4 {
+      font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+      color: var(--text-primary);
+      margin-bottom: 0.3em;
+    }
+
+    .info-card p {
+      font-size: var(--small-size);
+      line-height: 1.5;
+    }
+
+    /* Two-column layout */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(1rem, 3vw, 2.5rem);
+      align-items: center;
+    }
+
+    @media (max-width: 700px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Arrow indicator for relationships */
+    .arrow-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(0.5rem, 1.5vw, 1rem);
+      font-size: var(--body-size);
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+    }
+
+    .arrow-indicator .arrow {
+      color: var(--accent-gold);
+      font-size: 1.2em;
+    }
+
+    /* ===========================================
+       PROGRESS BAR
+       =========================================== */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: var(--accent-gold);
+      width: 0%;
+      z-index: 1000;
+      transition: width 0.3s ease;
+    }
+
+    /* ===========================================
+       NAVIGATION DOTS
+       =========================================== */
+    .nav-dots {
+      position: fixed;
+      right: clamp(0.8rem, 2vw, 1.5rem);
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1000;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(240, 236, 228, 0.2);
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+      padding: 0;
+    }
+
+    .nav-dot.active {
+      background: var(--accent-gold);
+      transform: scale(1.3);
+    }
+
+    .nav-dot:hover {
+      background: var(--accent-warm);
+    }
+
+    @media (max-width: 600px) {
+      .nav-dots {
+        display: none;
+      }
+    }
+
+    /* ===========================================
+       KEYBOARD HINT
+       =========================================== */
+    .keyboard-hint {
+      position: fixed;
+      bottom: clamp(0.5rem, 1.5vw, 1rem);
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(0.6rem, 1vw, 0.75rem);
+      color: rgba(168, 162, 158, 0.4);
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    @media (max-height: 600px) {
+      .keyboard-hint {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Progress bar -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- Navigation dots -->
+  <nav class="nav-dots" id="navDots" aria-label="幻灯片导航"></nav>
+
+  <!-- Keyboard hint -->
+  <div class="keyboard-hint">↑ ↓ 方向键或滚轮切换幻灯片</div>
+
+  <!-- ==================== SLIDE 1: TITLE ==================== -->
+  <section class="slide title-slide" id="slide-0">
+    <div class="slide-content">
+      <p class="subtitle reveal">金融市场入门课程</p>
+      <h1 class="reveal">金融市场 101</h1>
+      <div class="gold-line reveal"></div>
+      <p class="tagline reveal">理解金钱游戏的规则与逻辑</p>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 2: WHAT IS FINANCIAL MARKET ==================== -->
+  <section class="slide content-slide" id="slide-1">
+    <div class="slide-content">
+      <h2 class="reveal">什么是金融市场？</h2>
+      <p class="reveal" style="color: var(--text-primary); font-size: var(--subtitle-size); margin-bottom: var(--element-gap);">
+        世界上有两种人——有钱人，有点子的人。
+      </p>
+      <p class="reveal">
+        金融市场就像这样一个地方，可以让需要钱的人找到钱，需要点子的人用钱换到机会。
+      </p>
+      <ul class="bullet-list reveal" style="margin-top: var(--content-gap);">
+        <li><strong style="color: var(--text-primary);">定义：</strong>资金供需双方进行交易的场所</li>
+        <li><strong style="color: var(--text-primary);">功能：</strong>资金融通、风险管理、价格发现</li>
+        <li><strong style="color: var(--text-primary);">主要参与者：</strong>个人投资者、机构投资者、政府</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 3: INTEREST RATE ==================== -->
+  <section class="slide content-slide" id="slide-2">
+    <div class="slide-content">
+      <h2 class="reveal">利率：钱的「租金」</h2>
+      <p class="reveal" style="color: var(--text-primary); font-size: var(--subtitle-size);">
+        利率就像是借钱给别人时收取的「租金」
+      </p>
+      <div class="highlight-box reveal">
+        <p>例如：你借 100 元给朋友，约定一年后还 105 元 —— 这里的利率就是 <strong style="color: var(--accent-gold);">5%</strong></p>
+      </div>
+      <div class="two-col reveal" style="margin-top: var(--content-gap);">
+        <div style="text-align: center; padding: clamp(0.8rem, 2vw, 1.5rem); background: var(--accent-gold-dim); border-radius: 8px;">
+          <p style="color: var(--accent-gold); font-weight: 700; font-size: var(--h3-size);">利率高</p>
+          <p style="margin-top: 0.3em;">借钱成本高</p>
+        </div>
+        <div style="text-align: center; padding: clamp(0.8rem, 2vw, 1.5rem); background: var(--accent-gold-dim); border-radius: 8px;">
+          <p style="color: var(--accent-gold); font-weight: 700; font-size: var(--h3-size);">利率低</p>
+          <p style="margin-top: 0.3em;">借钱成本低</p>
+        </div>
+      </div>
+      <div class="highlight-box reveal" style="margin-top: var(--content-gap);">
+        <p><strong style="color: var(--accent-gold);">无风险收益率：</strong>没有风险一定能收到的利率。（例如：美国国债）</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 4: FOUR TYPES ==================== -->
+  <section class="slide content-slide" id="slide-3">
+    <div class="slide-content">
+      <h2 class="reveal">四大类金融工具</h2>
+      <p class="reveal" style="margin-bottom: var(--element-gap);">接下来，我们来认识四种主要的「金钱游戏」：</p>
+      <div class="card-grid reveal">
+        <div class="info-card">
+          <div class="card-number">01</div>
+          <h4>债券 (Fixed Income)</h4>
+          <p>借钱给别人，收取固定回报</p>
+        </div>
+        <div class="info-card">
+          <div class="card-number">02</div>
+          <h4>股票 (Equity)</h4>
+          <p>成为公司的小主人，分享盈利</p>
+        </div>
+        <div class="info-card">
+          <div class="card-number">03</div>
+          <h4>衍生品 (Derivatives)</h4>
+          <p>价值来源于其他资产的金融合同</p>
+        </div>
+        <div class="info-card">
+          <div class="card-number">04</div>
+          <h4>其他类投资 (Alternatives)</h4>
+          <p>房地产、艺术品、黄金等特殊资产</p>
+        </div>
+      </div>
+      <div class="highlight-box reveal" style="margin-top: var(--content-gap);">
+        <p>它们统称「资产 Asset」。可持有，可交易，价格波动。整个金融市场，就是交易各类金融资产的地方。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 5: BONDS ==================== -->
+  <section class="slide content-slide" id="slide-4">
+    <div class="slide-content">
+      <h2 class="reveal">1. 债券：借钱给别人</h2>
+      <ul class="bullet-list reveal">
+        <li><strong style="color: var(--text-primary);">基本概念：</strong>你借钱给政府或公司，他们承诺还你本金和利息</li>
+        <li><strong style="color: var(--text-primary);">定价：</strong>主要取决于利率和借款人的信用</li>
+        <li><strong style="color: var(--text-primary);">举例：</strong>国债、公司债</li>
+      </ul>
+      <div class="highlight-box reveal" style="margin-top: var(--content-gap);">
+        <p><strong style="color: var(--accent-gold);">核心逻辑：</strong>利率上升 → 债券价格下跌；利率下降 → 债券价格上涨。利率和债券定价呈反向波动关系。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 6: STOCKS ==================== -->
+  <section class="slide content-slide" id="slide-5">
+    <div class="slide-content">
+      <h2 class="reveal">2. 股票：成为公司的小主人</h2>
+      <ul class="bullet-list reveal">
+        <li><strong style="color: var(--text-primary);">基本概念：</strong>购买公司的一小部分所有权</li>
+        <li><strong style="color: var(--text-primary);">定价：</strong>基于公司现在和未来的赚钱能力</li>
+        <li><strong style="color: var(--text-primary);">举例：</strong>苹果、腾讯的股票，或其他非公开上市的私有企业股权，都是 Equity</li>
+      </ul>
+      <div class="highlight-box reveal" style="margin-top: var(--content-gap);">
+        <p><strong style="color: var(--accent-gold);">核心逻辑：</strong>一个公司的定价，是由这个公司的<strong>未来盈利能力</strong>决定的。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 7: GGM ==================== -->
+  <section class="slide content-slide" id="slide-6">
+    <div class="slide-content">
+      <h2 class="reveal">股票定价：戈登增长模型 (GGM)</h2>
+      <p class="reveal"> Gordon Growth Model 是股息贴现模型的一个简化特例，易于理解和应用。</p>
+      <div class="formula reveal" style="margin-top: var(--content-gap);">
+        P = D₁ / (r − g)
+      </div>
+      <div class="card-grid reveal" style="margin-top: var(--content-gap);">
+        <div class="info-card">
+          <h4 style="color: var(--accent-gold);">P</h4>
+          <p>股票的理论价格</p>
+        </div>
+        <div class="info-card">
+          <h4 style="color: var(--accent-gold);">D₁</h4>
+          <p>下一期预期的每股股息</p>
+        </div>
+        <div class="info-card">
+          <h4 style="color: var(--accent-gold);">r</h4>
+          <p>要求的回报率（股权成本）</p>
+        </div>
+        <div class="info-card">
+          <h4 style="color: var(--accent-gold);">g</h4>
+          <p>预期的永续股息增长率</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 8: DERIVATIVES ==================== -->
+  <section class="slide content-slide" id="slide-7">
+    <div class="slide-content">
+      <h2 class="reveal">3. 衍生品：金融世界的「变形金刚」</h2>
+      <ul class="bullet-list reveal">
+        <li><strong style="color: var(--text-primary);">基本概念：</strong>价值来源于其他金融工具的金融合同</li>
+        <li><strong style="color: var(--text-primary);">定价：</strong>基于 underlying 资产的价格变化</li>
+        <li><strong style="color: var(--text-primary);">举例：</strong>期货、期权</li>
+      </ul>
+      <div class="highlight-box reveal" style="margin-top: var(--content-gap);">
+        <p>就像用积木搭建的复杂玩具，可以变成各种形状！衍生品让投资者能够对冲风险、放大收益，或以更灵活的方式参与市场。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 9: DERIVATIVES EXAMPLE 1 ==================== -->
+  <section class="slide content-slide" id="slide-8">
+    <div class="slide-content">
+      <h2 class="reveal">衍生品定价举例：期货</h2>
+      <p class="reveal" style="color: var(--text-primary);">期货：未来购买某资产的价格的锁定。定价取决于当前价格和未来价格的变化。</p>
+      <div class="highlight-box reveal" style="margin-top: var(--content-gap);">
+        <p style="margin-bottom: var(--element-gap);"><strong style="color: var(--accent-gold);">情景：</strong></p>
+        <p>现在是夏天，一瓶矿泉水的现货价格是 <strong style="color: var(--text-primary);">5 元</strong>。预测显示今年冬天可能出现干旱，导致矿泉水供应紧张。</p>
+      </div>
+      <p class="reveal" style="margin-top: var(--content-gap);">
+        一家饮料公司担心冬天矿泉水价格上涨，可以与水厂签订一份<strong style="color: var(--text-primary);">期货合约</strong>，约定在 6 个月后以 <strong style="color: var(--accent-gold);">6 元/瓶</strong> 的价格购买一批矿泉水。
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 10: DERIVATIVES EXAMPLE 2 ==================== -->
+  <section class="slide content-slide" id="slide-9">
+    <div class="slide-content">
+      <h2 class="reveal">期货价格如何确定？</h2>
+      <p class="reveal">这个 6 元/瓶的期货价格主要包含以下几个因素：</p>
+      <ul class="bullet-list reveal" style="margin-top: var(--content-gap);">
+        <li><strong style="color: var(--text-primary);">现货价格：</strong>目前的 5 元/瓶</li>
+        <li><strong style="color: var(--text-primary);">持有成本：</strong>水厂储存这批水 6 个月的仓储费用</li>
+        <li><strong style="color: var(--text-primary);">机会成本：</strong>水厂将这批水锁定 6 个月，而不是立即出售的机会成本</li>
+        <li><strong style="color: var(--text-primary);">预期因素：</strong>市场对未来 6 个月水价走势的预期</li>
+      </ul>
+      <div class="highlight-box reveal" style="margin-top: var(--content-gap);">
+        <p><strong style="color: var(--accent-gold);">思考变化：</strong></p>
+        <p>如果预报说冬天<strong>不会</strong>干旱，期货价格会怎样？如果预报说干旱<strong>加剧</strong>，又会怎样？</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 11: DERIVATIVES OTHER CONTRACTS ==================== -->
+  <section class="slide content-slide" id="slide-10">
+    <div class="slide-content">
+      <h2 class="reveal">衍生品：其他合约</h2>
+      <div class="card-grid reveal">
+        <div class="info-card">
+          <h4 style="color: var(--accent-gold);">Long / Short</h4>
+          <p>做多：预期价格上涨而买入；做空：预期价格下跌而卖出</p>
+        </div>
+        <div class="info-card">
+          <h4 style="color: var(--accent-gold);">期权 vs 期货</h4>
+          <p>期货：必须履约；期权：拥有权利但无义务履约</p>
+        </div>
+        <div class="info-card">
+          <h4 style="color: var(--accent-gold);">期货逼空案例</h4>
+          <p>空头无法交割，被迫高价平仓，价格暴涨</p>
+        </div>
+        <div class="info-card">
+          <h4 style="color: var(--accent-gold);">期权价值归零</h4>
+          <p>行权日价格未达预期，期权一文不值</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 12: SPECIAL DERIVATIVES ==================== -->
+  <section class="slide content-slide" id="slide-11">
+    <div class="slide-content">
+      <h2 class="reveal">衍生品：特殊合约</h2>
+      <div class="card-grid reveal" style="grid-template-columns: 1fr;">
+        <div class="info-card">
+          <h4 style="color: var(--accent-gold);">Lookback Options（回望期权）</h4>
+          <p>给予持有人权利，可以在过去 3 个月内任选一个最低价格作为买入价。无论期间价格如何波动，都能以最优价格成交。</p>
+        </div>
+        <div class="info-card">
+          <h4 style="color: var(--accent-gold);">Binary Options（二元期权）</h4>
+          <p>如果股票价格在到期日高于某个特定价格，支付固定金额（如 100 元）；否则，期权价值为零。结果只有「全有或全无」。</p>
+        </div>
+      </div>
+      <p class="reveal" style="margin-top: var(--content-gap); text-align: center; font-style: italic;">还有更多复杂的结构性衍生品……</p>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 13: ALTERNATIVE INVESTMENTS ==================== -->
+  <section class="slide content-slide" id="slide-12">
+    <div class="slide-content">
+      <h2 class="reveal">4. 其他类投资：特别的「藏宝箱」</h2>
+      <ul class="bullet-list reveal">
+        <li><strong style="color: var(--text-primary);">基本概念：</strong>不属于传统投资类别的其他投资</li>
+        <li><strong style="color: var(--text-primary);">定价：</strong>每种类型都有独特的定价方法</li>
+        <li><strong style="color: var(--text-primary);">举例：</strong>房地产、艺术品、黄金</li>
+      </ul>
+      <div class="highlight-box reveal" style="margin-top: var(--content-gap);">
+        <p><strong style="color: var(--accent-gold);">特殊类别：对冲基金</strong></p>
+        <p>采用多种策略（多空、套利、全球宏观等）追求绝对收益，不受传统市场基准约束。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 14: LEVERAGE ==================== -->
+  <section class="slide content-slide" id="slide-13">
+    <div class="slide-content">
+      <h2 class="reveal">杠杆 Leverage</h2>
+      <p class="reveal" style="color: var(--text-primary); font-size: var(--subtitle-size);">
+        杠杆是指使用借来的资金进行投资，以期望放大投资收益。
+      </p>
+      <div class="card-grid reveal" style="margin-top: var(--content-gap); grid-template-columns: 1fr;">
+        <div class="info-card">
+          <h4 style="color: var(--accent-gold);">01 借钱投资</h4>
+          <p>投资者借钱购买更多的投资资产，以小博大</p>
+        </div>
+        <div class="info-card">
+          <h4 style="color: var(--accent-gold);">02 放大收益</h4>
+          <p>如果投资获利，收益会放大，因为借来的钱也在产生收益</p>
+        </div>
+        <div class="info-card">
+          <h4 style="color: var(--accent-gold);">03 风险增加</h4>
+          <p>如果投资亏损，损失也会放大，因为借来的钱也需要偿还</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 15: LEVERAGE CHARACTERISTICS ==================== -->
+  <section class="slide content-slide" id="slide-14">
+    <div class="slide-content">
+      <h2 class="reveal">杠杆的特点</h2>
+      <div class="two-col reveal" style="margin-top: var(--content-gap);">
+        <div style="text-align: center; padding: clamp(1rem, 2.5vw, 2rem); border: 1px solid var(--border-subtle); border-radius: 8px;">
+          <p style="font-size: clamp(2rem, 5vw, 3rem); color: var(--accent-gold); font-weight: 900;">有利息</p>
+          <p style="margin-top: var(--element-gap);">借来的资金并非免费，需要支付利息成本</p>
+        </div>
+        <div style="text-align: center; padding: clamp(1rem, 2.5vw, 2rem); border: 1px solid var(--border-subtle); border-radius: 8px;">
+          <p style="font-size: clamp(2rem, 5vw, 3rem); color: var(--accent-gold); font-weight: 900;">会爆仓</p>
+          <p style="margin-top: var(--element-gap);">亏损超过本金时，触发强制平仓，血本无归</p>
+        </div>
+      </div>
+      <div class="highlight-box reveal" style="margin-top: var(--content-gap);">
+        <p>杠杆是一把<strong style="color: var(--accent-gold);">双刃剑</strong>——它能让你一夜暴富，也能让你瞬间归零。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 16: CURRENCY ==================== -->
+  <section class="slide content-slide" id="slide-15">
+    <div class="slide-content">
+      <h2 class="reveal">货币：既是交易媒介，又是资产本身</h2>
+      <ul class="bullet-list reveal">
+        <li><strong style="color: var(--text-primary);">衍生品与杠杆为主：</strong>货币交易大部分以衍生品和杠杆的形式进行</li>
+        <li><strong style="color: var(--text-primary);">多货币跨国市场：</strong>涉及宏观经济学、多利率博弈等复杂因素</li>
+        <li><strong style="color: var(--text-primary);">Crypto 不是货币（目前）：</strong>加密货币尚未成为广泛接受的支付手段和计价单位</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 17: SUMMARY ==================== -->
+  <section class="slide title-slide" id="slide-16">
+    <div class="slide-content">
+      <h2 class="reveal" style="font-size: var(--title-size);">总结</h2>
+      <div class="gold-line reveal"></div>
+      <p class="reveal" style="color: var(--text-primary); font-size: var(--subtitle-size); max-width: min(80vw, 700px);">
+        金融市场是一个充满机会和挑战的大游乐场。规则复杂，远离实体经济。
+      </p>
+      <p class="reveal tagline" style="margin-top: var(--content-gap);">
+        初心和现实不一定相交……
+      </p>
+    </div>
+  </section>
+
+  <script>
+    /* ===========================================
+       SLIDE PRESENTATION CONTROLLER
+       =========================================== */
+    class SlidePresentation {
+      constructor() {
+        this.slides = document.querySelectorAll(".slide");
+        this.currentSlide = 0;
+        this.isScrolling = false;
+        this.scrollTimeout = null;
+        this.setupIntersectionObserver();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+        this.setupProgressBar();
+        this.setupNavDots();
+      }
+
+      setupIntersectionObserver() {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                this.currentSlide = Array.from(this.slides).indexOf(entry.target);
+                this.updateNavDots();
+                this.updateProgressBar();
+              }
+            });
+          },
+          { threshold: 0.5 }
+        );
+        this.slides.forEach((slide) => observer.observe(slide));
+      }
+
+      setupKeyboardNav() {
+        document.addEventListener("keydown", (e) => {
+          if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+          switch (e.key) {
+            case "ArrowDown":
+            case "ArrowRight":
+            case " ":
+            case "PageDown":
+              e.preventDefault();
+              this.nextSlide();
+              break;
+            case "ArrowUp":
+            case "ArrowLeft":
+            case "PageUp":
+              e.preventDefault();
+              this.prevSlide();
+              break;
+            case "Home":
+              e.preventDefault();
+              this.goToSlide(0);
+              break;
+            case "End":
+              e.preventDefault();
+              this.goToSlide(this.slides.length - 1);
+              break;
+          }
+        });
+      }
+
+      setupTouchNav() {
+        let touchStartY = 0;
+        let touchEndY = 0;
+        const minSwipeDistance = 50;
+
+        document.addEventListener("touchstart", (e) => {
+          touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        document.addEventListener("touchend", (e) => {
+          touchEndY = e.changedTouches[0].screenY;
+          const diff = touchStartY - touchEndY;
+          if (Math.abs(diff) > minSwipeDistance) {
+            if (diff > 0) {
+              this.nextSlide();
+            } else {
+              this.prevSlide();
+            }
+          }
+        }, { passive: true });
+      }
+
+      setupWheelNav() {
+        let wheelTimeout = null;
+        document.addEventListener("wheel", (e) => {
+          if (wheelTimeout) return;
+          wheelTimeout = setTimeout(() => {
+            wheelTimeout = null;
+          }, 600);
+
+          if (e.deltaY > 30) {
+            this.nextSlide();
+          } else if (e.deltaY < -30) {
+            this.prevSlide();
+          }
+        }, { passive: true });
+      }
+
+      setupProgressBar() {
+        this.progressBar = document.getElementById("progressBar");
+        this.updateProgressBar();
+      }
+
+      updateProgressBar() {
+        if (!this.progressBar) return;
+        const progress = ((this.currentSlide + 1) / this.slides.length) * 100;
+        this.progressBar.style.width = progress + "%";
+      }
+
+      setupNavDots() {
+        this.navDotsContainer = document.getElementById("navDots");
+        if (!this.navDotsContainer) return;
+        this.navDotsContainer.innerHTML = "";
+        this.slides.forEach((_, index) => {
+          const dot = document.createElement("button");
+          dot.className = "nav-dot";
+          dot.setAttribute("aria-label", `转到第 ${index + 1} 张幻灯片`);
+          dot.addEventListener("click", () => this.goToSlide(index));
+          this.navDotsContainer.appendChild(dot);
+        });
+        this.updateNavDots();
+      }
+
+      updateNavDots() {
+        if (!this.navDotsContainer) return;
+        const dots = this.navDotsContainer.querySelectorAll(".nav-dot");
+        dots.forEach((dot, index) => {
+          dot.classList.toggle("active", index === this.currentSlide);
+        });
+      }
+
+      nextSlide() {
+        if (this.currentSlide < this.slides.length - 1) {
+          this.goToSlide(this.currentSlide + 1);
+        }
+      }
+
+      prevSlide() {
+        if (this.currentSlide > 0) {
+          this.goToSlide(this.currentSlide - 1);
+        }
+      }
+
+      goToSlide(index) {
+        if (index >= 0 && index < this.slides.length) {
+          this.slides[index].scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    }
+
+    new SlidePresentation();
+  </script>
+</body>
+</html>

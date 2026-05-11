@@ -1,1362 +1,2129 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>职场向上管理与沟通</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
-
-  <style>
-    /* ===========================================
-       CSS CUSTOM PROPERTIES (THEME)
-       温暖纸墨风 · 全部思源宋体
-       =========================================== */
-    :root {
-      --bg-cream: #f5f3ee;
-      --bg-dark: #1a1a1a;
-      --text-primary: #1a1a1a;
-      --text-secondary: #666666;
-      --text-light: #f5f3ee;
-      --accent: #8b3a3a;
-      --accent-light: #c49a8c;
-      --border-light: rgba(26, 26, 26, 0.12);
-      --border-dark: rgba(245, 243, 238, 0.15);
-
-      --font-display: "Noto Serif SC", serif;
-      --font-body: "Noto Serif SC", serif;
-
-      --title-size: clamp(2rem, 5vw, 4rem);
-      --subtitle-size: clamp(1rem, 2.5vw, 1.75rem);
-      --body-size: clamp(0.85rem, 1.5vw, 1.125rem);
-      --small-size: clamp(0.75rem, 1.2vw, 0.95rem);
-
-      --slide-padding: clamp(1.5rem, 5vw, 4rem);
-      --content-gap: clamp(1rem, 2.5vw, 2rem);
-      --element-gap: clamp(0.5rem, 1.2vw, 1rem);
-
-      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-      --duration-normal: 0.7s;
-    }
-
-    /* ===========================================
-       BASE STYLES
-       =========================================== */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html, body {
-      height: 100%;
-      overflow-x: hidden;
-      font-family: var(--font-body);
-      color: var(--text-primary);
-      background: var(--bg-cream);
-    }
-
-    html {
-      scroll-snap-type: y mandatory;
-      scroll-behavior: smooth;
-    }
-
-    /* ===========================================
-       VIEWPORT BASE (MANDATORY)
-       =========================================== */
-    .slide {
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      overflow: hidden;
-      scroll-snap-align: start;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
-
-    .slide-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      max-height: 100%;
-      overflow: hidden;
-      padding: var(--slide-padding);
-    }
-
-    .card, .container, .content-box {
-      max-width: min(90vw, 1000px);
-      max-height: min(80vh, 700px);
-    }
-
-    .feature-list, .bullet-list {
-      gap: clamp(0.5rem, 1.2vh, 1rem);
-    }
-
-    .feature-list li, .bullet-list li {
-      font-size: var(--body-size);
-      line-height: 1.6;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
-      gap: clamp(0.5rem, 1.5vw, 1rem);
-    }
-
-    img, .image-container {
-      max-width: 100%;
-      max-height: min(50vh, 400px);
-      object-fit: contain;
-    }
-
-    @media (max-height: 700px) {
-      :root {
-        --slide-padding: clamp(1rem, 3vw, 2.5rem);
-        --content-gap: clamp(0.6rem, 1.5vw, 1.2rem);
-        --title-size: clamp(1.5rem, 4.5vw, 3rem);
-        --subtitle-size: clamp(0.9rem, 2vw, 1.4rem);
-      }
-    }
-
-    @media (max-height: 600px) {
-      :root {
-        --slide-padding: clamp(0.75rem, 2.5vw, 1.5rem);
-        --content-gap: clamp(0.4rem, 1vw, 0.8rem);
-        --title-size: clamp(1.3rem, 4vw, 2.2rem);
-        --body-size: clamp(0.75rem, 1.2vw, 0.9rem);
-      }
-      .nav-dots, .keyboard-hint, .decorative {
-        display: none;
-      }
-    }
-
-    @media (max-height: 500px) {
-      :root {
-        --slide-padding: clamp(0.5rem, 2vw, 1rem);
-        --title-size: clamp(1.1rem, 3.5vw, 1.6rem);
-        --subtitle-size: clamp(0.8rem, 2vw, 1.1rem);
-        --body-size: clamp(0.7rem, 1vw, 0.85rem);
-      }
-    }
-
-    @media (max-width: 600px) {
-      :root {
-        --title-size: clamp(1.5rem, 7vw, 2.5rem);
-      }
-      .grid { grid-template-columns: 1fr; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.2s !important;
-      }
-      html { scroll-behavior: auto; }
-    }
-
-    /* ===========================================
-       ANIMATIONS
-       =========================================== */
-    .reveal {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity var(--duration-normal) var(--ease-out-expo),
-                  transform var(--duration-normal) var(--ease-out-expo);
-    }
-
-    .slide.visible .reveal {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .reveal:nth-child(1) { transition-delay: 0.1s; }
-    .reveal:nth-child(2) { transition-delay: 0.2s; }
-    .reveal:nth-child(3) { transition-delay: 0.3s; }
-    .reveal:nth-child(4) { transition-delay: 0.4s; }
-    .reveal:nth-child(5) { transition-delay: 0.5s; }
-    .reveal:nth-child(6) { transition-delay: 0.6s; }
-    .reveal:nth-child(7) { transition-delay: 0.7s; }
-
-    .reveal-scale {
-      opacity: 0;
-      transform: scale(0.92);
-      transition: opacity var(--duration-normal) var(--ease-out-expo),
-                  transform var(--duration-normal) var(--ease-out-expo);
-    }
-    .slide.visible .reveal-scale {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    .reveal-left {
-      opacity: 0;
-      transform: translateX(-40px);
-      transition: opacity var(--duration-normal) var(--ease-out-expo),
-                  transform var(--duration-normal) var(--ease-out-expo);
-    }
-    .slide.visible .reveal-left {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    /* ===========================================
-       PROGRESS BAR
-       =========================================== */
-    .progress-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 3px;
-      background: var(--accent);
-      width: 0%;
-      z-index: 1000;
-      transition: width 0.3s ease;
-    }
-
-    /* ===========================================
-       NAV DOTS
-       =========================================== */
-    .nav-dots {
-      position: fixed;
-      right: clamp(1rem, 2vw, 2rem);
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 1000;
-    }
-
-    .nav-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--border-light);
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      padding: 0;
-    }
-
-    .nav-dot.active {
-      background: var(--accent);
-      transform: scale(1.3);
-    }
-
-    .dark-slide ~ .nav-dots .nav-dot,
-    .dark-slide ~ .nav-dots .nav-dot {
-      background: var(--border-dark);
-    }
-    .dark-slide ~ .nav-dots .nav-dot.active,
-    .dark-slide ~ .nav-dots .nav-dot.active {
-      background: var(--accent-light);
-    }
-
-    /* ===========================================
-       COMMON COMPONENTS
-       =========================================== */
-    .chapter-number {
-      font-size: var(--small-size);
-      letter-spacing: 0.2em;
-      color: var(--accent);
-      font-weight: 600;
-      margin-bottom: var(--element-gap);
-    }
-
-    .chapter-number.light {
-      color: var(--accent-light);
-    }
-
-    .slide-title {
-      font-size: var(--title-size);
-      font-weight: 700;
-      line-height: 1.2;
-      margin-bottom: var(--content-gap);
-    }
-
-    .slide-subtitle {
-      font-size: var(--subtitle-size);
-      font-weight: 400;
-      line-height: 1.5;
-      color: var(--text-secondary);
-      margin-bottom: var(--content-gap);
-    }
-
-    .slide-body {
-      font-size: var(--body-size);
-      line-height: 1.8;
-      color: var(--text-secondary);
-    }
-
-    .divider {
-      width: 48px;
-      height: 2px;
-      background: var(--accent);
-      margin: var(--content-gap) 0;
-    }
-
-    .divider.light {
-      background: var(--accent-light);
-    }
-
-    /* Quote style */
-    .quote-block {
-      font-size: clamp(1.1rem, 2.5vw, 1.6rem);
-      font-weight: 600;
-      line-height: 1.6;
-      color: var(--text-primary);
-      padding-left: clamp(1rem, 2vw, 1.5rem);
-      border-left: 3px solid var(--accent);
-      margin: var(--content-gap) 0;
-    }
-
-    .quote-block.light {
-      color: var(--text-light);
-      border-left-color: var(--accent-light);
-    }
-
-    /* Bullet list */
-    .styled-list {
-      list-style: none;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: clamp(0.6rem, 1.2vh, 1rem);
-    }
-
-    .styled-list li {
-      position: relative;
-      padding-left: clamp(1.2rem, 2vw, 1.5rem);
-      font-size: var(--body-size);
-      line-height: 1.7;
-      color: var(--text-secondary);
-    }
-
-    .styled-list li::before {
-      content: "·";
-      position: absolute;
-      left: 0;
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    /* Two column */
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: clamp(1.5rem, 3vw, 3rem);
-    }
-
-    @media (max-width: 768px) {
-      .two-col { grid-template-columns: 1fr; }
-    }
-
-    /* Card */
-    .info-card {
-      background: rgba(26, 26, 26, 0.03);
-      border: 1px solid var(--border-light);
-      border-radius: 4px;
-      padding: clamp(1rem, 2vw, 1.5rem);
-    }
-
-    .info-card h4 {
-      font-size: var(--body-size);
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: var(--text-primary);
-    }
-
-    .info-card p {
-      font-size: var(--small-size);
-      line-height: 1.6;
-      color: var(--text-secondary);
-    }
-
-    /* Dark slide overrides */
-    .dark-slide {
-      background: var(--bg-dark);
-      color: var(--text-light);
-    }
-
-    .dark-slide .slide-title,
-    .dark-slide .slide-body,
-    .dark-slide .styled-list li {
-      color: var(--text-light);
-    }
-
-    .dark-slide .slide-subtitle {
-      color: rgba(245, 243, 238, 0.65);
-    }
-
-    .dark-slide .styled-list li::before {
-      color: var(--accent-light);
-    }
-
-    /* Decorative shapes */
-    .deco-circle {
-      position: absolute;
-      border-radius: 50%;
-      opacity: 0.06;
-      pointer-events: none;
-    }
-
-    .deco-line {
-      position: absolute;
-      height: 1px;
-      background: var(--accent);
-      opacity: 0.2;
-      pointer-events: none;
-    }
-
-    /* Keyword highlight */
-    .keyword {
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    .dark-slide .keyword {
-      color: var(--accent-light);
-    }
-
-    /* Small note */
-    .note {
-      font-size: var(--small-size);
-      color: var(--text-secondary);
-      font-style: italic;
-      margin-top: var(--content-gap);
-      opacity: 0.8;
-    }
-
-    .dark-slide .note {
-      color: rgba(245, 243, 238, 0.5);
-    }
-
-    /* Book list */
-    .book-list {
-      display: flex;
-      gap: clamp(1rem, 2vw, 2rem);
-      flex-wrap: wrap;
-      margin-top: var(--content-gap);
-    }
-
-    .book-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
-      border: 1px solid var(--border-light);
-      border-radius: 4px;
-    }
-
-    .book-icon {
-      width: 24px;
-      height: 24px;
-      border-radius: 3px;
-      background: var(--accent);
-      opacity: 0.8;
-      flex-shrink: 0;
-    }
-
-    .book-item span {
-      font-size: var(--body-size);
-      font-weight: 600;
-    }
-
-    /* Page number */
-    .page-num {
-      position: absolute;
-      bottom: clamp(1rem, 2vw, 1.5rem);
-      right: clamp(1rem, 2vw, 1.5rem);
-      font-size: var(--small-size);
-      color: var(--text-secondary);
-      opacity: 0.5;
-    }
-
-    .dark-slide .page-num {
-      color: rgba(245, 243, 238, 0.4);
-    }
-
-    /* End mark */
-    .end-mark {
-      width: 40px;
-      height: 2px;
-      background: var(--accent);
-      margin: var(--content-gap) auto 0;
-    }
-
-    .dark-slide .end-mark {
-      background: var(--accent-light);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>职场向上管理与沟通 · 内训材料</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@300;400;500;600&family=Noto+Serif+SC:wght@300;400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ============ 主题色(默认:🖋 墨水经典) ============
+       切换主题:从 references/themes.md 复制对应的 :root 块
+       整体替换这几行(--ink / --ink-rgb / --paper / --paper-rgb)
+       其他地方散落的 rgba() 都走 var(--ink-rgb) / var(--paper-rgb),无需逐处改 */
+    --ink:#0a0a0b;
+    --ink-rgb:10,10,11;
+    --paper:#f1efea;
+    --paper-rgb:241,239,234;
+    --paper-tint:#e8e5de;
+    --ink-tint:#18181a;
+
+    /* ============ 字体(跨主题固定) ============ */
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --serif-en:"Playfair Display","Source Serif 4",Georgia,serif;
+    --serif-body-en:"Source Serif 4",Georgia,serif;
+    --serif-zh:"Noto Serif SC",source-han-serif-sc,serif;
+    --sans-zh:"Noto Serif SC",source-han-serif-sc,serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--ink);color:var(--paper);font-family:var(--sans-zh);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+  /* ============ WebGL 双背景 ============ */
+  canvas.bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block;transition:opacity 1.2s ease}
+  canvas#bg-light{opacity:0}
+  canvas#bg-dark{opacity:1}
+  body.light-bg canvas#bg-light{opacity:1}
+  body.light-bg canvas#bg-dark{opacity:0}
+  body.low-power canvas.bg{display:none!important}
+
+  /* ============ Deck 容器 + 翻页 ============ */
+  /* width: NSLIDES * 100vw，会在 JS 里动态矫正 */
+  #deck{position:fixed;inset:0;width:10000vw;height:100vh;display:flex;flex-wrap:nowrap;transition:transform .9s cubic-bezier(.77,0,.175,1);z-index:10;will-change:transform}
+  .slide{width:100vw;height:100vh;flex:0 0 100vw;position:relative;padding:6vh 6vw 10vh 6vw;display:flex;flex-direction:column;overflow:hidden}
+  .slide.light{color:var(--ink);background:var(--paper)}
+  .slide.dark{color:var(--paper);background:var(--ink)}
+
+  /* 默认页：遮罩较厚，保证文字可读 */
+  .slide::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;transition:background .7s ease}
+  .slide.light::before{background:rgba(var(--paper-rgb),.78);backdrop-filter:blur(3px)}
+  .slide.dark::before{background:rgba(var(--ink-rgb),.78);backdrop-filter:blur(3px)}
+  /* Hero 页：遮罩大幅降低，让 WebGL 背景明显透出 */
+  .slide.hero.light::before{background:rgba(var(--paper-rgb),.16);backdrop-filter:none}
+  .slide.hero.dark::before{background:rgba(var(--ink-rgb),.12);backdrop-filter:none}
+  /* Hero 页顶底微弱渐隐，保证 chrome/foot 区域可读 */
+  .slide.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none}
+  .slide.hero.light::after{background:linear-gradient(180deg,rgba(var(--paper-rgb),.28) 0%,rgba(var(--paper-rgb),0) 14%,rgba(var(--paper-rgb),0) 86%,rgba(var(--paper-rgb),.28) 100%)}
+  .slide.hero.dark::after{background:linear-gradient(180deg,rgba(var(--ink-rgb),.32) 0%,rgba(var(--ink-rgb),0) 14%,rgba(var(--ink-rgb),0) 86%,rgba(var(--ink-rgb),.32) 100%)}
+
+  /* ============ Magazine chrome：顶部 meta + 底部 foot ============ */
+  .chrome{display:flex;justify-content:space-between;align-items:flex-start;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;opacity:.7}
+  .chrome .left,.chrome .right{display:flex;gap:2.4em;align-items:center}
+  .chrome .sep{width:40px;height:1px;background:currentColor;opacity:.4}
+  .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.55}
+  .foot .title{font-family:var(--serif-zh);font-weight:400;letter-spacing:.05em;text-transform:none;opacity:.75;font-size:13px}
+
+  .tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;padding:6px 14px;border:1px solid currentColor;opacity:.85}
+  .rule{width:100%;height:1px;background:currentColor;opacity:.25;margin:3vh 0}
+  .rule.v{width:1px;height:100%;margin:0}
+
+  /* ============ 字体规则 ============
+     · 衬线（Noto Serif SC / Playfair）：大标题、重点金句、数字
+     · 非衬线（Noto Sans SC）：正文描述、body、补充说明
+     · 等宽（IBM Plex Mono）：kicker、meta 小标签、foot 右侧
+  */
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;opacity:.6;margin-bottom:2.6vh}
+  .display{font-family:var(--serif-en);font-weight:700;font-size:11vw;line-height:.92;letter-spacing:-.025em}
+  .display-zh{font-family:var(--serif-zh);font-weight:700;font-size:7.8vw;line-height:1.04;letter-spacing:-.005em}
+  .h1-zh{font-family:var(--serif-zh);font-weight:700;font-size:4.6vw;line-height:1.12;letter-spacing:-.005em}
+  .h2-zh{font-family:var(--serif-zh);font-weight:600;font-size:3.2vw;line-height:1.2;letter-spacing:0}
+  .h3-zh{font-family:var(--serif-zh);font-weight:500;font-size:1.9vw;line-height:1.35}
+  .body-zh{font-family:var(--sans-zh);font-weight:400;font-size:max(15px,1.22vw);line-height:1.75;opacity:.82;letter-spacing:.01em}
+  .body-serif{font-family:var(--serif-zh);font-weight:400;font-size:max(15px,1.3vw);line-height:1.65;opacity:.88}
+  .lead{font-family:var(--serif-zh);font-weight:400;font-size:1.9vw;line-height:1.4;opacity:.85}
+  .meta{font-family:var(--mono);font-size:max(11px,.88vw);letter-spacing:.16em;text-transform:uppercase;opacity:.6}
+  .big-num{font-family:var(--serif-en);font-weight:800;font-size:10vw;line-height:.85;letter-spacing:-.03em;font-feature-settings:"tnum"}
+  .mid-num{font-family:var(--serif-en);font-weight:700;font-size:5.5vw;line-height:.88;letter-spacing:-.02em;font-feature-settings:"tnum"}
+  .ghost{font-family:var(--serif-en);font-weight:900;font-size:34vw;line-height:.8;opacity:.06;letter-spacing:-.04em;position:absolute;font-feature-settings:"tnum"}
+  em{font-style:italic;font-family:var(--serif-en)}
+  .en{font-family:var(--serif-en);font-style:italic;font-weight:500}
+
+  /* ============ 布局工具 ============ */
+  .col{display:flex;flex-direction:column;gap:2.4vh}
+  .row{display:flex;align-items:center;gap:3vw}
+  .grid-6{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:4vw 6vw;flex:1;align-content:center;padding:2vh 0}
+  .grid-9{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:3vh 4vw;flex:1;align-content:center}
+  .grid-4{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:4vh 6vw;flex:1;align-content:center}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:4vw;flex:1;align-content:center}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:4vw;flex:1;align-items:center}
+  .split-55{display:grid;grid-template-columns:55fr 45fr;gap:5vw;flex:1;align-items:stretch}
+  .fill{flex:1}
+  .center{align-items:center;justify-content:center;text-align:center}
+  .bottom-left{position:absolute;left:6vw;bottom:9vh;max-width:50vw}
+  .bottom-right{position:absolute;right:6vw;bottom:9vh;max-width:50vw;text-align:right}
+  .top-right{position:absolute;right:6vw;top:6vh;text-align:right}
+
+  /* ============ Stat（数字矩阵） ============ */
+  .stat{display:flex;flex-direction:column;gap:1vh;align-items:flex-start}
+  .stat .n{font-family:var(--serif-en);font-weight:800;font-size:8vw;line-height:.88;letter-spacing:-.03em;font-feature-settings:"tnum"}
+  .stat .l{font-family:var(--sans-zh);font-size:max(13px,1.05vw);opacity:.7;margin-top:1vh;font-weight:400;line-height:1.5}
+  .stat .m{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.5;margin-bottom:.2vh}
+
+  /* ============ Callout（引用框） ============ */
+  .callout{padding:3vh 2.4vw;border-left:3px solid currentColor;position:relative;font-family:var(--serif-zh);font-size:max(15px,1.2vw);line-height:1.55;opacity:.92}
+  .slide.light .callout{background:rgba(var(--ink-rgb),.05)}
+  .slide.dark .callout{background:rgba(var(--paper-rgb),.06)}
+  .callout .cite{display:block;margin-top:1.6vh;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+  .callout .q-big{font-family:var(--serif-zh);font-weight:600;font-size:max(17px,1.6vw);line-height:1.42}
+
+  /* ============ Platform（平台卡） ============ */
+  .plat{display:flex;flex-direction:column;justify-content:flex-end;padding:2vh 0;border-top:1px solid currentColor;border-color:rgba(127,127,127,.35)}
+  .plat .name{font-family:var(--serif-zh);font-weight:700;font-size:1.8vw;margin-bottom:.6vh}
+  .plat .nb{font-family:var(--serif-en);font-weight:700;font-size:3.2vw;letter-spacing:-.02em;line-height:1;font-feature-settings:"tnum"}
+  .plat .sub{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.55;margin-top:.6vh}
+  .plat .fill{font-family:var(--sans-zh);font-weight:300;font-size:2.4vw;opacity:.28;letter-spacing:-.01em;line-height:1}
+
+  /* ============ Rowline（表格行） ============ */
+  .rowline{display:grid;grid-template-columns:1fr 2fr 1fr;gap:2vw;padding:2.2vh 0;border-top:1px solid currentColor;align-items:center;border-color:rgba(127,127,127,.25)}
+  .rowline:last-child{border-bottom:1px solid currentColor;border-color:rgba(127,127,127,.25)}
+  .rowline .k{font-family:var(--serif-zh);font-weight:700;font-size:1.7vw}
+  .rowline .v{font-family:var(--sans-zh);font-weight:400;font-size:max(14px,1.2vw);opacity:.85;line-height:1.55}
+  .rowline .m{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;justify-self:end}
+
+  /* ============ Pillar（支柱卡片） ============ */
+  .pillar{display:flex;flex-direction:column;gap:1.8vh}
+  .pillar .ic{font-family:var(--serif-en);font-style:italic;font-size:2.6vw;opacity:.45;font-weight:400}
+  .pillar .ic svg{width:2.8vw;height:2.8vw;stroke-width:1.2;opacity:.7}
+  .pillar .t{font-family:var(--serif-zh);font-weight:700;font-size:2.4vw;line-height:1.1}
+  .pillar .d{font-family:var(--sans-zh);font-weight:400;font-size:max(14px,1.1vw);opacity:.76;line-height:1.6}
+
+  /* ============ Signature / Highlight ============ */
+  .sign{font-family:var(--serif-en);font-style:italic;font-weight:500;font-size:2vw;opacity:.7}
+  .hi{position:relative;display:inline}
+  .slide.dark .hi::after{content:"";position:absolute;left:-.1em;right:-.1em;bottom:-.05em;height:.28em;background:rgba(var(--paper-rgb),.15);z-index:-1}
+  .slide.light .hi::after{content:"";position:absolute;left:-.1em;right:-.1em;bottom:-.05em;height:.28em;background:rgba(var(--ink-rgb),.08);z-index:-1}
+
+  /* ============ Icons（Lucide via CDN） ============ */
+  .ico{width:1em;height:1em;display:inline-block;vertical-align:-.12em;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  .ico-lg,.ico-md,.ico-sm{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+  .ico-lg{width:2.6vw;height:2.6vw;stroke-width:1.2;display:inline-block}
+  .ico-md{width:1.8vw;height:1.8vw;stroke-width:1.3;display:inline-block;vertical-align:-.4em}
+  .ico-sm{width:1.1vw;height:1.1vw;stroke-width:1.4;display:inline-block;vertical-align:-.15em;opacity:.7}
+
+  /* ============ 图片占位（虚线框，提示设计师位置） ============ */
+  .img-slot{border:1.5px dashed rgba(127,127,127,.4);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1vh;padding:2vh 2vw;font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;opacity:.55;position:relative;aspect-ratio:16/9;width:100%;max-height:56vh;margin-inline:auto;box-sizing:border-box}
+  .img-slot::before{content:"";position:absolute;inset:8px;border:1px solid currentColor;opacity:.2}
+  .img-slot .plus{font-size:2vw;font-weight:300;opacity:.5;letter-spacing:0}
+  .img-slot .label{position:relative;z-index:2;text-align:center}
+  .img-slot.r-4x3{aspect-ratio:4/3}
+  .img-slot.r-3x2{aspect-ratio:3/2}
+  .img-slot.r-1x1{aspect-ratio:1/1}
+
+  /* ============ 图片实填框（关键：固定高度 + 只裁底部） ============
+     重要约束：高度用内联 height:Nvh 精确控制，不要用 aspect-ratio（会撑破布局）
+     object-position:top center 保证严禁裁剪顶部和左右，只裁剪底部
+  */
+  .frame-img{overflow:hidden;position:relative;background:rgba(0,0,0,.04);box-sizing:border-box;width:100%;border-radius:4px}
+  .slide.dark .frame-img{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)}
+  .frame-img > img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+  .frame-img.fit-contain > img{object-fit:contain;object-position:center center}
+  .frame-img.r-16x9{aspect-ratio:16/9;max-height:64vh}
+  .frame-img.r-16x10{aspect-ratio:16/10;max-height:56vh}
+  .frame-img.r-4x3{aspect-ratio:4/3;max-height:56vh}
+  .frame-img.r-3x2{aspect-ratio:3/2;max-height:46vh}
+  .frame-img.r-3x4{aspect-ratio:3/4;max-height:60vh}
+  .frame-img.r-1x1{aspect-ratio:1/1;max-height:50vh}
+  .frame-img.h-16{height:16vh}
+  .frame-img.h-18{height:18vh}
+  .frame-img.h-22{height:22vh}
+  .frame-img.h-26{height:26vh}
+  .frame-img.h-28{height:28vh}
+  .frame-cap{display:flex;justify-content:space-between;align-items:baseline;gap:1vw;margin-top:.8vh;font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.72}
+  .frame-cap .pf{font-family:var(--serif-zh);font-weight:600;font-size:max(13px,1vw);letter-spacing:.04em;text-transform:none;opacity:.94}
+  .frame-cap .nb{font-family:var(--serif-en);font-style:italic;font-size:max(15px,1.2vw);letter-spacing:.02em;text-transform:none;opacity:.88}
+  .frame-cap .idx{font-family:var(--mono);opacity:.5}
+  figure.tile{display:flex;flex-direction:column;margin:0;min-width:0}
+  figure.tile > .frame-img{flex:0 0 auto}
+
+  /* ============ 导航 ============ */
+  #nav{position:fixed;left:50%;bottom:2.6vh;transform:translateX(-50%);z-index:30;display:flex;gap:10px;padding:8px 14px;border-radius:999px;background:rgba(0,0,0,.18);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  #nav .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .3s ease;border:0;padding:0}
+  #nav .dot:hover{background:rgba(255,255,255,.5);transform:scale(1.15)}
+  #nav .dot.active{background:rgba(255,255,255,.95);width:22px;border-radius:999px}
+  body.light-bg #nav{background:rgba(255,255,255,.25)}
+  body.light-bg #nav .dot{background:rgba(var(--ink-rgb),.25)}
+  body.light-bg #nav .dot.active{background:rgba(var(--ink-rgb),.9)}
+  #hint{position:fixed;bottom:3vh;right:3vw;z-index:30;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.4;mix-blend-mode:difference;color:#aaa}
+  body.low-power #hint{opacity:.72;color:var(--paper);mix-blend-mode:normal}
+  body.light-bg.low-power #hint{color:var(--ink)}
+
+  /* ============================================================
+     ============ LAYOUTS API · 面向 agent 的类（v2）============
+     所有 layouts.md 中的骨架都基于下面这套命名。
+     如果你在 layouts.md 里看到某个类，它必须在下面有定义。
+     ============================================================ */
+
+  /* ---------- .frame：每页主内容容器 ---------- */
+  .frame{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  /* 当 .frame 同时加了 grid 类时，grid 的 display:grid 覆盖 flex */
+  .frame.grid-2-7-5,
+  .frame.grid-2-6-6,
+  .frame.grid-2-8-4,
+  .frame.grid-3-3,
+  .frame.grid-6{display:grid}
+
+  /* ---------- 标题层级（API 名称，衬线为主） ---------- */
+  .h-hero{
+    font-family:var(--serif-zh);
+    font-weight:900;
+    font-size:10vw;
+    line-height:.96;
+    letter-spacing:-.02em;
+  }
+  .h-xl{
+    font-family:var(--serif-zh);
+    font-weight:700;
+    font-size:6.2vw;
+    line-height:1.08;
+    letter-spacing:-.01em;
+  }
+  .h-sub{
+    font-family:var(--serif-zh);
+    font-weight:500;
+    font-size:3.1vw;
+    line-height:1.25;
+    letter-spacing:0;
+    opacity:.7;
+  }
+  .h-md{
+    font-family:var(--serif-zh);
+    font-weight:600;
+    font-size:2.3vw;
+    line-height:1.3;
+  }
+  /* 英文标题专用（Playfair 衬线） */
+  .h-hero-en,.h-xl-en{font-family:var(--serif-en);letter-spacing:-.025em}
+
+  /* ---------- lead 引语 ---------- */
+  .lead{
+    font-family:var(--serif-zh);
+    font-weight:400;
+    font-size:1.75vw;
+    line-height:1.5;
+    opacity:.86;
+  }
+
+  /* ---------- meta-row 底部元数据 ---------- */
+  .meta-row{
+    display:flex;
+    gap:1.2em;
+    align-items:baseline;
+    flex-wrap:wrap;
+    font-family:var(--mono);
+    font-size:max(12px,.92vw);
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    opacity:.6;
+  }
+
+  /* ---------- stat-card（数据大字报用） ---------- */
+  .stat-card{
+    display:flex;
+    flex-direction:column;
+    gap:.8vh;
+    align-items:flex-start;
+    padding-top:1.6vh;
+    border-top:1px solid currentColor;
+    border-color:rgba(127,127,127,.3);
+  }
+  .stat-card .stat-label{
+    font-family:var(--mono);
+    font-size:max(10px,.78vw);
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    opacity:.55;
+  }
+  .stat-card .stat-nb{
+    font-family:var(--serif-en);
+    font-weight:800;
+    font-size:5.8vw;
+    line-height:.9;
+    letter-spacing:-.03em;
+    font-feature-settings:"tnum";
+    margin-top:.4vh;
+  }
+  .stat-card .stat-nb .stat-unit{
+    font-family:var(--serif-zh);
+    font-weight:500;
+    font-size:.38em;
+    letter-spacing:0;
+    opacity:.72;
+    margin-left:.14em;
+  }
+  .stat-card .stat-note{
+    font-family:var(--sans-zh);
+    font-weight:400;
+    font-size:max(13px,1.05vw);
+    line-height:1.5;
+    opacity:.72;
+    margin-top:.6vh;
+  }
+  /* 当 stat-card 用于 grid-4（2x2），数字适度放大；若页面有标题+引文在上方，可内联 style 覆盖为更小值 */
+  .grid-4 .stat-card .stat-nb{font-size:5vw}
+  /* 当只有 3 个，字也可以稍大 */
+  .grid-3 .stat-card .stat-nb{font-size:6.8vw}
+
+  /* ---------- pipeline（流水线） ---------- */
+  .pipeline-section{
+    margin-top:4.4vh;
+    padding-top:2.8vh;
+    border-top:1px dashed rgba(127,127,127,.32);
+  }
+  .pipeline-section:first-of-type{
+    border-top:0;
+    padding-top:0;
+    margin-top:3vh;
+  }
+  .pipeline-label{
+    font-family:var(--mono);
+    font-size:max(11px,.85vw);
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    opacity:.62;
+    margin-bottom:2.2vh;
+  }
+  .pipeline{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:1.2vw;
+  }
+  .pipeline[data-cols="3"]{grid-template-columns:repeat(3,1fr)}
+  .pipeline[data-cols="4"]{grid-template-columns:repeat(4,1fr)}
+  .pipeline[data-cols="6"]{grid-template-columns:repeat(6,1fr)}
+  .step{
+    display:flex;
+    flex-direction:column;
+    gap:.8vh;
+    padding-top:1.4vh;
+    border-top:1px solid currentColor;
+    border-color:rgba(127,127,127,.35);
+  }
+  .step-nb{
+    font-family:var(--serif-en);
+    font-style:italic;
+    font-weight:500;
+    font-size:1.15vw;
+    opacity:.45;
+  }
+  .step-title{
+    font-family:var(--sans-zh);
+    font-weight:700;
+    font-size:1.55vw;
+    letter-spacing:.01em;
+    line-height:1.2;
+  }
+  .step-desc{
+    font-family:var(--sans-zh);
+    font-weight:400;
+    font-size:max(12px,.95vw);
+    line-height:1.45;
+    opacity:.72;
+  }
+
+  /* ---------- 网格（layouts.md 所用） ---------- */
+  /* 这些类独立挂到任何容器上都能生效，不依赖 .frame 复合选择器 */
+  .grid-2-7-5{display:grid;grid-template-columns:7fr 5fr;gap:3vw 4vh;align-items:start}
+  .grid-2-6-6{display:grid;grid-template-columns:1fr 1fr;gap:3vw 4vh;align-items:start}
+  .grid-2-8-4{display:grid;grid-template-columns:8fr 4fr;gap:3vw 4vh;align-items:start}
+  .grid-3-3{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    grid-auto-rows:minmax(0,1fr);
+    gap:2.4vh 2vw;
+  }
+  /* grid-6 已在旧样式里定义为 3x2，这里仅补 align */
+
+  /* ---------- 图片 frame-img（layouts.md 主命名） ---------- */
+  /* 在旧样式里已定义，这里补 img-cap 命名别名与增强 */
+  figure.frame-img{margin:0;display:flex;flex-direction:column;min-width:0}
+  .img-cap{
+    display:block;
+    margin-top:.8vh;
+    font-family:var(--mono);
+    font-size:max(10px,.8vw);
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    opacity:.6;
+  }
+  /* callout src 命名别名 */
+  .callout-src{
+    display:block;
+    margin-top:1.6vh;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    opacity:.6;
+  }
+
+  /* ---------- chrome & foot 补位（layouts.md 简单写法） ---------- */
+  .chrome{font-family:var(--mono);font-size:max(11px,.78vw);letter-spacing:.2em;text-transform:uppercase;opacity:.62}
+  .foot{font-family:var(--mono);font-size:max(11px,.78vw);letter-spacing:.18em;text-transform:uppercase;opacity:.5}
+
+  /* ============ 动效系统(Motion One 驱动) ============
+     所有 [data-anim] 元素默认隐藏,进入页面时由 JS 逐个揭示。
+     - cascade(默认):按 DOM 顺序 stagger 120ms 淡入 + y:16→0
+     - hero(hero 页自动):慢一点的 stagger 180ms
+     - quote(含 [data-anim="line"]):逐行 600ms 淡入
+     - directional(含 [data-anim="left|right"]):左→分隔线→右
+     - pipeline(data-animate="pipeline"):Space/→ 手动推进
+     Motion One 没加载成功时(CDN 断 + 本地丢),所有 [data-anim] 会兜底显示。
+  */
+  [data-anim]{opacity:1}
+  body.motion-ready [data-anim]{opacity:0}
+  body.motion-ready [data-anim="left"]{transform:translateX(-24px)}
+  body.motion-ready [data-anim="right"]{transform:translateX(24px)}
+  body.motion-ready [data-anim="line"]{opacity:0;transform:translateY(10px)}
+  body.motion-ready [data-animate="pipeline"] [data-anim]{opacity:.15}
+  body.low-power #deck{transition:none!important}
+  body.low-power *,
+  body.low-power *::before,
+  body.low-power *::after{animation:none!important;transition:none!important}
+  body.low-power.motion-ready [data-anim],
+  body.low-power [data-anim]{opacity:1!important;transform:none!important}
+
+  /* ---------- 响应式降级 ---------- */
+  @media (max-width:900px){
+    .display{font-size:16vw}
+    .display-zh{font-size:12vw}
+    .h1-zh{font-size:7vw}
+    .h-hero{font-size:14vw}
+    .h-xl{font-size:9vw}
+    .pipeline{grid-template-columns:repeat(2,1fr)}
+    .grid-2-7-5,.grid-2-6-6,.grid-2-8-4{grid-template-columns:1fr}
+  }
+</style>
 </head>
-
 <body>
-  <div class="progress-bar" id="progressBar"></div>
-  <nav class="nav-dots" id="navDots"></nav>
+<script>
+  (function(){
+    const KEY = 'guizang-ppt-low-power';
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stored = localStorage.getItem(KEY);
+    window.__lowPowerMode = stored === '1' || (stored === null && reduced);
+    function updateHint(){
+      const hint = document.getElementById('hint');
+      if(hint) hint.textContent = `← → 翻页 · B ${window.__lowPowerMode ? '动态' : '静态'} · ESC 索引`;
+    }
+    window.__setLowPowerMode = function(on, opts={}){
+      window.__lowPowerMode = !!on;
+      document.body.classList.toggle('low-power', window.__lowPowerMode);
+      if(opts.persist !== false) localStorage.setItem(KEY, window.__lowPowerMode ? '1' : '0');
+      if(window.__lowPowerMode && document.getAnimations){
+        document.getAnimations().forEach(a=>a.cancel());
+      }
+      updateHint();
+      dispatchEvent(new CustomEvent('ppt-low-power-change', {detail:{on:window.__lowPowerMode}}));
+      if(window.__playSlide) window.__playSlide(window.__currentSlideIndex || 0);
+    };
+    document.body.classList.toggle('low-power', window.__lowPowerMode);
+    addEventListener('DOMContentLoaded', updateHint, {once:true});
+  })();
+</script>
 
-  <!-- ==================== SLIDE 1: Title ==================== -->
-  <section class="slide dark-slide" id="slide-1">
-    <div class="deco-circle" style="width: 60vh; height: 60vh; top: -20vh; right: -15vh; background: var(--accent-light);"></div>
-    <div class="deco-circle" style="width: 40vh; height: 40vh; bottom: -10vh; left: -10vh; background: var(--accent);"></div>
-    <div class="slide-content" style="align-items: center; text-align: center;">
-      <p class="reveal chapter-number light" style="margin-bottom: calc(var(--content-gap) * 1.5);">内训材料</p>
-      <h1 class="reveal slide-title" style="font-size: clamp(2.2rem, 6vw, 5rem); font-weight: 900;">职场向上管理与沟通</h1>
-      <div class="reveal divider light" style="margin: var(--content-gap) auto;"></div>
-      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.6);">把所有人变成你的资源</p>
-      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 1 —</p>
+<canvas id="bg-dark" class="bg"></canvas>
+<canvas id="bg-light" class="bg"></canvas>
+<div id="hint">← → 翻页 · B 静态 · ESC 索引</div>
+
+<div id="deck">
+
+<!-- ============================================================
+     SLIDES 插入区 · 在此处填充所有 <section class="slide ..."> 页面
+     每页模板参考 references/page-patterns.md
+     页面组件参考 references/components.md
+     ============================================================ -->
+
+
+<!-- ========== SLIDE 1: 封面 ========== -->
+<section class="slide hero dark">
+  <div class="chrome">
+    <div>内训分享 · 2026.05</div>
+    <div>Vol.01</div>
+  </div>
+  <div class="frame" style="display:grid; gap:4vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>职场生存法则</div>
+    <h1 class="h-hero" data-anim>向上管理与沟通</h1>
+    <h2 class="h-sub" data-anim>没有所谓的向上管理，只有资源优化与商业合作</h2>
+    <p class="lead" style="max-width:60vw" data-anim>
+      你和上司、下属、同事、公司的关系，本质上都是商业合作关系。沟通与管理的目标，是优化资源利用，实现利人利己利公司。
+    </p>
+    <div class="meta-row" data-anim>
+      <span>内训课程</span><span>·</span><span>约 60 分钟</span>
     </div>
-  </section>
+  </div>
+  <div class="foot">
+    <div>职场向上管理与沟通 · 内训材料</div>
+    <div>— 2026 —</div>
+  </div>
+</section>
 
-  <!-- ==================== SLIDE 2: 开篇核心 ==================== -->
-  <section class="slide" id="slide-2">
-    <div class="slide-content">
-      <p class="reveal chapter-number">开篇</p>
-      <h2 class="reveal slide-title">没有所谓的向上管理</h2>
-      <div class="reveal divider"></div>
-      <p class="reveal slide-body" style="max-width: 700px;">
-        职场中常听到"向上管理"这个词，但它本质上是一个伪命题。
-        真正重要的不是"管理老板"，而是理解你与周围所有人的关系本质。
+<!-- ========== SLIDE 2: 开篇金句 ========== -->
+<section class="slide light" data-animate="quote">
+  <div class="chrome">
+    <div>The Takeaway · 核心观点</div>
+    <div>02 / 36</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>Opening · 开篇</div>
+    <blockquote style="font-family:var(--serif-zh); font-weight:700; font-size:5.2vw; line-height:1.25; letter-spacing:-.01em; max-width:76vw">
+      <span data-anim="line" style="display:block">"没有所谓的向上管理。"</span>
+      <span data-anim="line" style="display:block">"只有商业合作关系</span>
+      <span data-anim="line" style="display:block">与资源优化。"</span>
+    </blockquote>
+    <p class="lead" style="max-width:55vw; opacity:.65" data-anim>
+      所有关系——上司、下属、同事、公司——都是你可以利用的资源。注意：你并不拥有和指挥他们，但你要学会管理住他们。
+    </p>
+    <div class="meta-row" data-anim>
+      <span>— 核心前提</span><span>·</span><span>适用于和所有人的沟通</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 02 · 核心观点</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 3: 商业合作关系 ========== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>核心认知 · Foundation</div>
+    <div>03 / 36</div>
+  </div>
+  <div class="frame grid-2-7-5" style="padding-top:6vh">
+    <div style="display:flex; flex-direction:column; justify-content:space-between; gap:3vh">
+      <div>
+        <div class="kicker" data-anim>BUT</div>
+        <h2 class="h-xl" style="white-space:nowrap" data-anim>不是雇佣，是合作。</h2>
+        <p class="lead" style="margin-top:3vh" data-anim>
+          你和老板、同事、下属、公司的关系，本质上是商业合作关系。理解了这一点，你就不会再有"谁指挥谁"的执念。
+        </p>
+      </div>
+      <div class="callout" data-anim>
+        "他们是你<span class="hi">可以利用</span>的资源，<br>不是你拥有的财产。"
+        <div class="callout-src">— 关键认知转变</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:3vh;justify-content:center">
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Relationship</div>
+        <div class="stat-nb" style="font-size:4.2vw">商业<span class="stat-unit">合作</span></div>
+        <div class="stat-note">不是上下级，不是依附</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Resource</div>
+        <div class="stat-nb" style="font-size:4.2vw">可被<span class="stat-unit">管理</span></div>
+        <div class="stat-note">可被利用，但不被拥有</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Goal</div>
+        <div class="stat-nb" style="font-size:4.2vw">利人<span class="stat-unit">利己</span></div>
+        <div class="stat-note">优化资源配置，实现共赢</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 03 · 核心认知</div>
+    <div>Foundation</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 4: 优化资源利用 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>沟通目标 · Objective</div>
+    <div>04 / 36</div>
+  </div>
+  <div class="frame grid-2-8-4" style="padding-top:6vh">
+    <div>
+      <div class="kicker" data-anim>Objective · 目标</div>
+      <h2 class="h-xl" style="margin-top:1vh; margin-bottom:3vh" data-anim>优化资源，实现共赢</h2>
+      <p class="lead" style="margin-bottom:3vh" data-anim>
+        沟通与管理的目标，都是优化资源利用，实现利人利己利公司。这套方法适用于和所有人的沟通，并「管理」（调动）他们。
       </p>
+      <div style="display:flex;flex-direction:column;gap:2.4vh;margin-top:4vh">
+        <div class="rowline" data-anim>
+          <div class="k">利人</div>
+          <div class="v">让老板、同事、团队的目标更容易达成</div>
+          <div class="m">WIN</div>
+        </div>
+        <div class="rowline" data-anim>
+          <div class="k">利己</div>
+          <div class="v">让自己的成长、资源、空间最大化</div>
+          <div class="m">WIN</div>
+        </div>
+        <div class="rowline" data-anim>
+          <div class="k">利公司</div>
+          <div class="v">公司整体效率提升，目标达成</div>
+          <div class="m">WIN</div>
+        </div>
+      </div>
     </div>
-    <span class="page-num">2</span>
-  </section>
+    <div style="display:flex;flex-direction:column;gap:3vh;justify-content:center">
+      <div class="pillar" data-anim>
+        <div class="ic">01</div>
+        <div class="t">识别资源</div>
+        <div class="d">谁手里有你需要的信息、权力、支持？</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic">02</div>
+        <div class="t">优化配置</div>
+        <div class="d">如何让资源流向最高效的环节？</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic">03</div>
+        <div class="t">实现共赢</div>
+        <div class="d">让每一方都觉得自己赢了</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 04 · 沟通目标</div>
+    <div>Objective</div>
+  </div>
+</section>
 
-  <!-- ==================== SLIDE 3: 商业合作 ==================== -->
-  <section class="slide" id="slide-3">
-    <div class="slide-content">
-      <p class="reveal chapter-number">开篇 · 核心认知</p>
-      <h2 class="reveal slide-title">都是商业合作关系</h2>
-      <div class="reveal divider"></div>
-      <ul class="reveal styled-list" style="max-width: 720px;">
-        <li>你和<span class="keyword">上司</span>的关系，是商业合作</li>
-        <li>你和<span class="keyword">下属</span>的关系，是商业合作</li>
-        <li>你和<span class="keyword">同事</span>的关系，是商业合作</li>
-        <li>你和<span class="keyword">公司</span>的关系，也是商业合作</li>
+<!-- ========== SLIDE 5: 第一章幕封 ========== -->
+<section class="slide hero light">
+  <div class="chrome">
+    <div>第一章 · 资源盘点</div>
+    <div>Act I · 05 / 36</div>
+  </div>
+  <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>Act I</div>
+    <h1 class="h-hero" style="font-size:8.5vw" data-anim>盘点资源</h1>
+    <p class="lead" style="max-width:55vw" data-anim>
+      先画地图，再走路。日常里你不知道的事情会很少，因此，你才应该有自信自己不知道一些事情的勇气。
+    </p>
+  </div>
+  <div class="foot">
+    <div>第一章引子</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 6: 全局地图 ========== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>全局地图 · Map</div>
+    <div>Act I · 06 / 36</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker" data-anim>Map · 你的全局地图</div>
+    <h2 class="h-xl" data-anim>先看清棋盘，再落子</h2>
+    <p class="lead" style="margin-bottom:4vh;max-width:60vw" data-anim>盘点你和老板、公司、Peer、团队的全局关系，是向上管理的第一步。</p>
+    <div class="grid-3" style="margin-top:4vh">
+      <div class="pillar" style="padding:3vh 2vw;border:1px solid rgba(255,255,255,.15)" data-anim>
+        <div class="ic"><i data-lucide="network" class="ico-lg"></i></div>
+        <div class="t">公司业务<br>与组织架构</div>
+        <div class="d">公司怎么赚钱？各部门怎么协作？决策链怎么走？</div>
+      </div>
+      <div class="pillar" style="padding:3vh 2vw;border:1px solid rgba(255,255,255,.15)" data-anim>
+        <div class="ic"><i data-lucide="users" class="ico-lg"></i></div>
+        <div class="t">你老板<br>的关系</div>
+        <div class="d">老板向谁汇报？老板的 KPI 是什么？老板的压力来自哪里？</div>
+      </div>
+      <div class="pillar" style="padding:3vh 2vw;border:1px solid rgba(255,255,255,.15)" data-anim>
+        <div class="ic"><i data-lucide="link" class="ico-lg"></i></div>
+        <div class="t">你和老板<br>的关系</div>
+        <div class="d">你们的信任度如何？沟通频率？风格匹配度？</div>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:3vh">
+      <div class="pillar" style="padding:3vh 2vw;border:1px solid rgba(255,255,255,.15)" data-anim>
+        <div class="ic"><i data-lucide="share-2" class="ico-lg"></i></div>
+        <div class="t">你和 Peer<br>的关系</div>
+        <div class="d">谁是你的盟友？谁是你的信息源？竞争还是协作？</div>
+      </div>
+      <div class="pillar" style="padding:3vh 2vw;border:1px solid rgba(255,255,255,.15)" data-anim>
+        <div class="ic"><i data-lucide="compass" class="ico-lg"></i></div>
+        <div class="t">你和团队<br>的关系</div>
+        <div class="d">如果有团队，他们的能力、状态、诉求是什么？</div>
+      </div>
+      <div class="pillar" style="padding:3vh 2vw;border:1px solid rgba(255,255,255,.15)" data-anim>
+        <div class="ic"><i data-lucide="target" class="ico-lg"></i></div>
+        <div class="t">你自己<br>的位置</div>
+        <div class="d">你在整个棋局中处于什么位置？你的独特价值是什么？</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 06 · 全局地图</div>
+    <div>Act I · Map</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 7: 关系网络 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>关系网络 · Relations</div>
+    <div>Act I · 07 / 36</div>
+  </div>
+  <div class="frame grid-2-6-6" style="padding-top:5vh">
+    <div data-anim="left" style="padding:3vh 2vw; border-left:3px solid currentColor; opacity:.85">
+      <div class="kicker" style="opacity:.9">你老板的关系</div>
+      <h3 class="h-md" style="margin-top:2vh">向上看一层</h3>
+      <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55; opacity:.82">
+        <li>老板向谁汇报？他的老板关心什么？</li>
+        <li>老板的 KPI 和核心压力点在哪？</li>
+        <li>老板目前的优先级排序是什么？</li>
       </ul>
-      <p class="reveal note">它们不是情感关系，不是依附关系，而是平等的资源交换关系。</p>
     </div>
-    <span class="page-num">3</span>
-  </section>
+    <div data-anim="right" style="padding:3vh 2vw; border-left:3px solid currentColor">
+      <div class="kicker" style="opacity:.9">你和你 Peer 的关系</div>
+      <h3 class="h-md" style="margin-top:2vh">平行协作网</h3>
+      <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55; opacity:.82">
+        <li>谁是关键信息节点？</li>
+        <li>谁可以在关键时刻给你背书？</li>
+        <li>谁是潜在的阻力或风险？</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 07 · 关系网络</div>
+    <div>Act I · Relations</div>
+  </div>
+</section>
 
-  <!-- ==================== SLIDE 4: 资源视角 ==================== -->
-  <section class="slide" id="slide-4">
-    <div class="slide-content">
-      <p class="reveal chapter-number">开篇 · 资源视角</p>
-      <h2 class="reveal slide-title">所有人都是你的资源</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 720px;">
-        <p class="slide-body" style="margin-bottom: var(--content-gap);">
-          注意：你<span class="keyword">并不拥有</span>他们，也<span class="keyword">不能指挥</span>他们。
-          但你要学会<span class="keyword">管理住</span>他们——调动、借力、共赢。
-        </p>
-        <div class="quote-block">
-          "沟通与管理的目标，都是优化资源利用，实现利人利己利公司。"
-        </div>
-        <p class="slide-body" style="margin-top: var(--content-gap);">
-          这套方法适用于和<span class="keyword">所有人</span>的沟通，并"管理"（调动）他们。
-        </p>
+<!-- ========== SLIDE 8: 升职加薪是假象 ========== -->
+<section class="slide dark" data-animate="quote">
+  <div class="chrome">
+    <div>The Truth · 真相</div>
+    <div>Act I · 08 / 36</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>Truth · 职场真相</div>
+    <blockquote style="font-family:var(--serif-zh); font-weight:700; font-size:5.8vw; line-height:1.2; letter-spacing:-.01em; max-width:72vw">
+      <span data-anim="line" style="display:block">"升职加薪是假象，</span>
+      <span data-anim="line" style="display:block">是结果，不应该是原因。"</span>
+    </blockquote>
+    <p class="lead" style="max-width:55vw; opacity:.65" data-anim>
+      如果你把升职加薪当作目标，你会失去方向。正确的做法是：专注于创造价值，让升职加薪成为自然结果。
+    </p>
+    <div class="meta-row" data-anim>
+      <span>— 认知纠偏</span><span>·</span><span>先创造价值，再谈回报</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 08 · 职场真相</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 9: 当前工作的核心目的 ========== -->
+<section class="slide light" data-animate="directional">
+  <div class="chrome">
+    <div>目标定位 · Purpose</div>
+    <div>Act I · 09 / 36</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker" data-anim>Purpose · 核心目的</div>
+    <h2 class="h-xl" style="margin-bottom:4vh" data-anim>当前这份工作，你图什么？</h2>
+    <div class="grid-2-6-6" style="gap:5vw 4vh">
+      <div data-anim="left" style="padding:3vh 2vw; border-left:3px solid currentColor; opacity:.55">
+        <div class="kicker" style="opacity:.9">错误心态</div>
+        <h3 class="h-md" style="margin-top:2vh">混日子 / 等升职加薪</h3>
+        <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55">
+          <li>被动等待，没有主动规划</li>
+          <li>把升职加薪当作唯一目标</li>
+          <li>缺乏对全局的认知</li>
+          <li>容易被淘汰或边缘化</li>
+        </ul>
       </div>
-    </div>
-    <span class="page-num">4</span>
-  </section>
-
-  <!-- ==================== SLIDE 5: Ch1 Title ==================== -->
-  <section class="slide dark-slide" id="slide-5">
-    <div class="deco-line" style="width: 30%; top: 33%; left: 0;"></div>
-    <div class="deco-line" style="width: 20%; bottom: 33%; right: 0;"></div>
-    <div class="slide-content" style="align-items: center; text-align: center;">
-      <p class="reveal chapter-number light">第一章</p>
-      <h2 class="reveal slide-title" style="font-size: clamp(2rem, 5vw, 4rem);">盘点你和老板<br/>与公司的全局地图</h2>
-      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.5);">盘点资源，是行动的前提</p>
-      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 5 —</p>
-    </div>
-  </section>
-
-  <!-- ==================== SLIDE 6: 全局地图 ==================== -->
-  <section class="slide" id="slide-6">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第一章 · 盘点资源</p>
-      <h2 class="reveal slide-title">先画一张全局地图</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal two-col" style="max-width: 900px;">
-        <div>
-          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem;">公司业务</h4>
-          <p class="slide-body">公司在做什么？核心商业模式是什么？收入来源与成本结构？</p>
-        </div>
-        <div>
-          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem;">组织架构</h4>
-          <p class="slide-body">各部门如何分工？决策链怎么跑？你的位置在哪里？</p>
-        </div>
-      </div>
-      <p class="reveal note" style="margin-top: var(--content-gap);">理解公司业务与组织架构，是你一切判断的底层坐标系。</p>
-    </div>
-    <span class="page-num">6</span>
-  </section>
-
-  <!-- ==================== SLIDE 7: 关系网 ==================== -->
-  <section class="slide" id="slide-7">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第一章 · 关系网络</p>
-      <h2 class="reveal slide-title">厘清四种关键关系</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal grid" style="max-width: 900px; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 2vw, 1.5rem);">
-        <div class="info-card">
-          <h4>你的老板</h4>
-          <p>他的目标、压力、偏好、决策风格是什么？</p>
-        </div>
-        <div class="info-card">
-          <h4>你的 Peer</h4>
-          <p>他们的能力边界、利益诉求、合作历史？</p>
-        </div>
-        <div class="info-card">
-          <h4>你的团队</h4>
-          <p>如果有团队，他们的状态、能力、动机如何？</p>
-        </div>
-        <div class="info-card">
-          <h4>你自己</h4>
-          <p>你的优势、短板、当前阶段的核心诉求？</p>
-        </div>
-      </div>
-    </div>
-    <span class="page-num">7</span>
-  </section>
-
-  <!-- ==================== SLIDE 8: 信息即自信 ==================== -->
-  <section class="slide" id="slide-8">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第一章 · 认知升级</p>
-      <h2 class="reveal slide-title">信息即自信</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 720px;">
-        <p class="slide-body" style="margin-bottom: var(--content-gap);">
-          当你把上述地图画完，你会发现：日常里，<span class="keyword">你不知道的事情会很少</span>。
-        </p>
-        <div class="quote-block">
-          "因此，你才应该有自信自己不知道一些事情的勇气。"
-        </div>
-        <p class="slide-body" style="margin-top: var(--content-gap);">
-          真正的自信不是假装全知，而是清楚知道自己知道什么、不知道什么。
-        </p>
-      </div>
-    </div>
-    <span class="page-num">8</span>
-  </section>
-
-  <!-- ==================== SLIDE 9: 升职加薪 ==================== -->
-  <section class="slide" id="slide-9">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第一章 · 核心洞察</p>
-      <h2 class="reveal slide-title">升职加薪是假象</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 720px;">
-        <p class="slide-body" style="margin-bottom: var(--content-gap);">
-          升职加薪是<span class="keyword">结果</span>，不应该是<span class="keyword">原因</span>。
-        </p>
-        <p class="slide-body">
-          如果你把工作目标设定为"升职加薪"，你的动作会变形。<br/>
-          真正该问的是：当前这份工作，你当前这个阶段，<span class="keyword">最核心的目的是什么</span>？
-        </p>
-        <ul class="styled-list" style="margin-top: var(--content-gap);">
-          <li>积累技能？</li>
-          <li>积累人脉？</li>
-          <li>保持现金流，同时尽量少干活、有余闲？</li>
+      <div data-anim="right" style="padding:3vh 2vw; border-left:3px solid currentColor">
+        <div class="kicker" style="opacity:.9">正确心态</div>
+        <h3 class="h-md" style="margin-top:2vh">明确阶段核心目的</h3>
+        <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55">
+          <li>积累<span class="hi">技能</span>——让自己更值钱</li>
+          <li>积累<span class="hi">人脉</span>——建立信任网络</li>
+          <li>保持<span class="hi">现金流</span>——有余闲做更重要的事</li>
+          <li>尽量少干活有余闲——战略性偷懒</li>
         </ul>
       </div>
     </div>
-    <span class="page-num">9</span>
-  </section>
+  </div>
+  <div class="foot">
+    <div>Page 09 · 目标定位</div>
+    <div>Act I · Purpose</div>
+  </div>
+</section>
 
-  <!-- ==================== SLIDE 10: Ch2 Title ==================== -->
-  <section class="slide dark-slide" id="slide-10">
-    <div class="deco-line" style="width: 25%; top: 40%; left: 0;"></div>
-    <div class="deco-line" style="width: 15%; bottom: 35%; right: 0;"></div>
-    <div class="slide-content" style="align-items: center; text-align: center;">
-      <p class="reveal chapter-number light">第二章</p>
-      <h2 class="reveal slide-title">向上管理的目标<br/>是利用好老板</h2>
-      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.5);">老板是你最重要的资源</p>
-      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 10 —</p>
+<!-- ========== SLIDE 10: 第二章幕封 ========== -->
+<section class="slide hero dark">
+  <div class="chrome">
+    <div>第二章 · 利用老板</div>
+    <div>Act II · 10 / 36</div>
+  </div>
+  <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>Act II</div>
+    <h1 class="h-hero" style="font-size:8.5vw" data-anim>利用老板</h1>
+    <p class="lead" style="max-width:55vw" data-anim>
+      企业里最重要的资源，是老板的注意力。向上管理的目标，是设计一条路径，让你的目的和老板的目的一致。
+    </p>
+  </div>
+  <div class="foot">
+    <div>第二章引子</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 11: 老板的注意力 ========== -->
+<section class="slide light" data-animate="quote">
+  <div class="chrome">
+    <div>The Quote · 金句</div>
+    <div>Act II · 11 / 36</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>Quote · 金句</div>
+    <blockquote style="font-family:var(--serif-zh); font-weight:700; font-size:5.8vw; line-height:1.2; letter-spacing:-.01em; max-width:72vw">
+      <span data-anim="line" style="display:block">"企业里最重要的资源，</span>
+      <span data-anim="line" style="display:block">是老板的注意力。"</span>
+    </blockquote>
+    <p class="lead" style="max-width:55vw; opacity:.65" data-anim>
+      注意力是稀缺资源。谁能更高效地获取和运用老板的注意力，谁就能在组织中拥有更大的影响力。
+    </p>
+    <div class="meta-row" data-anim>
+      <span>— 核心认知</span><span>·</span><span>注意力 &gt; 时间 &gt; 金钱</span>
     </div>
-  </section>
+  </div>
+  <div class="foot">
+    <div>Page 11 · 金句</div>
+    <div>— · —</div>
+  </div>
+</section>
 
-  <!-- ==================== SLIDE 11: 金句 ==================== -->
-  <section class="slide" id="slide-11">
-    <div class="slide-content" style="align-items: center; text-align: center;">
-      <p class="reveal chapter-number">第二章 · 核心金句</p>
-      <div class="reveal" style="max-width: 800px;">
-        <div class="quote-block" style="border-left: none; padding-left: 0; text-align: center; font-size: clamp(1.4rem, 3.5vw, 2.2rem); font-weight: 700;">
-          "企业里最重要的资源，<br/>是老板的注意力。"
-        </div>
-        <div class="divider" style="margin: var(--content-gap) auto;"></div>
-        <p class="reveal slide-body" style="text-align: center;">
-          注意力是稀缺品。谁拿到了老板的注意力，谁就拿到了资源、支持与晋升的通道。
+<!-- ========== SLIDE 12: 设计路径 ========== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>路径设计 · Path</div>
+    <div>Act II · 12 / 36</div>
+  </div>
+  <div class="frame grid-2-7-5" style="padding-top:6vh">
+    <div style="display:flex; flex-direction:column; justify-content:space-between; gap:3vh">
+      <div>
+        <div class="kicker" data-anim>Path · 路径设计</div>
+        <h2 class="h-xl" data-anim>让你的目的<br>和老板的目的<br>一致。</h2>
+        <p class="lead" style="margin-top:3vh" data-anim>
+          利用老板，达到自己的目的。关键在于如何设计出一条路径，让你的目标和老板的目标产生共振。
         </p>
       </div>
-    </div>
-    <span class="page-num">11</span>
-  </section>
-
-  <!-- ==================== SLIDE 12: 利用老板 ==================== -->
-  <section class="slide" id="slide-12">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第二章 · 策略</p>
-      <h2 class="reveal slide-title">让老板为你的目的服务</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 720px;">
-        <p class="slide-body" style="margin-bottom: var(--content-gap);">
-          "利用老板"不是贬义词。它的意思是：<span class="keyword">设计一条路径，让你的目的和老板的目的一致。</span>
-        </p>
-        <p class="slide-body">
-          当老板觉得推进你的事就是在推进他的事，资源、授权、背书都会自然流向你。
-        </p>
+      <div class="callout" data-anim>
+        "不是改变老板的目标，<br>而是让你的目标<span class="hi">嵌入</span>老板的目标之中。"
+        <div class="callout-src">— 向上管理的核心策略</div>
       </div>
     </div>
-    <span class="page-num">12</span>
-  </section>
-
-  <!-- ==================== SLIDE 13: 知道什么 ==================== -->
-  <section class="slide" id="slide-13">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第二章 · 信息边界</p>
-      <h2 class="reveal slide-title">知道老板知道什么，<br/>不知道什么</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal two-col" style="max-width: 900px;">
-        <div>
-          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem; color: var(--accent);">老板知道什么</h4>
-          <p class="slide-body">他的信息源、他的判断依据、他的固有认知——这是你沟通的起点。</p>
-        </div>
-        <div>
-          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem; color: var(--accent);">老板不知道什么</h4>
-          <p class="slide-body">信息差就是你的价值空间。补上这个差，你就不可替代。</p>
-        </div>
+    <div style="display:flex;flex-direction:column;gap:3vh;justify-content:center">
+      <div class="pillar" data-anim>
+        <div class="ic">01</div>
+        <div class="t">理解老板的目标</div>
+        <div class="d">老板这个季度/年度的核心 KPI 是什么？</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic">02</div>
+        <div class="t">找到交集点</div>
+        <div class="d">你的目标和老板目标的交集在哪里？</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic">03</div>
+        <div class="t">设计共赢路径</div>
+        <div class="d">让每一步推进都同时服务两个目标</div>
       </div>
     </div>
-    <span class="page-num">13</span>
-  </section>
+  </div>
+  <div class="foot">
+    <div>Page 12 · 路径设计</div>
+    <div>Act II · Path</div>
+  </div>
+</section>
 
-  <!-- ==================== SLIDE 14: 两个错误 ==================== -->
-  <section class="slide" id="slide-14">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第二章 · 常见错误</p>
-      <h2 class="reveal slide-title">两个致命的信息错误</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal grid" style="max-width: 900px; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 2vw, 1.5rem);">
-        <div class="info-card" style="border-color: rgba(139,58,58,0.2);">
-          <h4 style="color: var(--accent);">错误一 · 该报没报</h4>
-          <p>需要老板知道的事，没有及时让老板知道。等老板从别的渠道知道，你就失去了主动权。</p>
-        </div>
-        <div class="info-card" style="border-color: rgba(139,58,58,0.2);">
-          <h4 style="color: var(--accent);">错误二 · 不该报乱报</h4>
-          <p>不需要老板知道的事，汇报给他——这是在浪费企业最稀缺的注意力资源。</p>
-        </div>
+<!-- ========== SLIDE 13: 知道与不知道的边界 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>信息边界 · Info</div>
+    <div>Act II · 13 / 36</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker" data-anim>Info · 信息边界</div>
+    <h2 class="h-xl" data-anim>知道老板知道什么，不知道什么</h2>
+    <p class="lead" style="margin-bottom:4vh;max-width:60vw" data-anim>管理信息的第一步，是清晰划分老板的信息边界。</p>
+    <div class="grid-2-6-6" style="gap:5vw 4vh">
+      <div data-anim="left" style="padding:3vh 2vw; border-left:3px solid currentColor">
+        <div class="kicker" style="opacity:.9">老板需要知道什么</div>
+        <h3 class="h-md" style="margin-top:2vh">必须及时汇报</h3>
+        <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55">
+          <li>影响项目进度/质量的风险</li>
+          <li>需要老板决策或背书的事项</li>
+          <li>超出预期或低于预期的情况</li>
+          <li>竞品或市场的重大变化</li>
+        </ul>
       </div>
-    </div>
-    <span class="page-num">14</span>
-  </section>
-
-  <!-- ==================== SLIDE 15: 管理决策 ==================== -->
-  <section class="slide" id="slide-15">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第二章 · 核心逻辑</p>
-      <h2 class="reveal slide-title">管理信息 = 管理决策</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 720px;">
-        <p class="slide-body" style="margin-bottom: var(--content-gap);">
-          管理信息，管理注意力，就能<span class="keyword">管理老板的决策</span>。
-        </p>
-        <p class="slide-body">
-          老板每天接收的信息量极大。你控制他接收什么、何时接收、以什么形式接收，
-          就在一定程度上控制了他的认知和判断。
-        </p>
-      </div>
-    </div>
-    <span class="page-num">15</span>
-  </section>
-
-  <!-- ==================== SLIDE 16: 本职内外 ==================== -->
-  <section class="slide" id="slide-16">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第二章 · 行动指南</p>
-      <h2 class="reveal slide-title">本职之内与之外</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal two-col" style="max-width: 900px;">
-        <div>
-          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem;">本职工作内</h4>
-          <p class="slide-body">优先级相对容易理解——把分内事做到超出预期。</p>
-        </div>
-        <div>
-          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem;">本职工作外</h4>
-          <p class="slide-body">主动做更多对老板重要的、甚至老板都不知道怎么办的事——这是你的<span class="keyword">超额价值</span>。</p>
-        </div>
-      </div>
-    </div>
-    <span class="page-num">16</span>
-  </section>
-
-  <!-- ==================== SLIDE 17: Ch3 Title ==================== -->
-  <section class="slide dark-slide" id="slide-17">
-    <div class="deco-line" style="width: 20%; top: 30%; right: 0;"></div>
-    <div class="deco-line" style="width: 30%; bottom: 40%; left: 0;"></div>
-    <div class="slide-content" style="align-items: center; text-align: center;">
-      <p class="reveal chapter-number light">第三章</p>
-      <h2 class="reveal slide-title">沟通基本功</h2>
-      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.5);">和老板沟通失效，代价最大</p>
-      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 17 —</p>
-    </div>
-  </section>
-
-  <!-- ==================== SLIDE 18: 语气 ==================== -->
-  <section class="slide" id="slide-18">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第三章 · 语气与原则</p>
-      <h2 class="reveal slide-title">语气：笃定、节奏、不啰嗦</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 720px;">
-        <p class="slide-body" style="margin-bottom: var(--content-gap);">
-          不光是跟老板，跟<span class="keyword">所有人</span>的沟通，都应该遵循同一套原则。
-          之所以专门在这里提，是因为如果和老板沟通效果差，对个人的负面影响更大。
-        </p>
-        <ul class="styled-list">
-          <li><span style="color: var(--text-primary); font-weight: 700;">笃定</span> — 不要犹豫、摇摆、自我否定</li>
-          <li><span style="color: var(--text-primary); font-weight: 700;">节奏</span> — 有快有慢，重点停顿</li>
-          <li><span style="color: var(--text-primary); font-weight: 700;">不啰嗦</span> — 每一句话都要有价值</li>
-          <li><span style="color: var(--text-primary); font-weight: 700;">有说服力</span> — 用事实和逻辑说话，不用情绪</li>
+      <div data-anim="right" style="padding:3vh 2vw; border-left:3px solid currentColor; opacity:.7">
+        <div class="kicker" style="opacity:.9">老板不需要知道什么</div>
+        <h3 class="h-md" style="margin-top:2vh">不必浪费注意力</h3>
+        <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55">
+          <li>日常执行的细枝末节</li>
+          <li>团队内部已解决的小问题</li>
+          <li>你个人的学习过程</li>
+          <li>重复性的进度更新</li>
         </ul>
       </div>
     </div>
-    <span class="page-num">18</span>
-  </section>
+  </div>
+  <div class="foot">
+    <div>Page 13 · 信息边界</div>
+    <div>Act II · Info</div>
+  </div>
+</section>
 
-  <!-- ==================== SLIDE 19: 明确闭环 ==================== -->
-  <section class="slide" id="slide-19">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第三章 · 核心原则</p>
-      <h2 class="reveal slide-title">明确 · 闭环 · 有回响</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 720px;">
-        <p class="slide-body" style="margin-bottom: var(--content-gap);">
-          任何沟通——包括给领导，也包括给同事——都要做到这三点。
-        </p>
-        <div class="two-col" style="gap: clamp(1rem, 2vw, 2rem);">
-          <div class="info-card">
-            <h4>给领导</h4>
-            <p>交代的事要有进度反馈，有问题及时同步，完成时明确告知结果。</p>
-          </div>
-          <div class="info-card">
-            <h4>给同事</h4>
-            <p>即使无法解决，也要给出路——不要只丢问题，丢方案或方向。</p>
-          </div>
-        </div>
-        <p class="note">同事关系是非常重要的资源。往上走，一定会需要外部背书和评价。</p>
+<!-- ========== SLIDE 14: 管理信息就是管理决策 ========== -->
+<section class="slide dark" data-animate="directional">
+  <div class="chrome">
+    <div>决策管理 · Decision</div>
+    <div>Act II · 14 / 36</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker" data-anim>Decision · 管理决策</div>
+    <h2 class="h-xl" style="margin-bottom:4vh" data-anim>管理信息，管理注意力，就能管理老板的决策</h2>
+    <div class="grid-2-6-6" style="gap:5vw 4vh">
+      <div data-anim="left" style="padding:3vh 2vw; border-left:3px solid currentColor; opacity:.55">
+        <div class="kicker" style="opacity:.9">错误做法</div>
+        <h3 class="h-md" style="margin-top:2vh">信息失控</h3>
+        <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55">
+          <li>需要知道的，但没有及时让老板知道</li>
+          <li>不需要老板知道的，汇报给老板</li>
+          <li>信息过载，老板无法判断优先级</li>
+          <li>关键时刻信息断层</li>
+        </ul>
       </div>
-    </div>
-    <span class="page-num">19</span>
-  </section>
-
-  <!-- ==================== SLIDE 20: 不拒绝问出路 ==================== -->
-  <section class="slide" id="slide-20">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第三章 · 行动准则</p>
-      <h2 class="reveal slide-title">不拒绝，问，永远给出路</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 720px;">
-        <p class="slide-body" style="margin-bottom: var(--content-gap);">
-          遇到做不到的事，不要直接说"不"。<br/>
-          要问清楚需求，然后<span class="keyword">给出替代方案或路径</span>。
-        </p>
-        <div class="quote-block">
-          "任何不确定：明确问，要有问的勇气，要有自己不知道的勇气，绝对不要装懂。"
-        </div>
-      </div>
-    </div>
-    <span class="page-num">20</span>
-  </section>
-
-  <!-- ==================== SLIDE 21: 不确定就问 ==================== -->
-  <section class="slide" id="slide-21">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第三章 · 诚实策略</p>
-      <h2 class="reveal slide-title">不懂就问，比装懂安全</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal two-col" style="max-width: 900px;">
-        <div>
-          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem; color: var(--accent);">事前说不懂</h4>
-          <p class="slide-body">老板会降低预期。最后交付时，哪怕只是达到基础水平，也在预期之内。</p>
-        </div>
-        <div>
-          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem; color: var(--accent);">装懂</h4>
-          <p class="slide-body">老板会提高预期。一旦交付不及预期，失望后的损失远高于"提前示弱"。</p>
-        </div>
-      </div>
-    </div>
-    <span class="page-num">21</span>
-  </section>
-
-  <!-- ==================== SLIDE 22: 降低沟通成本 ==================== -->
-  <section class="slide" id="slide-22">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第三章 · 效率</p>
-      <h2 class="reveal slide-title">降低沟通成本</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 800px;">
-        <ul class="styled-list">
-          <li><span style="color: var(--text-primary); font-weight: 700;">永远给方案，给选择，不给开放问题。</span><br/><span style="font-size: var(--small-size);">适用于向上沟通，也适用于一切沟通。</span></li>
-          <li><span style="color: var(--text-primary); font-weight: 700;">老板不给反馈，就往前推一步再问。</span><br/><span style="font-size: var(--small-size);">比如细化一点点，补充参考信息。不要在同样的状态下过一阵再追问。</span></li>
-          <li><span style="color: var(--text-primary); font-weight: 700;">定期 1v1。</span><br/><span style="font-size: var(--small-size);">把零散沟通收束到固定节奏里，减少随机打扰，提高信息密度。</span></li>
+      <div data-anim="right" style="padding:3vh 2vw; border-left:3px solid currentColor">
+        <div class="kicker" style="opacity:.9">正确做法</div>
+        <h3 class="h-md" style="margin-top:2vh">信息策展</h3>
+        <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55">
+          <li>精准筛选：只给老板需要的信息</li>
+          <li>及时推送：风险提前预警</li>
+          <li>结构化呈现：结论先行</li>
+          <li>控制频率：重要事项集中汇报</li>
         </ul>
       </div>
     </div>
-    <span class="page-num">22</span>
-  </section>
+  </div>
+  <div class="foot">
+    <div>Page 14 · 决策管理</div>
+    <div>Act II · Decision</div>
+  </div>
+</section>
 
-  <!-- ==================== SLIDE 23: Ch4 Title ==================== -->
-  <section class="slide dark-slide" id="slide-23">
-    <div class="deco-line" style="width: 25%; top: 35%; left: 0;"></div>
-    <div class="deco-line" style="width: 18%; bottom: 38%; right: 0;"></div>
-    <div class="slide-content" style="align-items: center; text-align: center;">
-      <p class="reveal chapter-number light">第四章</p>
-      <h2 class="reveal slide-title">信息密度与偏好管理</h2>
-      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.5);">让每一次汇报都值钱</p>
-      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 23 —</p>
-    </div>
-  </section>
-
-  <!-- ==================== SLIDE 24: 原则与错误 ==================== -->
-  <section class="slide" id="slide-24">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第四章 · 原则与错误</p>
-      <h2 class="reveal slide-title">有结论，高密度，只说该说的</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 800px;">
-        <p class="slide-body" style="margin-bottom: var(--content-gap);">
-          原则：<span class="keyword">有结论</span>，信息密度要<span class="keyword">大</span>，只提作为一个老板<span class="keyword">需要知道</span>的部分。
-        </p>
-        <div class="grid" style="grid-template-columns: 1fr 1fr 1fr; gap: clamp(0.75rem, 1.5vw, 1rem); margin-top: var(--content-gap);">
-          <div class="info-card" style="border-color: rgba(139,58,58,0.15);">
-            <h4 style="color: var(--accent); font-size: var(--small-size);">错误一</h4>
-            <p style="font-size: var(--small-size);">堆叠工作——把做的事罗列出来，没有结论。</p>
-          </div>
-          <div class="info-card" style="border-color: rgba(139,58,58,0.15);">
-            <h4 style="color: var(--accent); font-size: var(--small-size);">错误二</h4>
-            <p style="font-size: var(--small-size);">先铺垫再结论——老板时间宝贵，不要绕弯子。</p>
-          </div>
-          <div class="info-card" style="border-color: rgba(139,58,58,0.15);">
-            <h4 style="color: var(--accent); font-size: var(--small-size);">错误三</h4>
-            <p style="font-size: var(--small-size);">甩锅，不给方案——老板请你来是解决问题的。</p>
-          </div>
-        </div>
+<!-- ========== SLIDE 15: 本职工作内外 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>价值延伸 · Value</div>
+    <div>Act II · 15 / 36</div>
+  </div>
+  <div class="frame grid-2-8-4" style="padding-top:6vh">
+    <div>
+      <div class="kicker" data-anim>Value · 价值延伸</div>
+      <h2 class="h-xl" style="margin-top:1vh; margin-bottom:3vh" data-anim>本职工作内，优先级更容易理解</h2>
+      <p class="lead" style="margin-bottom:3vh" data-anim>
+        本职工作外，主动做更多对老板重要的、甚至老板都不知道怎么办的事——这才是真正的向上管理。
+      </p>
+      <div class="callout" style="margin-top:3vh" data-anim>
+        "最好的向上管理，<br>是帮老板解决他<span class="hi">还没意识到</span>的问题。"
+        <div class="callout-src">— 高阶策略</div>
       </div>
     </div>
-    <span class="page-num">24</span>
-  </section>
-
-  <!-- ==================== SLIDE 25: 报问题 ==================== -->
-  <section class="slide" id="slide-25">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第四章 · 报问题</p>
-      <h2 class="reveal slide-title">报问题的正确结构</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 720px;">
-        <ol class="styled-list" style="list-style: none; counter-reset: item;">
-          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">① 快速说问题</span> — 一句话讲清楚发生了什么</li>
-          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">② 说问题的影响</span> — 对业务、对团队、对时间线的影响</li>
-          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">③ 说你的解决办法</span> — 至少准备一个方案</li>
-          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">④ 可选说原因</span> — 如果需要追责或复盘，再补充</li>
-        </ol>
+    <div style="display:flex;flex-direction:column;gap:3vh;justify-content:center">
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Inside</div>
+        <div class="stat-nb" style="font-size:4.2vw">本职<span class="stat-unit">之内</span></div>
+        <div class="stat-note">做好该做的，理解优先级</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Outside</div>
+        <div class="stat-nb" style="font-size:4.2vw">本职<span class="stat-unit">之外</span></div>
+        <div class="stat-note">主动承担，创造超预期价值</div>
       </div>
     </div>
-    <span class="page-num">25</span>
-  </section>
+  </div>
+  <div class="foot">
+    <div>Page 15 · 价值延伸</div>
+    <div>Act II · Value</div>
+  </div>
+</section>
 
-  <!-- ==================== SLIDE 26: 要决策 ==================== -->
-  <section class="slide" id="slide-26">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第四章 · 要决策</p>
-      <h2 class="reveal slide-title">要决策的正确结构</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 800px;">
-        <ol class="styled-list" style="list-style: none; counter-reset: item;">
-          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">① 快速说需要决策的内容</span></li>
-          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">② 说选择</span> — 不要只有一个选项</li>
-          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">③ 说利弊</span> — 每个选项的得失</li>
-          <li style="counter-increment: item;"><span style="color: var(--accent); font-weight: 700;">④ 说你的偏好</span> — 让老板做选择题，不是开放题</li>
-        </ol>
-        <p class="note" style="margin-top: calc(var(--content-gap) * 1.2);">
-          要决策的本质：需要老板背锅，或需要老板独有的资源、知识、信息。否则不需要老板决策。
+<!-- ========== SLIDE 16: 第三章幕封 ========== -->
+<section class="slide hero light">
+  <div class="chrome">
+    <div>第三章 · 沟通基本功</div>
+    <div>Act III · 16 / 36</div>
+  </div>
+  <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>Act III</div>
+    <h1 class="h-hero" style="font-size:7.8vw" data-anim>沟通基本功</h1>
+    <p class="lead" style="max-width:55vw" data-anim>
+      不光是跟老板，跟所有人的沟通，都应该遵循同样的原则。之所以在这里专门提，是因为和老板沟通效果差，对个人的负面影响更大。
+    </p>
+  </div>
+  <div class="foot">
+    <div>第三章引子</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 17: 潜台词 ========== -->
+<section class="slide dark" data-animate="quote">
+  <div class="chrome">
+    <div>The Context · 潜台词</div>
+    <div>Act III · 17 / 36</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>Context · 潜台词</div>
+    <blockquote style="font-family:var(--serif-zh); font-weight:700; font-size:5.2vw; line-height:1.25; letter-spacing:-.01em; max-width:76vw">
+      <span data-anim="line" style="display:block">"和老板沟通效果差，</span>
+      <span data-anim="line" style="display:block">对个人的负面影响</span>
+      <span data-anim="line" style="display:block">比其他沟通更大。"</span>
+    </blockquote>
+    <p class="lead" style="max-width:55vw; opacity:.65" data-anim>
+      这套沟通原则适用于所有人，但在老板身上，失败的代价最高。
+    </p>
+    <div class="meta-row" data-anim>
+      <span>— 为什么专门讲</span><span>·</span><span>因为后果不同</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 17 · 潜台词</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 18: 语气与原则 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>语气原则 · Tone</div>
+    <div>Act III · 18 / 36</div>
+  </div>
+  <div class="frame grid-2-7-5" style="padding-top:6vh">
+    <div style="display:flex; flex-direction:column; justify-content:space-between; gap:3vh">
+      <div>
+        <div class="kicker" data-anim>Tone · 语气</div>
+        <h2 class="h-xl" data-anim>笃定，节奏，<br>不啰嗦，<br>要有说服力。</h2>
+        <p class="lead" style="margin-top:3vh" data-anim>
+          任何沟通：明确，闭环，有回响。包括给领导，也包括给同事。
         </p>
       </div>
-    </div>
-    <span class="page-num">26</span>
-  </section>
-
-  <!-- ==================== SLIDE 27: Ch5 Title ==================== -->
-  <section class="slide dark-slide" id="slide-27">
-    <div class="deco-line" style="width: 22%; top: 32%; right: 0;"></div>
-    <div class="deco-line" style="width: 28%; bottom: 36%; left: 0;"></div>
-    <div class="slide-content" style="align-items: center; text-align: center;">
-      <p class="reveal chapter-number light">第五章</p>
-      <h2 class="reveal slide-title">邪修</h2>
-      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.5);">高阶心法与暗黑技巧</p>
-      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 27 —</p>
-    </div>
-  </section>
-
-  <!-- ==================== SLIDE 28: 影响老板 ==================== -->
-  <section class="slide" id="slide-28">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第五章 · 植入观点</p>
-      <h2 class="reveal slide-title">如何影响老板</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 720px;">
-        <p class="slide-body" style="margin-bottom: var(--content-gap);">
-          老板注意力稀缺，有固有思维方式和观点，<span class="keyword">很难被说服</span>。
-        </p>
-        <div class="quote-block">
-          "老板是不可以被说服的。但观点是可以植入的——放长线，做长局。"
-        </div>
-        <p class="slide-body" style="margin-top: var(--content-gap);">
-          不要试图在一次对话里改变老板。重复、渗透、让想法变成"他自己想到的"。
-        </p>
+      <div class="callout" data-anim>
+        "同事关系是非常重要的资源，<br>因为往上走一定会需要<span class="hi">外部背书</span>和评价。"
+        <div class="callout-src">— 不要忽视平行关系</div>
       </div>
     </div>
-    <span class="page-num">28</span>
-  </section>
-
-  <!-- ==================== SLIDE 29: 控制对手方 ==================== -->
-  <section class="slide" id="slide-29">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第五章 · 博弈</p>
-      <h2 class="reveal slide-title">控制对手方</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 720px;">
-        <p class="slide-body" style="margin-bottom: var(--content-gap);">
-          <span class="keyword">表达方式决定了对方可能的反馈范围。</span>
-        </p>
-        <p class="slide-body">
-          你怎么提问题，对方就只能在你框定的选项里回答。<br/>
-          精心设计你的表达，就是设计对方的回应空间。
-        </p>
+    <div style="display:flex;flex-direction:column;gap:3vh;justify-content:center">
+      <div class="pillar" data-anim>
+        <div class="ic"><i data-lucide="check-circle" class="ico-lg"></i></div>
+        <div class="t">明确</div>
+        <div class="d">不说模糊话，不给开放问题</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic"><i data-lucide="repeat" class="ico-lg"></i></div>
+        <div class="t">闭环</div>
+        <div class="d">事事有回音，件件有着落</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic"><i data-lucide="activity" class="ico-lg"></i></div>
+        <div class="t">有回响</div>
+        <div class="d">即使无法解决，也要给出路</div>
       </div>
     </div>
-    <span class="page-num">29</span>
-  </section>
+  </div>
+  <div class="foot">
+    <div>Page 18 · 语气原则</div>
+    <div>Act III · Tone</div>
+  </div>
+</section>
 
-  <!-- ==================== SLIDE 30: 识别风险 ==================== -->
-  <section class="slide" id="slide-30">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第五章 · 风控</p>
-      <h2 class="reveal slide-title">识别风险，插旗子，或救火</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal two-col" style="max-width: 900px;">
-        <div>
-          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem;">插旗子</h4>
-          <p class="slide-body">提前预警风险，留下书面记录。出事时可以"I told you so"，保护你自己。</p>
-        </div>
-        <div>
-          <h4 style="font-size: var(--body-size); font-weight: 700; margin-bottom: 0.5rem;">及时救火</h4>
-          <p class="slide-body">风险爆发时，冲在最前面解决——这是你建立信任和展示价值的关键时刻。</p>
-        </div>
+
+
+<!-- ========== SLIDE 19: 明确闭环有回响 ========== -->
+<section class="slide dark" data-animate="directional">
+  <div class="chrome">
+    <div>闭环原则 · Closure</div>
+    <div>Act III · 19 / 36</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker" data-anim>Closure · 闭环原则</div>
+    <h2 class="h-xl" style="margin-bottom:4vh" data-anim>任何沟通：明确，闭环，有回响</h2>
+    <div class="grid-2-6-6" style="gap:5vw 4vh">
+      <div data-anim="left" style="padding:3vh 2vw; border-left:3px solid currentColor; opacity:.55">
+        <div class="kicker" style="opacity:.9">错误做法</div>
+        <h3 class="h-md" style="margin-top:2vh">有头无尾</h3>
+        <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55">
+          <li>交代了任务，但没有确认理解</li>
+          <li>遇到卡点，没有主动同步</li>
+          <li>做完了，没有反馈结果</li>
+          <li>说"有问题再说"，然后消失</li>
+        </ul>
       </div>
-    </div>
-    <span class="page-num">30</span>
-  </section>
-
-  <!-- ==================== SLIDE 31: 预期管理上 ==================== -->
-  <section class="slide" id="slide-31">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第五章 · 预期管理</p>
-      <h2 class="reveal slide-title">如何不瞎卷：预期管理</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 800px;">
-        <ul class="styled-list">
-          <li><span style="color: var(--text-primary); font-weight: 700;">好好干的同时，降低预期。</span><br/><span style="font-size: var(--small-size);">降低预期的事要做在最前面。</span></li>
-          <li><span style="color: var(--text-primary); font-weight: 700;">超出预期的结果，要放在关键的时间。</span><br/><span style="font-size: var(--small-size);">不要在日常小事上过度消耗惊喜感。</span></li>
-          <li><span style="color: var(--text-primary); font-weight: 700;">不重要的事，不要低于预期。</span><br/><span style="font-size: var(--small-size);">维持基本信任线。</span></li>
+      <div data-anim="right" style="padding:3vh 2vw; border-left:3px solid currentColor">
+        <div class="kicker" style="opacity:.9">正确做法</div>
+        <h3 class="h-md" style="margin-top:2vh">有始有终</h3>
+        <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55">
+          <li>接收任务时<span class="hi">复述确认</span></li>
+          <li>执行中关键节点主动汇报</li>
+          <li>完成后总结成果与经验</li>
+          <li>即使无法解决，也要<span class="hi">给出路</span></li>
         </ul>
       </div>
     </div>
-    <span class="page-num">31</span>
-  </section>
+  </div>
+  <div class="foot">
+    <div>Page 19 · 闭环原则</div>
+    <div>Act III · Closure</div>
+  </div>
+</section>
 
-  <!-- ==================== SLIDE 32: 预期管理下 ==================== -->
-  <section class="slide" id="slide-32">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第五章 · 预期管理</p>
-      <h2 class="reveal slide-title">关键节点，一定要超出预期</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 720px;">
-        <div class="quote-block">
-          "重要的事，关键的节点，最开始的印象，一定要超出预期很多。"
-        </div>
-        <p class="slide-body" style="margin-top: var(--content-gap);">
-          预期管理不是躺平。它是把有限的精力和注意力，<span class="keyword">精准投放到高杠杆的时刻</span>。
-        </p>
+<!-- ========== SLIDE 20: 不拒绝问给出路 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>沟通策略 · Strategy</div>
+    <div>Act III · 20 / 36</div>
+  </div>
+  <div class="frame grid-2-8-4" style="padding-top:6vh">
+    <div>
+      <div class="kicker" data-anim>Strategy · 沟通策略</div>
+      <h2 class="h-xl" style="margin-top:1vh; margin-bottom:3vh" data-anim>不拒绝，问，永远给出路</h2>
+      <p class="lead" style="margin-bottom:3vh" data-anim>
+        任何不确定：明确问，要有问的勇气，要有自己不知道的勇气，绝对不要装懂。
+      </p>
+      <div class="callout" style="margin-top:3vh" data-anim>
+        "事前明确自己不懂，老板会降低预期。<br>装自己懂，老板会提高预期，<span class="hi">失望后的损失更高。</span>"
+        <div class="callout-src">— 诚实是最好的策略</div>
       </div>
     </div>
-    <span class="page-num">32</span>
-  </section>
+    <div style="display:flex;flex-direction:column;gap:3vh;justify-content:center">
+      <div class="pillar" data-anim>
+        <div class="ic"><i data-lucide="search-check" class="ico-lg"></i></div>
+        <div class="t">明确问</div>
+        <div class="d">不知道就问，别猜。猜错的代价远高于问的成本。</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic"><i data-lucide="arrow-right" class="ico-lg"></i></div>
+        <div class="t">给出路</div>
+        <div class="d">永远给方案，给选择，不给开放问题。</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic"><i data-lucide="shield-check" class="ico-lg"></i></div>
+        <div class="t">有勇气</div>
+        <div class="d">承认自己不知道，是一种职业自信。</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 20 · 沟通策略</div>
+    <div>Act III · Strategy</div>
+  </div>
+</section>
 
-  <!-- ==================== SLIDE 33: 汇报时机 ==================== -->
-  <section class="slide" id="slide-33">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第五章 · 时机</p>
-      <h2 class="reveal slide-title">汇报要看准时机</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 800px;">
-        <p class="slide-body" style="margin-bottom: var(--content-gap);">
-          不是准备好了就汇报，而是<span class="keyword">在正确的时间窗口</span>汇报。
+<!-- ========== SLIDE 21: 降低沟通成本 Pipeline ========== -->
+<section class="slide dark" data-animate="pipeline">
+  <div class="chrome">
+    <div>效率提升 · Efficiency</div>
+    <div>Act III · 21 / 36</div>
+  </div>
+  <div class="frame">
+    <div class="kicker">Efficiency · 降低沟通成本</div>
+    <h2 class="h-xl">三条法则，让沟通更高效</h2>
+    <div class="pipeline-section">
+      <div class="pipeline-label">法则一 · 给方案不给开放问题</div>
+      <div class="pipeline" data-cols="3">
+        <div class="step" data-anim="step">
+          <div class="step-nb">01</div>
+          <div class="step-title">永远给方案</div>
+          <div class="step-desc">带着至少两个选项去找老板</div>
+        </div>
+        <div class="step" data-anim="step">
+          <div class="step-nb">02</div>
+          <div class="step-title">给选择</div>
+          <div class="step-desc">让老板做选择题，不是问答题</div>
+        </div>
+        <div class="step" data-anim="step">
+          <div class="step-nb">03</div>
+          <div class="step-title">不给开放问题</div>
+          <div class="step-desc">"怎么办"换成"A还是B"</div>
+        </div>
+      </div>
+    </div>
+    <div class="pipeline-section">
+      <div class="pipeline-label">法则二 · 往前推一步再问</div>
+      <div class="pipeline" data-cols="3">
+        <div class="step" data-anim="step">
+          <div class="step-nb">04</div>
+          <div class="step-title">细化一点点</div>
+          <div class="step-desc">不要同样状态下过一阵再追问</div>
+        </div>
+        <div class="step" data-anim="step">
+          <div class="step-nb">05</div>
+          <div class="step-title">补充参考信息</div>
+          <div class="step-desc">带上背景、数据、对比</div>
+        </div>
+        <div class="step" data-anim="step">
+          <div class="step-nb">06</div>
+          <div class="step-title">展示思考过程</div>
+          <div class="step-desc">让老板看到你的努力</div>
+        </div>
+      </div>
+    </div>
+    <div class="pipeline-section">
+      <div class="pipeline-label">法则三 · 定期 1v1</div>
+      <div class="pipeline" data-cols="3">
+        <div class="step" data-anim="step">
+          <div class="step-nb">07</div>
+          <div class="step-title">固定节奏</div>
+          <div class="step-desc">每周或每两周一次</div>
+        </div>
+        <div class="step" data-anim="step">
+          <div class="step-nb">08</div>
+          <div class="step-title">提前准备</div>
+          <div class="step-desc">带着议程和问题去</div>
+        </div>
+        <div class="step" data-anim="step">
+          <div class="step-nb">09</div>
+          <div class="step-title">同步与对齐</div>
+          <div class="step-desc">确保方向一致，风险透明</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 21 · 降低沟通成本</div>
+    <div>Act III · Efficiency</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 22: 第四章幕封 ========== -->
+<section class="slide hero dark">
+  <div class="chrome">
+    <div>第四章 · 信息密度</div>
+    <div>Act IV · 22 / 36</div>
+  </div>
+  <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>Act IV</div>
+    <h1 class="h-hero" style="font-size:7.8vw" data-anim>信息密度与偏好</h1>
+    <p class="lead" style="max-width:55vw" data-anim>
+      有结论，信息密度要大，只提作为一个老板需要知道的部分。
+    </p>
+  </div>
+  <div class="foot">
+    <div>第四章引子</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 23: 信息密度原则 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>核心原则 · Principle</div>
+    <div>Act IV · 23 / 36</div>
+  </div>
+  <div class="frame grid-2-7-5" style="padding-top:6vh">
+    <div style="display:flex; flex-direction:column; justify-content:space-between; gap:3vh">
+      <div>
+        <div class="kicker" data-anim>Principle · 核心原则</div>
+        <h2 class="h-xl" data-anim>有结论，<br>信息密度要大，<br>只提老板需要知道的。</h2>
+        <p class="lead" style="margin-top:3vh" data-anim>
+          老板的时间是稀缺资源。你的每一次汇报，都是对他注意力的征用。征用前，请确保值得。
         </p>
-        <ul class="styled-list">
-          <li>公司做预算的时间</li>
-          <li>董事会的时间</li>
-          <li>绩效定稿评估的时间</li>
-          <li>项目里程碑的关键节点</li>
+      </div>
+      <div class="callout" data-anim>
+        "老板不需要知道你怎么做的，<br>他只需要知道<span class="hi">结果和影响</span>。"
+        <div class="callout-src">— 信息策展原则</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:3vh;justify-content:center">
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Rule 01</div>
+        <div class="stat-nb" style="font-size:3.8vw">结论<span class="stat-unit">先行</span></div>
+        <div class="stat-note">先给结论，再给论据</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Rule 02</div>
+        <div class="stat-nb" style="font-size:3.8vw">高<span class="stat-unit">密度</span></div>
+        <div class="stat-note">每句话都有信息量</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Rule 03</div>
+        <div class="stat-nb" style="font-size:3.8vw">精准<span class="stat-unit">筛选</span></div>
+        <div class="stat-note">只给老板决策需要的信息</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 23 · 核心原则</div>
+    <div>Act IV · Principle</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 24: 常见错误 ========== -->
+<section class="slide dark" data-animate="directional">
+  <div class="chrome">
+    <div>常见错误 · Mistakes</div>
+    <div>Act IV · 24 / 36</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker" data-anim>Mistakes · 常见错误</div>
+    <h2 class="h-xl" style="margin-bottom:4vh" data-anim>三种最常见的沟通错误</h2>
+    <div class="grid-3" style="margin-top:4vh">
+      <div class="pillar" style="padding:3vh 2vw;border:1px solid rgba(255,255,255,.15)" data-anim>
+        <div class="ic"><i data-lucide="x-circle" class="ico-lg"></i></div>
+        <div class="t">堆叠工作</div>
+        <div class="d">把一堆琐事罗列给老板，没有重点，没有结论。老板只看到信息垃圾。</div>
+      </div>
+      <div class="pillar" style="padding:3vh 2vw;border:1px solid rgba(255,255,255,.15)" data-anim>
+        <div class="ic"><i data-lucide="x-circle" class="ico-lg"></i></div>
+        <div class="t">先铺垫再结论</div>
+        <div class="d">铺垫太长，老板已经失去耐心。结论藏在一堆背景后面，找不到。</div>
+      </div>
+      <div class="pillar" style="padding:3vh 2vw;border:1px solid rgba(255,255,255,.15)" data-anim>
+        <div class="ic"><i data-lucide="x-circle" class="ico-lg"></i></div>
+        <div class="t">甩锅不给方案</div>
+        <div class="d">只报问题不给解法，等于把问题抛回给老板。这是最大的失职。</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 24 · 常见错误</div>
+    <div>Act IV · Mistakes</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 25: 报问题的正确方式 Pipeline ========== -->
+<section class="slide light" data-animate="pipeline">
+  <div class="chrome">
+    <div>正确方式 · How To</div>
+    <div>Act IV · 25 / 36</div>
+  </div>
+  <div class="frame">
+    <div class="kicker">How To · 报问题的正确方式</div>
+    <h2 class="h-xl">报问题的时候，按这个顺序</h2>
+    <div class="pipeline-section">
+      <div class="pipeline-label">报问题 · Problem Reporting</div>
+      <div class="pipeline" data-cols="4">
+        <div class="step" data-anim="step">
+          <div class="step-nb">01</div>
+          <div class="step-title">快速说问题</div>
+          <div class="step-desc">一句话概括核心问题</div>
+        </div>
+        <div class="step" data-anim="step">
+          <div class="step-nb">02</div>
+          <div class="step-title">说问题的影响</div>
+          <div class="step-desc">对项目/团队/公司的影响</div>
+        </div>
+        <div class="step" data-anim="step">
+          <div class="step-nb">03</div>
+          <div class="step-title">说你的解决办法</div>
+          <div class="step-desc">带着方案来，不是只带问题</div>
+        </div>
+        <div class="step" data-anim="step">
+          <div class="step-nb">04</div>
+          <div class="step-title">可选说原因</div>
+          <div class="step-desc">如果有助于理解，简要说明</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 25 · 正确方式</div>
+    <div>Act IV · How To</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 26: 要决策的正确方式 ========== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>决策请求 · Decision</div>
+    <div>Act IV · 26 / 36</div>
+  </div>
+  <div class="frame grid-2-8-4" style="padding-top:6vh">
+    <div>
+      <div class="kicker" data-anim>Decision · 要决策的时候</div>
+      <h2 class="h-xl" style="margin-top:1vh; margin-bottom:3vh" data-anim>快速说需要决策的内容</h2>
+      <p class="lead" style="margin-bottom:3vh" data-anim>
+        要决策，本质是需要老板背锅的时候。要决策，是老板有你无法决策的资源、知识、信息的时候。否则不需要老板决策。
+      </p>
+      <div class="callout" style="margin-top:3vh" data-anim>
+        "如果一件事老板<span class="hi">几乎一定会同意</span>，<br>那么就不应该请示。"
+        <div class="callout-src">— 决策边界判断</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:3vh;justify-content:center">
+      <div class="pillar" data-anim>
+        <div class="ic">01</div>
+        <div class="t">说选择</div>
+        <div class="d">列出可行的选项</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic">02</div>
+        <div class="t">说利弊</div>
+        <div class="d">每个选项的优缺点</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic">03</div>
+        <div class="t">说你的偏好</div>
+        <div class="d">推荐哪个及原因</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 26 · 决策请求</div>
+    <div>Act IV · Decision</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 27: 第五章幕封 ========== -->
+<section class="slide hero light">
+  <div class="chrome">
+    <div>第五章 · 邪修</div>
+    <div>Act V · 27 / 36</div>
+  </div>
+  <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>Act V</div>
+    <h1 class="h-hero" style="font-size:10vw" data-anim>邪修</h1>
+    <p class="lead" style="max-width:55vw" data-anim>
+      高级技巧。如何影响老板，如何控制对手方，如何识别风险，如何预期管理，如何把握汇报时机。
+    </p>
+  </div>
+  <div class="foot">
+    <div>第五章引子</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 28: 如何影响老板 ========== -->
+<section class="slide dark">
+  <div class="chrome">
+    <div>影响植入 · Influence</div>
+    <div>Act V · 28 / 36</div>
+  </div>
+  <div class="frame grid-2-7-5" style="padding-top:6vh">
+    <div style="display:flex; flex-direction:column; justify-content:space-between; gap:3vh">
+      <div>
+        <div class="kicker" data-anim>Influence · 影响植入</div>
+        <h2 class="h-xl" data-anim>老板是<br>不可被说服的，<br>但观点可以被植入。</h2>
+        <p class="lead" style="margin-top:3vh" data-anim>
+          老板注意力稀缺，有固有思维方式，很难改变。但观点是可以植入的——放长线，做长局。
+        </p>
+      </div>
+      <div class="callout" data-anim>
+        "不要试图说服老板，<br>要<span class="hi">让老板觉得</span>这个主意是他自己想到的。"
+        <div class="callout-src">— 植入的艺术</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:3vh;justify-content:center">
+      <div class="pillar" data-anim>
+        <div class="ic">01</div>
+        <div class="t">理解思维框架</div>
+        <div class="d">老板的决策习惯和价值排序是什么？</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic">02</div>
+        <div class="t">提前埋种子</div>
+        <div class="d">在正式提案前多次提及相关概念</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic">03</div>
+        <div class="t">让老板说出来</div>
+        <div class="d">引导老板自己得出结论</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 28 · 影响植入</div>
+    <div>Act V · Influence</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 29: 控制对手方 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>表达控制 · Framing</div>
+    <div>Act V · 29 / 36</div>
+  </div>
+  <div class="frame grid-2-8-4" style="padding-top:6vh">
+    <div>
+      <div class="kicker" data-anim>Framing · 表达控制</div>
+      <h2 class="h-xl" style="margin-top:1vh; margin-bottom:3vh" data-anim>表达方式决定了对方可能的反馈范围</h2>
+      <p class="lead" style="margin-bottom:3vh" data-anim>
+        同样的请求，不同的表达方式，会得到完全不同的结果。控制表达方式，就是控制对方的反馈空间。
+      </p>
+      <div class="callout" style="margin-top:3vh" data-anim>
+        "你不是在请求许可，<br>你是在<span class="hi">框定选择</span>。"
+        <div class="callout-src">— 谈判的起点</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:3vh;justify-content:center">
+      <div class="pillar" data-anim>
+        <div class="ic"><i data-lucide="corner-down-right" class="ico-lg"></i></div>
+        <div class="t">框定范围</div>
+        <div class="d">给出边界，让对方在范围内选择</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic"><i data-lucide="target" class="ico-lg"></i></div>
+        <div class="t">预设默认</div>
+        <div class="d">让"同意"成为默认选项</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic"><i data-lucide="compass" class="ico-lg"></i></div>
+        <div class="t">引导方向</div>
+        <div class="d">用措辞引导对方往你想要的方向走</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 29 · 表达控制</div>
+    <div>Act V · Framing</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 30: 预期管理 ========== -->
+<section class="slide dark" data-animate="directional">
+  <div class="chrome">
+    <div>预期管理 · Expectation</div>
+    <div>Act V · 30 / 36</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker" data-anim>Expectation · 预期管理</div>
+    <h2 class="h-xl" style="margin-bottom:4vh" data-anim>好好干的同时，降低预期</h2>
+    <div class="grid-2-6-6" style="gap:5vw 4vh">
+      <div data-anim="left" style="padding:3vh 2vw; border-left:3px solid currentColor">
+        <div class="kicker" style="opacity:.9">降低预期</div>
+        <h3 class="h-md" style="margin-top:2vh">做在最前面</h3>
+        <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55">
+          <li>降低预期的事要做在<span class="hi">最前面</span></li>
+          <li>事前声明可能的困难和风险</li>
+          <li>给自己留有余地</li>
+          <li>不瞎卷，不硬撑</li>
         </ul>
-        <p class="note">在这些时间点之前布局、铺垫、出结果，才能最大化你的曝光价值。</p>
+      </div>
+      <div data-anim="right" style="padding:3vh 2vw; border-left:3px solid currentColor">
+        <div class="kicker" style="opacity:.9">超出预期</div>
+        <h3 class="h-md" style="margin-top:2vh">放在关键时间</h3>
+        <ul style="margin-top:3vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.4vh; font-family:var(--sans-zh); font-size:max(14px,1.1vw); line-height:1.55">
+          <li>超出预期的结果，要放在<span class="hi">关键的时间</span></li>
+          <li>不重要的事，不要低于预期</li>
+          <li>重要的事、关键节点、最开始的印象，一定要超出预期很多</li>
+        </ul>
       </div>
     </div>
-    <span class="page-num">33</span>
-  </section>
+  </div>
+  <div class="foot">
+    <div>Page 30 · 预期管理</div>
+    <div>Act V · Expectation</div>
+  </div>
+</section>
 
-  <!-- ==================== SLIDE 34: Ch6 Title ==================== -->
-  <section class="slide dark-slide" id="slide-34">
-    <div class="deco-line" style="width: 30%; top: 38%; left: 0;"></div>
-    <div class="deco-line" style="width: 20%; bottom: 33%; right: 0;"></div>
-    <div class="slide-content" style="align-items: center; text-align: center;">
-      <p class="reveal chapter-number light">第六章</p>
-      <h2 class="reveal slide-title">总结</h2>
-      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.5);">把地图装在心里</p>
-      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 34 —</p>
-    </div>
-  </section>
-
-  <!-- ==================== SLIDE 35: 上帝视角 ==================== -->
-  <section class="slide" id="slide-35">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第六章 · 终极心法</p>
-      <h2 class="reveal slide-title">建立上帝视角</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 720px;">
-        <p class="slide-body" style="margin-bottom: var(--content-gap);">
-          理解老板甚至老板的老板的目标、困难，站过去，<span class="keyword">把自己拔到高维度去</span>——甚至比老板更高。
-        </p>
-        <p class="slide-body">
-          当你能用老板的老板的视角看问题，你的建议自然有分量，你的判断自然准确，你的价值自然稀缺。
-        </p>
-      </div>
-    </div>
-    <span class="page-num">35</span>
-  </section>
-
-  <!-- ==================== SLIDE 36: 放长线 ==================== -->
-  <section class="slide" id="slide-36">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第六章 · 时间维度</p>
-      <h2 class="reveal slide-title">越是大的地方，越要放长线</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal" style="max-width: 720px;">
-        <p class="slide-body" style="margin-bottom: var(--content-gap);">
-          大厂、大领导、大组织——决策周期长，人际关系复杂，短期博弈收益低。
-        </p>
-        <div class="quote-block">
-          "越是大厂、大领导，越要放长线。"
+<!-- ========== SLIDE 31: 汇报时机 ========== -->
+<section class="slide light" data-animate="pipeline">
+  <div class="chrome">
+    <div>时机把握 · Timing</div>
+    <div>Act V · 31 / 36</div>
+  </div>
+  <div class="frame">
+    <div class="kicker">Timing · 汇报的时机</div>
+    <h2 class="h-xl">关键时间节点</h2>
+    <div class="pipeline-section">
+      <div class="pipeline-label">要考虑的时间点 · Key Moments</div>
+      <div class="pipeline" data-cols="4">
+        <div class="step" data-anim="step">
+          <div class="step-nb">01</div>
+          <div class="step-title">公司做预算</div>
+          <div class="step-desc">提前布局，争取资源</div>
         </div>
-        <p class="slide-body" style="margin-top: var(--content-gap);">
-          用半年、一年、三年的时间尺度去经营关系、积累信任、等待窗口。
-        </p>
-      </div>
-    </div>
-    <span class="page-num">36</span>
-  </section>
-
-  <!-- ==================== SLIDE 37: 书籍推荐 ==================== -->
-  <section class="slide" id="slide-37">
-    <div class="slide-content">
-      <p class="reveal chapter-number">第六章 · 延伸阅读</p>
-      <h2 class="reveal slide-title">推荐三本书</h2>
-      <div class="reveal divider"></div>
-      <div class="reveal book-list" style="justify-content: center;">
-        <div class="book-item">
-          <div class="book-icon"></div>
-          <span>《猴子》</span>
+        <div class="step" data-anim="step">
+          <div class="step-nb">02</div>
+          <div class="step-title">董事会时间</div>
+          <div class="step-desc">老板需要向上汇报的素材</div>
         </div>
-        <div class="book-item">
-          <div class="book-icon"></div>
-          <span>《谈判的逻辑》</span>
+        <div class="step" data-anim="step">
+          <div class="step-nb">03</div>
+          <div class="step-title">绩效评估</div>
+          <div class="step-desc">成果展示的关键窗口</div>
         </div>
-        <div class="book-item">
-          <div class="book-icon"></div>
-          <span>《说服的瞬间》</span>
+        <div class="step" data-anim="step">
+          <div class="step-nb">04</div>
+          <div class="step-title">项目里程碑</div>
+          <div class="step-desc">关键时刻的曝光机会</div>
         </div>
       </div>
-      <p class="reveal note" style="text-align: center;">这三本书分别对应责任边界、博弈策略、影响技巧。</p>
     </div>
-    <span class="page-num">37</span>
-  </section>
+  </div>
+  <div class="foot">
+    <div>Page 31 · 汇报时机</div>
+    <div>Act V · Timing</div>
+  </div>
+</section>
 
-  <!-- ==================== SLIDE 38: End ==================== -->
-  <section class="slide dark-slide" id="slide-38">
-    <div class="deco-circle" style="width: 50vh; height: 50vh; top: -15vh; left: -10vh; background: var(--accent-light);"></div>
-    <div class="deco-circle" style="width: 35vh; height: 35vh; bottom: -10vh; right: -10vh; background: var(--accent);"></div>
-    <div class="slide-content" style="align-items: center; text-align: center;">
-      <h2 class="reveal slide-title" style="font-size: clamp(1.8rem, 4.5vw, 3.5rem); font-weight: 700;">把所有人变成你的资源</h2>
-      <div class="reveal divider light" style="margin: var(--content-gap) auto;"></div>
-      <p class="reveal slide-subtitle" style="color: rgba(245,243,238,0.5);">职场向上管理与沟通</p>
-      <p class="reveal page-num" style="position: static; margin-top: auto; opacity: 0.3;">— 完 —</p>
+<!-- ========== SLIDE 32: 第六章幕封 ========== -->
+<section class="slide hero dark">
+  <div class="chrome">
+    <div>第六章 · 总结</div>
+    <div>Act VI · 32 / 36</div>
+  </div>
+  <div class="frame" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>Act VI</div>
+    <h1 class="h-hero" style="font-size:8.5vw" data-anim>总结</h1>
+    <p class="lead" style="max-width:55vw" data-anim>
+      理解老板甚至老板的老板的目标、困难，站过去，把自己拔到高纬度去，建立上帝视角。
+    </p>
+  </div>
+  <div class="foot">
+    <div>第六章引子</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 33: 上帝视角 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>上帝视角 · Perspective</div>
+    <div>Act VI · 33 / 36</div>
+  </div>
+  <div class="frame grid-2-7-5" style="padding-top:6vh">
+    <div style="display:flex; flex-direction:column; justify-content:space-between; gap:3vh">
+      <div>
+        <div class="kicker" data-anim>Perspective · 上帝视角</div>
+        <h2 class="h-xl" data-anim>把自己拔到<br>比老板更高的<br>纬度。</h2>
+        <p class="lead" style="margin-top:3vh" data-anim>
+          理解老板甚至老板的老板的目标、困难，站过去，建立全局视角。当你能看到老板看不到的东西，你就有了不可替代的价值。
+        </p>
+      </div>
+      <div class="callout" data-anim>
+        "越是（大厂，大领导），<br>越要<span class="hi">放长线</span>。"
+        <div class="callout-src">— 长期主义</div>
+      </div>
     </div>
-  </section>
+    <div style="display:flex;flex-direction:column;gap:3vh;justify-content:center">
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Level 01</div>
+        <div class="stat-nb" style="font-size:4vw">理解<span class="stat-unit">老板</span></div>
+        <div class="stat-note">知道老板的目标和压力</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Level 02</div>
+        <div class="stat-nb" style="font-size:4vw">理解<span class="stat-unit">老板的老板</span></div>
+        <div class="stat-note">知道更高层的战略意图</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Level 03</div>
+        <div class="stat-nb" style="font-size:4vw">建立<span class="stat-unit">上帝视角</span></div>
+        <div class="stat-note">看到系统全貌和趋势</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 33 · 上帝视角</div>
+    <div>Act VI · Perspective</div>
+  </div>
+</section>
 
-  <script>
-    /* ===========================================
-       SLIDE PRESENTATION CONTROLLER
-       =========================================== */
-    class SlidePresentation {
-      constructor() {
-        this.slides = document.querySelectorAll(".slide");
-        this.currentSlide = 0;
-        this.isScrolling = false;
-        this.scrollTimeout = null;
-        this.setupIntersectionObserver();
-        this.setupKeyboardNav();
-        this.setupTouchNav();
-        this.setupWheelNav();
-        this.setupProgressBar();
-        this.setupNavDots();
-        this.updateDarkSlideDots();
-      }
+<!-- ========== SLIDE 34: 放长线 ========== -->
+<section class="slide dark" data-animate="quote">
+  <div class="chrome">
+    <div>The Mindset · 心态</div>
+    <div>Act VI · 34 / 36</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>Mindset · 心态</div>
+    <blockquote style="font-family:var(--serif-zh); font-weight:700; font-size:5.8vw; line-height:1.2; letter-spacing:-.01em; max-width:72vw">
+      <span data-anim="line" style="display:block">"越是（大厂，大领导），</span>
+      <span data-anim="line" style="display:block">越要放长线。"</span>
+    </blockquote>
+    <p class="lead" style="max-width:55vw; opacity:.65" data-anim>
+      在大组织中，短期博弈往往得不偿失。建立长期信任，积累声誉资本，才能在未来获得更大的回报。
+    </p>
+    <div class="meta-row" data-anim>
+      <span>— 长期主义</span><span>·</span><span>时间是你最大的盟友</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 34 · 放长线</div>
+    <div>— · —</div>
+  </div>
+</section>
 
-      setupIntersectionObserver() {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                entry.target.classList.add("visible");
-                this.currentSlide = Array.from(this.slides).indexOf(entry.target);
-                this.updateNavDots();
-                this.updateProgressBar();
-                this.updateDarkSlideDots();
-              }
-            });
-          },
-          { threshold: 0.5 }
-        );
-        this.slides.forEach((slide) => observer.observe(slide));
-      }
+<!-- ========== SLIDE 35: 书籍推荐 ========== -->
+<section class="slide light">
+  <div class="chrome">
+    <div>延伸阅读 · Reading</div>
+    <div>Act VI · 35 / 36</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker" data-anim>Reading · 延伸阅读</div>
+    <h2 class="h-xl" data-anim>三本书，推荐给你</h2>
+    <p class="lead" style="margin-bottom:5vh;max-width:60vw" data-anim>如果你想深入理解沟通、谈判和影响力，这三本书值得一读。</p>
+    <div class="grid-3" style="margin-top:4vh">
+      <div class="pillar" style="padding:4vh 2vw;border:1px solid rgba(10,10,11,.15)" data-anim>
+        <div class="ic" style="font-size:3.2vw;font-weight:700">01</div>
+        <div class="t">《猴子》</div>
+        <div class="d">关于责任归属和管理边界的经典。理解"别让猴子跳回背上"的真谛。</div>
+      </div>
+      <div class="pillar" style="padding:4vh 2vw;border:1px solid rgba(10,10,11,.15)" data-anim>
+        <div class="ic" style="font-size:3.2vw;font-weight:700">02</div>
+        <div class="t">《谈判的逻辑》</div>
+        <div class="d">系统性的谈判方法论。教你如何框定选择、控制反馈范围。</div>
+      </div>
+      <div class="pillar" style="padding:4vh 2vw;border:1px solid rgba(10,10,11,.15)" data-anim>
+        <div class="ic" style="font-size:3.2vw;font-weight:700">03</div>
+        <div class="t">《说服的瞬间》</div>
+        <div class="d">关于影响力的微观机制。如何在关键时刻改变他人的想法。</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 35 · 延伸阅读</div>
+    <div>Act VI · Reading</div>
+  </div>
+</section>
 
-      setupKeyboardNav() {
-        document.addEventListener("keydown", (e) => {
-          if (e.target.getAttribute("contenteditable")) return;
-          switch (e.key) {
-            case "ArrowDown":
-            case "ArrowRight":
-            case " ":
-            case "PageDown":
-              e.preventDefault();
-              this.nextSlide();
-              break;
-            case "ArrowUp":
-            case "ArrowLeft":
-            case "PageUp":
-              e.preventDefault();
-              this.prevSlide();
-              break;
-            case "Home":
-              e.preventDefault();
-              this.goToSlide(0);
-              break;
-            case "End":
-              e.preventDefault();
-              this.goToSlide(this.slides.length - 1);
-              break;
-          }
-        });
-      }
+<!-- ========== SLIDE 36: 结尾致谢 ========== -->
+<section class="slide hero light">
+  <div class="chrome">
+    <div>感谢聆听 · Thank You</div>
+    <div>36 / 36</div>
+  </div>
+  <div class="frame" style="display:grid; gap:8vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>Thank You</div>
+    <h1 class="h-hero" style="font-size:7vw; line-height:1.15">
+      <span data-anim style="display:block">向上管理，</span>
+      <span data-anim style="display:block">本质是管理自己</span>
+      <span data-anim style="display:block">与资源的关系。</span>
+    </h1>
+    <p class="lead" style="max-width:50vw" data-anim>
+      没有所谓的向上管理，只有商业合作与资源优化。祝你在职场中游刃有余。
+    </p>
+    <div class="meta-row" data-anim>
+      <span>职场向上管理与沟通</span><span>·</span><span>内训课程 · 2026</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Page 36 · 感谢聆听</div>
+    <div>— · —</div>
+  </div>
+</section>
 
-      setupTouchNav() {
-        let startY = 0;
-        let startTime = 0;
-        document.addEventListener("touchstart", (e) => {
-          startY = e.touches[0].clientY;
-          startTime = Date.now();
-        }, { passive: true });
-        document.addEventListener("touchend", (e) => {
-          const endY = e.changedTouches[0].clientY;
-          const diff = startY - endY;
-          const duration = Date.now() - startTime;
-          if (duration < 500 && Math.abs(diff) > 50) {
-            if (diff > 0) this.nextSlide();
-            else this.prevSlide();
-          }
-        }, { passive: true });
-      }
+</div>
 
-      setupWheelNav() {
-        let wheelTimeout = null;
-        document.addEventListener("wheel", (e) => {
-          if (wheelTimeout) return;
-          wheelTimeout = setTimeout(() => {
-            wheelTimeout = null;
-          }, 600);
-          if (e.deltaY > 30) this.nextSlide();
-          else if (e.deltaY < -30) this.prevSlide();
-        }, { passive: true });
-      }
+<div id="nav"></div>
 
-      nextSlide() {
-        if (this.currentSlide < this.slides.length - 1) {
-          this.goToSlide(this.currentSlide + 1);
-        }
-      }
+<script>
+/* =============== WebGL 双背景 ===============
+   深色页：Holographic Dispersion（全息色散 · 钛金暗流）—— 彩虹微扰、鼠标径向涟漪
+   浅色页：Spiral Vortex（旋转涡流 · 银色珍珠）—— domain-warp 流动、无中心
+   修改风格请参考 references/webgl-backgrounds.md
+*/
+const VS = `attribute vec2 position;void main(){gl_Position=vec4(position,0.0,1.0);}`;
 
-      prevSlide() {
-        if (this.currentSlide > 0) {
-          this.goToSlide(this.currentSlide - 1);
-        }
-      }
+const FS_DARK = `precision highp float;
+uniform vec2 u_resolution;uniform float u_time;uniform vec2 u_mouse;
+vec3 palette(float t,vec3 a,vec3 b,vec3 c,vec3 d){return a+b*cos(6.28318*(c*t+d));}
+void main(){
+  vec2 uv=gl_FragCoord.xy/u_resolution.xy;
+  vec2 p=uv*2.0-1.0;p.x*=u_resolution.x/u_resolution.y;
+  vec2 m=u_mouse*2.0-1.0;m.x*=u_resolution.x/u_resolution.y;
+  float md=length(p-m);
+  float mr=sin(md*15.0-u_time*4.0)*exp(-md*3.0);p+=mr*0.08;
+  vec2 p0=p;
+  for(float i=1.0;i<4.0;i++){
+    p.x+=0.1/i*sin(i*3.0*p.y+u_time*0.4)+0.05;
+    p.y+=0.1/i*cos(i*2.0*p.x+u_time*0.3)-0.05;
+  }
+  float r=length(p);float ang=atan(p.y,p.x);
+  vec3 a=vec3(0.12,0.12,0.13);
+  vec3 b=vec3(0.03,0.04,0.05);
+  vec3 c=vec3(1.0,1.0,1.0);
+  vec3 d=vec3(0.1,0.2,0.4);
+  vec3 col=palette(r*1.5+p0.x*0.5+u_time*0.1,a,b,c,d);
+  float disp=sin(r*25.0-u_time*1.5+ang*2.0)*0.5+0.5;
+  col+=vec3(disp*0.015,disp*0.01,disp*0.02);
+  float hi=pow(sin(p.x*4.0+p.y*3.0+u_time)*0.5+0.5,8.0);
+  col+=hi*0.08;
+  vec3 base=vec3(0.05,0.05,0.06);
+  col=mix(base,col,0.85);
+  gl_FragColor=vec4(col,1.0);
+}`;
 
-      goToSlide(index) {
-        this.slides[index].scrollIntoView({ behavior: "smooth" });
-      }
+const FS_LIGHT = `precision highp float;
+uniform vec2 u_resolution;uniform float u_time;uniform vec2 u_mouse;
+float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float noise(vec2 p){
+  vec2 i=floor(p),f=fract(p);
+  float a=hash(i),b=hash(i+vec2(1,0));
+  float c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));
+  vec2 u=f*f*(3.0-2.0*f);
+  return mix(a,b,u.x)+(c-a)*u.y*(1.0-u.x)+(d-b)*u.x*u.y;
+}
+float fbm(vec2 p){
+  float v=0.0,a=0.5;
+  mat2 m=mat2(0.80,0.60,-0.60,0.80);
+  for(int i=0;i<5;i++){v+=a*noise(p);p=m*p*2.02;a*=0.5;}
+  return v;
+}
+void main(){
+  vec2 uv=gl_FragCoord.xy/u_resolution.xy;
+  vec2 p=uv;p.x*=u_resolution.x/u_resolution.y;
+  vec2 m=u_mouse;m.x*=u_resolution.x/u_resolution.y;
+  vec2 md=p-m;float dl=length(md);
+  p+=normalize(md+vec2(0.0001))*exp(-dl*5.0)*0.03;
+  vec2 q=vec2(fbm(p*1.8+u_time*0.07),fbm(p*1.8+vec2(5.2,1.3)+u_time*0.06));
+  vec2 r=vec2(fbm(p*2.0+q*1.3+vec2(1.7,9.2)+u_time*0.05),
+              fbm(p*2.0+q*1.3+vec2(8.3,2.8)+u_time*0.04));
+  float f=fbm(p*2.2+r*1.5);
+  vec3 silverDark=vec3(0.86,0.85,0.84);
+  vec3 paper=vec3(0.955,0.945,0.925);
+  vec3 col=mix(silverDark,paper,f);
+  float ph=r.x*2.2+u_time*0.35;
+  col+=vec3(0.78,0.62,0.92)*sin(ph)*0.055;
+  col+=vec3(0.55,0.72,0.95)*sin(ph*0.8+2.0)*0.05;
+  float hl=smoothstep(0.48,0.92,f);
+  col+=hl*0.06;
+  gl_FragColor=vec4(col,1.0);
+}`;
 
-      setupProgressBar() {
-        this.progressBar = document.getElementById("progressBar");
-      }
+const mouse={x:0.5,y:0.5};
+addEventListener('mousemove',e=>{mouse.x=e.clientX/innerWidth;mouse.y=e.clientY/innerHeight});
 
-      updateProgressBar() {
-        const pct = ((this.currentSlide + 1) / this.slides.length) * 100;
-        this.progressBar.style.width = pct + "%";
-      }
+function bootGL(canvasId, fsSrc){
+  const canvas=document.getElementById(canvasId);
+  const gl=canvas.getContext('webgl',{alpha:false,antialias:true});
+  if(!gl) return ()=>false;
+  const mk=(t,s)=>{const sh=gl.createShader(t);gl.shaderSource(sh,s);gl.compileShader(sh);return sh};
+  const prog=gl.createProgram();
+  gl.attachShader(prog,mk(gl.VERTEX_SHADER,VS));
+  gl.attachShader(prog,mk(gl.FRAGMENT_SHADER,fsSrc));
+  gl.linkProgram(prog);gl.useProgram(prog);
+  const buf=gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+  const pos=gl.getAttribLocation(prog,'position');
+  gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
+  const lRes=gl.getUniformLocation(prog,'u_resolution');
+  const lT=gl.getUniformLocation(prog,'u_time');
+  const lM=gl.getUniformLocation(prog,'u_mouse');
+  const resize=()=>{
+    const d=Math.min(window.devicePixelRatio||1,2);
+    canvas.width=innerWidth*d;canvas.height=innerHeight*d;
+    gl.viewport(0,0,canvas.width,canvas.height);
+  };
+  addEventListener('resize',resize);resize();
+  return (tSec)=>{
+    gl.uniform2f(lRes,canvas.width,canvas.height);
+    gl.uniform1f(lT,tSec);
+    gl.uniform2f(lM,mouse.x,1-mouse.y);
+    gl.drawArrays(gl.TRIANGLES,0,6);
+    return true;
+  };
+}
+let drawDark=null, drawLight=null, glRAF=0, glT0=Date.now();
+function startGL(){
+  if(window.__lowPowerMode || glRAF) return;
+  if(!drawDark) drawDark=bootGL('bg-dark',FS_DARK);
+  if(!drawLight) drawLight=bootGL('bg-light',FS_LIGHT);
+  glT0=Date.now();
+  function loop(){
+    if(window.__lowPowerMode){glRAF=0;return;}
+    const t=(Date.now()-glT0)/1000;
+    drawDark(t);drawLight(t);
+    glRAF=requestAnimationFrame(loop);
+  }
+  glRAF=requestAnimationFrame(loop);
+}
+function stopGL(){
+  if(glRAF) cancelAnimationFrame(glRAF);
+  glRAF=0;
+}
+startGL();
+addEventListener('ppt-low-power-change', e=>{e.detail.on ? stopGL() : startGL();});
 
-      setupNavDots() {
-        this.navDotsContainer = document.getElementById("navDots");
-        this.navDotsContainer.innerHTML = "";
-        this.slides.forEach((_, i) => {
-          const dot = document.createElement("button");
-          dot.className = "nav-dot";
-          dot.setAttribute("aria-label", `Go to slide ${i + 1}`);
-          dot.addEventListener("click", () => this.goToSlide(i));
-          this.navDotsContainer.appendChild(dot);
-        });
-        this.dots = this.navDotsContainer.querySelectorAll(".nav-dot");
-        this.updateNavDots();
-      }
+// =============== 导航（翻页 / 圆点 / 键盘 / 滚轮 / 触屏） ===============
+const deck=document.getElementById('deck');
+const slides=deck.querySelectorAll('.slide');
+const nav=document.getElementById('nav');
+let idx=0,total=slides.length,lock=false;
 
-      updateNavDots() {
-        if (!this.dots) return;
-        this.dots.forEach((dot, i) => {
-          dot.classList.toggle("active", i === this.currentSlide);
-        });
-      }
+// 关键：矫正 deck 宽度为 total * 100vw，否则翻页会错位
+deck.style.width=(total*100)+'vw';
 
-      updateDarkSlideDots() {
-        const current = this.slides[this.currentSlide];
-        if (current.classList.contains("dark-slide")) {
-          this.navDotsContainer.classList.add("on-dark");
-        } else {
-          this.navDotsContainer.classList.remove("on-dark");
-        }
-      }
+slides.forEach((s,i)=>{
+  const b=document.createElement('button');
+  b.className='dot';b.dataset.i=i;b.setAttribute('aria-label','Page '+(i+1));
+  b.onclick=()=>go(i);
+  nav.appendChild(b);
+});
+
+function go(n){
+  if(lock)return;
+  idx=Math.max(0,Math.min(total-1,n));
+  window.__currentSlideIndex = idx;
+  deck.style.transform=`translateX(${-idx*100}vw)`;
+  nav.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+  /* 主题切换：优先读 data-theme，其次从 class（light/dark）推断 */
+  const el=slides[idx];
+  const th=el.dataset.theme || (el.classList.contains('light')?'light':(el.classList.contains('dark')?'dark':'dark'));
+  document.body.classList.toggle('light-bg',th==='light');
+  /* 动效：翻页过渡中段触发当前页的入场动画（由 motion-boot 注册） */
+  if(window.__playSlide) setTimeout(()=>window.__playSlide(idx), 450);
+  lock=true;setTimeout(()=>lock=false,700);
+}
+
+/* =============== ESC 索引视图 =============== */
+let overviewOn=false;
+const ov=document.createElement('div');
+ov.id='overview';
+ov.style.cssText='position:fixed;inset:0;z-index:100;background:rgba(var(--ink-rgb),.92);backdrop-filter:blur(12px);display:none;overflow-y:auto;padding:4vh 4vw';
+document.body.appendChild(ov);
+
+function buildOverview(){
+  ov.innerHTML='';
+  const grid=document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:2vh 1.6vw;max-width:90vw;margin:0 auto';
+  slides.forEach((s,i)=>{
+    const card=document.createElement('div');
+    card.style.cssText='cursor:pointer;border-radius:6px;overflow:hidden;border:2px solid '+(i===idx?'rgba(var(--paper-rgb),.8)':'rgba(var(--paper-rgb),.15)')+';transition:border-color .2s';
+    card.onmouseenter=()=>card.style.borderColor='rgba(var(--paper-rgb),.6)';
+    card.onmouseleave=()=>card.style.borderColor=i===idx?'rgba(var(--paper-rgb),.8)':'rgba(var(--paper-rgb),.15)';
+    const wrap=document.createElement('div');
+    wrap.style.cssText='width:100%;aspect-ratio:16/9;overflow:hidden;position:relative;pointer-events:none;background:'+(s.classList.contains('light')?'var(--paper)':'var(--ink)');
+    const clone=s.cloneNode(true);
+    clone.style.cssText='width:100vw;height:100vh;transform:scale('+(1/4.5)+');transform-origin:top left;position:absolute;top:0;left:0;pointer-events:none';
+    wrap.appendChild(clone);
+    const label=document.createElement('div');
+    label.style.cssText='padding:6px 10px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper);opacity:.7';
+    label.textContent=(i+1)+' / '+total;
+    card.appendChild(wrap);
+    card.appendChild(label);
+    card.onclick=()=>{toggleOverview();go(i)};
+    grid.appendChild(card);
+  });
+  ov.appendChild(grid);
+}
+
+function toggleOverview(){
+  overviewOn=!overviewOn;
+  if(overviewOn){buildOverview();ov.style.display='block';}
+  else{ov.style.display='none';}
+}
+
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleOverview();return;}
+  if(e.key && e.key.toLowerCase()==='b' && !e.metaKey && !e.ctrlKey && !e.altKey){
+    e.preventDefault();
+    window.__setLowPowerMode(!window.__lowPowerMode);
+    return;
+  }
+  if(overviewOn)return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '||e.key==='ArrowDown'){
+    if(window.__pipeAdvance && window.__pipeAdvance()) return;
+    go(idx+1);
+    return;
+  }
+  if(e.key==='ArrowLeft'||e.key==='PageUp'||e.key==='ArrowUp')go(idx-1);
+  if(e.key==='Home')go(0);
+  if(e.key==='End')go(total-1);
+});
+
+let wheelTO=null,wheelAcc=0;
+addEventListener('wheel',e=>{
+  wheelAcc+=e.deltaY+e.deltaX;
+  if(Math.abs(wheelAcc)>50){
+    if(wheelAcc>0 && window.__pipeAdvance && window.__pipeAdvance()){
+      wheelAcc=0;
+    }else{
+      go(idx+(wheelAcc>0?1:-1));wheelAcc=0;
+    }
+  }
+  clearTimeout(wheelTO);wheelTO=setTimeout(()=>wheelAcc=0,150);
+},{passive:true});
+
+let tx=0,ty=0;
+addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+addEventListener('touchend',e=>{
+  const dx=(e.changedTouches[0].clientX-tx);
+  const dy=(e.changedTouches[0].clientY-ty);
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){
+    if(dx<0 && window.__pipeAdvance && window.__pipeAdvance()) return;
+    go(idx+(dx<0?1:-1));
+  }
+},{passive:true});
+
+go(0);
+</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+
+<!-- ============ Motion One 动效引擎（本地优先,CDN 兜底） ============
+     加载策略:先 ./assets/motion.min.js(本地,离线可用),失败 fallback 到 jsDelivr CDN
+     加载完成后挂 window.__playSlide / window.__pipeAdvance,
+     导航脚本会在翻页中段调用 __playSlide(idx),键盘/滚轮/触屏会在翻页前调用 __pipeAdvance()
+     双双失败时会兜底把所有 [data-anim] 设为可见,不让动效破坏阅读
+-->
+<script type="module">
+let motion;
+try {
+  motion = await import('./assets/motion.min.js');
+} catch(e1) {
+  try {
+    motion = await import('https://cdn.jsdelivr.net/npm/motion@11.11.17/+esm');
+  } catch(e2) {
+    console.warn('[motion] local + CDN both failed, disabling animations', e1, e2);
+    document.querySelectorAll('[data-anim]').forEach(el=>{el.style.opacity='1';el.style.transform='none'});
+    document.querySelectorAll('[data-animate="pipeline"] [data-anim]').forEach(el=>el.style.opacity='1');
+  }
+}
+
+if(motion){
+  const { animate, stagger } = motion;
+  document.body.classList.add('motion-ready');
+  const EASE = [.22, 1, .36, 1];
+  const slides = [...document.querySelectorAll('.slide')];
+  let pipeStep = -1;
+  let lastIdx = -1;
+
+  function resetAnims(slide){
+    slide.querySelectorAll('[data-anim]').forEach(el=>{
+      el.style.opacity='';
+      el.style.transform='';
+    });
+  }
+
+  function revealStatic(slide){
+    resetAnims(slide);
+    document.getAnimations?.().forEach(a=>a.cancel());
+    slide.querySelectorAll('[data-anim]').forEach(el=>{
+      el.style.opacity='1';
+      el.style.transform='none';
+    });
+  }
+
+  function playSlide(i){
+    const slide = slides[i];
+    if(!slide) return;
+    lastIdx = i;
+    const recipe = slide.dataset.animate || (slide.classList.contains('hero') ? 'hero' : 'cascade');
+
+    if(window.__lowPowerMode){
+      revealStatic(slide);
+      return;
     }
 
-    new SlidePresentation();
-  </script>
+    if(recipe === 'pipeline'){
+      pipeStep = -1;
+      slide.querySelectorAll('[data-anim]').forEach(el=>{
+        el.style.opacity='0.15';
+        el.style.transform='none';
+      });
+      return;
+    }
+
+    resetAnims(slide);
+    const all = [...slide.querySelectorAll('[data-anim]')];
+    if(!all.length) return;
+
+    if(recipe === 'directional'){
+      const lefts  = all.filter(el=>el.dataset.anim==='left');
+      const divs   = all.filter(el=>el.dataset.anim==='divider');
+      const rights = all.filter(el=>el.dataset.anim==='right');
+      const others = all.filter(el=>!['left','right','divider'].includes(el.dataset.anim));
+      if(others.length) animate(others, {opacity:[0,1], y:[12,0]}, {duration:.6, delay:stagger(.1, {start:.15}), easing:EASE});
+      if(lefts.length)  animate(lefts,  {opacity:[0,1], x:[-24,0]}, {duration:.8, delay:.35, easing:EASE});
+      if(divs.length)   animate(divs,   {opacity:[0,.25]},          {duration:.5, delay:.9});
+      if(rights.length) animate(rights, {opacity:[0,1], x:[24,0]},  {duration:.8, delay:1.0, easing:EASE});
+      return;
+    }
+
+    if(recipe === 'quote'){
+      const lines = all.filter(el=>el.dataset.anim==='line');
+      const others = all.filter(el=>el.dataset.anim!=='line');
+      if(others.length) animate(others, {opacity:[0,1], y:[8,0]},    {duration:.6, delay:stagger(.12, {start:.2}), easing:EASE});
+      if(lines.length)  animate(lines,  {opacity:[.35,1], y:[10,0]}, {duration:.8, delay:stagger(.55, {start:.5}), easing:EASE});
+      return;
+    }
+
+    if(recipe === 'hero'){
+      animate(all, {opacity:[0,1], y:[14,0]}, {duration:.9, delay:stagger(.16, {start:.2}), easing:EASE});
+      return;
+    }
+
+    // default: cascade
+    animate(all, {opacity:[0,1], y:[16,0]}, {duration:.75, delay:stagger(.1, {start:.15}), easing:EASE});
+  }
+
+  function pipeAdvance(){
+    if(window.__lowPowerMode) return false;
+    const slide = slides[lastIdx];
+    if(!slide || slide.dataset.animate !== 'pipeline') return false;
+    const steps  = [...slide.querySelectorAll('[data-anim="step"]')];
+    const arrows = [...slide.querySelectorAll('[data-anim="arrow"]')];
+    if(pipeStep >= steps.length - 1) return false;
+    pipeStep++;
+    animate(steps[pipeStep], {opacity:[0.15,1], y:[8,0]}, {duration:.5, easing:EASE});
+    if(pipeStep > 0 && arrows[pipeStep-1]){
+      animate(arrows[pipeStep-1], {opacity:[0.15,.7]}, {duration:.3, delay:.15});
+    }
+    return true;
+  }
+
+  window.__playSlide = playSlide;
+  window.__pipeAdvance = pipeAdvance;
+
+  // 首屏:go(0) 已跑过(同步),没来得及触发动效 → 这里补一下
+  playSlide(0);
+}
+</script>
 </body>
 </html>

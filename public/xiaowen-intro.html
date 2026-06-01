@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>认识 Xiaowen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,600;1,400&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===========================================
+           THEME: 纸墨文学风 Paper & Ink
+           Warm cream, charcoal, crimson accent
+           =========================================== */
+        :root {
+            --bg-cream: #f5f3ee;
+            --bg-warm: #faf9f7;
+            --text-primary: #1a1a1a;
+            --text-secondary: #444;
+            --text-muted: #888;
+            --accent-crimson: #c41e3a;
+            --accent-warm: #e8d4c0;
+            --border-light: rgba(26, 26, 26, 0.08);
+
+            --font-display: 'Noto Serif SC', 'Cormorant', serif;
+            --font-body: 'Noto Sans SC', sans-serif;
+            --font-en: 'Cormorant', serif;
+
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.7s;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ===========================================
+           VIEWPORT BASE (mandatory — full contents)
+           =========================================== */
+        html, body {
+            width: 100%; height: 100%;
+            margin: 0; overflow: hidden;
+            background: var(--bg-cream);
+        }
+        .deck-viewport {
+            position: fixed; inset: 0;
+            overflow: hidden;
+            background: var(--bg-cream);
+        }
+        .deck-stage {
+            position: absolute; left: 0; top: 0;
+            width: 1920px; height: 1080px;
+            overflow: hidden;
+            transform-origin: 0 0;
+            background: var(--bg-cream);
+        }
+        .slide {
+            position: absolute; inset: 0;
+            width: 1920px; height: 1080px;
+            overflow: hidden;
+            display: block;
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            background: var(--bg-cream);
+        }
+        .slide.active, .slide.visible {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 1;
+        }
+        img, video, canvas, svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .deck-controls {
+            position: fixed;
+            left: 50%;
+            bottom: 22px;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+        @media print {
+            html, body {
+                width: 1920px; height: auto;
+                overflow: visible;
+                background: #fff;
+            }
+            .deck-viewport {
+                position: static;
+                overflow: visible;
+                background: #fff;
+            }
+            .deck-stage {
+                position: static;
+                width: auto; height: auto;
+                transform: none !important;
+                background: none;
+            }
+            .slide {
+                position: relative;
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                width: 1920px; height: 1080px;
+                break-after: page;
+                page-break-after: always;
+            }
+            .slide:last-child {
+                break-after: auto;
+                page-break-after: auto;
+            }
+            .deck-controls {
+                display: none !important;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+        }
+
+        /* ===========================================
+           SHARED SLIDE ELEMENTS
+           =========================================== */
+
+        /* Top decorative crimson bar */
+        .slide-top-bar {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: var(--accent-crimson);
+        }
+
+        /* Slide number in top-right */
+        .slide-num {
+            position: absolute;
+            top: 52px;
+            right: 80px;
+            font-family: var(--font-en);
+            font-size: 18px;
+            font-style: italic;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        /* Section title (used on content slides) */
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.04em;
+            line-height: 1.3;
+        }
+
+        /* Subtitle / section label */
+        .section-label {
+            font-family: var(--font-en);
+            font-size: 16px;
+            font-weight: 400;
+            font-style: italic;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+        }
+
+        /* Content bullet list */
+        .bullet-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .bullet-list li {
+            position: relative;
+            padding-left: 32px;
+            margin-bottom: 20px;
+            font-family: var(--font-body);
+            font-size: 22px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        .bullet-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 14px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-crimson);
+            border-radius: 50%;
+        }
+        .bullet-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Two-column layout for "Expectations" slide */
+        .two-col {
+            display: flex;
+            gap: 80px;
+            width: 100%;
+        }
+        .two-col .col {
+            flex: 1;
+        }
+        .col-title {
+            font-family: var(--font-display);
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+        .two-col .bullet-list li {
+            font-size: 18px;
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+        .two-col .bullet-list li::before {
+            top: 11px;
+            width: 6px;
+            height: 6px;
+        }
+
+        /* Bottom page indicator line */
+        .bottom-line {
+            position: absolute;
+            bottom: 60px;
+            left: 80px;
+            right: 80px;
+            height: 1px;
+            background: var(--border-light);
+        }
+        .bottom-label {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-body);
+            font-size: 13px;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+        }
+
+        /* ===========================================
+           SLIDE 1: TITLE
+           =========================================== */
+        .title-slide .slide-content {
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .title-slide .deco-quote {
+            position: absolute;
+            top: 160px;
+            left: 160px;
+            font-family: var(--font-en);
+            font-size: 220px;
+            color: var(--accent-warm);
+            line-height: 1;
+            user-select: none;
+            z-index: 0;
+        }
+        .title-slide .title-main {
+            font-family: var(--font-display);
+            font-size: 100px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.08em;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .title-slide .title-sub {
+            font-family: var(--font-en);
+            font-size: 28px;
+            font-weight: 400;
+            font-style: italic;
+            color: var(--text-muted);
+            margin-top: 24px;
+            letter-spacing: 0.15em;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .title-slide .bottom-info {
+            position: absolute;
+            bottom: 100px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .title-slide .bottom-info::before,
+        .title-slide .bottom-info::after {
+            content: '';
+            width: 40px;
+            height: 1px;
+            background: var(--text-muted);
+        }
+        .title-slide .bottom-info span {
+            font-family: var(--font-body);
+            font-size: 16px;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+        }
+
+        /* ===========================================
+           SLIDE 2-6: CONTENT SLIDES
+           =========================================== */
+        .content-slide .slide-content {
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 120px 140px 100px;
+            position: relative;
+        }
+        .content-slide .content-body {
+            margin-top: 48px;
+            max-width: 1400px;
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           Trigger via .visible class on active slide
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal:nth-child(1) { transition-delay: 0.15s; }
+        .reveal:nth-child(2) { transition-delay: 0.3s; }
+        .reveal:nth-child(3) { transition-delay: 0.45s; }
+        .reveal:nth-child(4) { transition-delay: 0.6s; }
+        .reveal:nth-child(5) { transition-delay: 0.75s; }
+        .reveal:nth-child(6) { transition-delay: 0.9s; }
+        .reveal:nth-child(7) { transition-delay: 1.05s; }
+        .reveal:nth-child(8) { transition-delay: 1.2s; }
+        .reveal:nth-child(9) { transition-delay: 1.35s; }
+
+        /* Stagger for list items */
+        .bullet-list li.reveal {
+            transition-delay: calc(0.3s + var(--li-index, 0) * 0.12s);
+        }
+
+        /* Decorative quote animation */
+        .deco-quote {
+            opacity: 0;
+            transform: scale(0.85);
+            transition: opacity 1s var(--ease-out-expo) 0.1s,
+                        transform 1s var(--ease-out-expo) 0.1s;
+        }
+        .slide.visible .deco-quote {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Top bar animation */
+        .slide-top-bar {
+            opacity: 0;
+            transform: scaleX(0);
+            transition: opacity 0.5s var(--ease-out-expo) 0.1s,
+                        transform 0.5s var(--ease-out-expo) 0.1s;
+        }
+        .slide.visible .slide-top-bar {
+            opacity: 1;
+            transform: scaleX(1);
+        }
+
+        /* ===========================================
+           EDIT MODE UI
+           =========================================== */
+        .edit-hotzone {
+            position: fixed; top: 0; left: 0;
+            width: 80px; height: 80px;
+            z-index: 10000;
+            cursor: pointer;
+        }
+        .edit-toggle {
+            position: fixed;
+            top: 12px; left: 12px;
+            width: 44px; height: 44px;
+            border: none;
+            border-radius: 50%;
+            background: var(--accent-crimson);
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 12px rgba(196, 30, 58, 0.3);
+        }
+        .edit-toggle.show,
+        .edit-toggle.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .edit-toggle:hover {
+            transform: scale(1.1);
+        }
+        .edit-toggle.active {
+            background: var(--text-primary);
+        }
+
+        /* Editable text styling */
+        [contenteditable="true"] {
+            outline: 2px dashed var(--accent-crimson);
+            outline-offset: 4px;
+            cursor: text;
+        }
+        [contenteditable="true"]:focus {
+            outline: 2px solid var(--accent-crimson);
+        }
+
+        /* Save indicator */
+        .save-indicator {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            padding: 8px 16px;
+            background: var(--text-primary);
+            color: #fff;
+            font-family: var(--font-body);
+            font-size: 13px;
+            border-radius: 4px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 10002;
+            pointer-events: none;
+        }
+        .save-indicator.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="deck-viewport">
+        <main class="deck-stage" id="deckStage">
+
+            <!-- ========== SLIDE 1: TITLE ========== -->
+            <section class="slide title-slide active">
+                <div class="slide-content">
+                    <div class="deco-quote">"</div>
+                    <h1 class="title-main reveal">认识 Xiaowen</h1>
+                    <p class="title-sub reveal">A Brief Introduction</p>
+                    <div class="bottom-info reveal">
+                        <span>个人工作手册</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== SLIDE 2: 工作方式 ========== -->
+            <section class="slide content-slide">
+                <div class="slide-top-bar"></div>
+                <div class="slide-num">02</div>
+                <div class="slide-content">
+                    <div class="reveal">
+                        <div class="section-label">Working Style</div>
+                        <h2 class="section-title">工作方式</h2>
+                    </div>
+                    <div class="content-body">
+                        <ul class="bullet-list">
+                            <li class="reveal" style="--li-index:0">工作日早 8 点至晚 23 点可随时交流。如有急事，直接发短信或打电话即可。（目前 8PM-9PM 暂时需要让渡给儿子）</li>
+                            <li class="reveal" style="--li-index:1">周末（除了 8pm 到 10pm）随时可以找我，但我不要求他人在周末工作</li>
+                            <li class="reveal" style="--li-index:2">周末或休假期间我也会查看 IM，邮件；如需紧急回复，请直接 Ping 我或打电话。</li>
+                            <li class="reveal" style="--li-index:3">我的直接汇报是最高的优先级，哪怕要等到当天深夜我们也一定有时间可以沟通。</li>
+                            <li class="reveal" style="--li-index:4">周五和周末是我思考与头脑风暴的绝佳时段——适合开展较长、非结构化的深度讨论。</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bottom-line"></div>
+            </section>
+
+            <!-- ========== SLIDE 3: 我如何吸收信息 ========== -->
+            <section class="slide content-slide">
+                <div class="slide-top-bar"></div>
+                <div class="slide-num">03</div>
+                <div class="slide-content">
+                    <div class="reveal">
+                        <div class="section-label">How I Absorb Information</div>
+                        <h2 class="section-title">我如何吸收信息</h2>
+                    </div>
+                    <div class="content-body">
+                        <ul class="bullet-list">
+                            <li class="reveal" style="--li-index:0">我会阅读任何文字信息，不限篇幅，包括参考资料和会前阅读材料，但如果内容逻辑结构清晰，我的吸收效率会显著提升</li>
+                            <li class="reveal" style="--li-index:1">如果方便，尽量不要发语音</li>
+                            <li class="reveal" style="--li-index:2">我擅长记住数字和逻辑链条，无需可视化。</li>
+                            <li class="reveal" style="--li-index:3">尽量避免冗长的 PPT，逻辑第一，篇幅第二</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bottom-line"></div>
+            </section>
+
+            <!-- ========== SLIDE 4: 会议和讨论中的表现 ========== -->
+            <section class="slide content-slide">
+                <div class="slide-top-bar"></div>
+                <div class="slide-num">04</div>
+                <div class="slide-content">
+                    <div class="reveal">
+                        <div class="section-label">In Meetings & Discussions</div>
+                        <h2 class="section-title">我在会议和讨论（争论）中的表现</h2>
+                    </div>
+                    <div class="content-body">
+                        <ul class="bullet-list">
+                            <li class="reveal" style="--li-index:0">永远保持好奇，保持注意力，请不要浪费</li>
+                            <li class="reveal" style="--li-index:1">追求真相，始终希望为企业做出正确的决定</li>
+                            <li class="reveal" style="--li-index:2">价值，效率最能激发我的热情</li>
+                            <li class="reveal" style="--li-index:3">观点强烈但保持开放——这有时会表现为提出质疑，提出争论性的观点。</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bottom-line"></div>
+            </section>
+
+            <!-- ========== SLIDE 5: 期望 ========== -->
+            <section class="slide content-slide">
+                <div class="slide-top-bar"></div>
+                <div class="slide-num">05</div>
+                <div class="slide-content">
+                    <div class="reveal">
+                        <div class="section-label">Expectations</div>
+                        <h2 class="section-title">期望</h2>
+                    </div>
+                    <div class="content-body">
+                        <div class="two-col">
+                            <div class="col reveal">
+                                <h3 class="col-title">我对你的业务期望</h3>
+                                <ul class="bullet-list">
+                                    <li style="--li-index:0">公开表现出对业务的热情与激情</li>
+                                    <li style="--li-index:1">成为与各利益相关方之间的赋能层</li>
+                                    <li style="--li-index:2">增加价值、洞察力与影响力——如果你做不到或不想做，那就不要挡道，学会闭嘴是重要的品德</li>
+                                    <li style="--li-index:3">永远拥有清晰且一致的战略思维，任何人都应该在战略地图里找到准确的定位</li>
+                                </ul>
+                            </div>
+                            <div class="col reveal">
+                                <h3 class="col-title">我作为 Leader 会尽力满足的对你的期望</h3>
+                                <ul class="bullet-list">
+                                    <li style="--li-index:0">提供组织层面的背景与更宏观的图景</li>
+                                    <li style="--li-index:1">给予自主权和空间</li>
+                                    <li style="--li-index:2">创造学习机会</li>
+                                    <li style="--li-index:3">直接坦率——期望收到反馈，也期望给予反馈</li>
+                                    <li style="--li-index:4">既是教练，也是学习者</li>
+                                    <li style="--li-index:5">将你的成长置于我的优先清单前列</li>
+                                    <li style="--li-index:6">提供工作与生活平衡，尊重边界</li>
+                                    <li style="--li-index:7">协作共事，对你的观点保持兴趣，保留注意力给团队</li>
+                                    <li style="--li-index:8">如果你需要我做决定，我希望先听到你的意见</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bottom-line"></div>
+            </section>
+
+            <!-- ========== SLIDE 6: 我的偏好 ========== -->
+            <section class="slide content-slide">
+                <div class="slide-top-bar"></div>
+                <div class="slide-num">06</div>
+                <div class="slide-content">
+                    <div class="reveal">
+                        <div class="section-label">My Preferences</div>
+                        <h2 class="section-title">我的偏好</h2>
+                    </div>
+                    <div class="content-body">
+                        <ul class="bullet-list">
+                            <li class="reveal" style="--li-index:0">风险厌恶，不喜欢任何"意外"——再大的知道都只是问题，再小的不知道的都会是风险。</li>
+                            <li class="reveal" style="--li-index:1">在大方向上永远保持彼此对齐和共赢</li>
+                            <li class="reveal" style="--li-index:2">没有喜恶，没有个人感受，所有沟通直接和有逻辑是最好的</li>
+                            <li class="reveal" style="--li-index:3">对直接的问题，永远直接回答</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bottom-line"></div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Edit mode UI -->
+    <div class="edit-hotzone"></div>
+    <button class="edit-toggle" id="editToggle" title="编辑模式 (E)">✏️</button>
+    <div class="save-indicator" id="saveIndicator">已保存 ✓</div>
+
+    <!-- Deck controls -->
+    <div class="deck-controls" id="deckControls" style="display:flex;gap:12px;align-items:center;">
+        <button id="prevBtn" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border-light);background:#fff;cursor:pointer;font-size:18px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;">←</button>
+        <span id="pageIndicator" style="font-family:var(--font-body);font-size:14px;color:var(--text-muted);min-width:60px;text-align:center;">1 / 6</span>
+        <button id="nextBtn" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border-light);background:#fff;cursor:pointer;font-size:18px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;">→</button>
+    </div>
+
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.stage = document.getElementById('deckStage');
+                this.pageIndicator = document.getElementById('pageIndicator');
+                this.setupStageScale();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.setupControls();
+                this.showSlide(0);
+            }
+
+            setupStageScale() {
+                const scale = () => {
+                    const factor = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+                    const x = (window.innerWidth - 1920 * factor) / 2;
+                    const y = (window.innerHeight - 1080 * factor) / 2;
+                    this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+                };
+                scale();
+                window.addEventListener('resize', scale);
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    // Skip when editing text
+                    if (e.target.getAttribute('contenteditable') === 'true') return;
+
+                    switch(e.key) {
+                        case 'ArrowRight':
+                        case 'ArrowDown':
+                        case ' ':
+                        case 'PageDown':
+                            e.preventDefault();
+                            this.nextSlide();
+                            break;
+                        case 'ArrowLeft':
+                        case 'ArrowUp':
+                        case 'PageUp':
+                            e.preventDefault();
+                            this.prevSlide();
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            this.showSlide(0);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            this.showSlide(this.slides.length - 1);
+                            break;
+                    }
+                });
+            }
+
+            setupTouchNav() {
+                let startX = 0;
+                let startY = 0;
+                const threshold = 50;
+
+                this.stage.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                }, { passive: true });
+
+                this.stage.addEventListener('touchend', (e) => {
+                    const endX = e.changedTouches[0].clientX;
+                    const endY = e.changedTouches[0].clientY;
+                    const dx = endX - startX;
+                    const dy = endY - startY;
+
+                    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > threshold) {
+                        if (dx < 0) this.nextSlide();
+                        else this.prevSlide();
+                    }
+                }, { passive: true });
+            }
+
+            setupControls() {
+                document.getElementById('prevBtn').addEventListener('click', () => this.prevSlide());
+                document.getElementById('nextBtn').addEventListener('click', () => this.nextSlide());
+            }
+
+            showSlide(index) {
+                this.currentSlide = Math.max(0, Math.min(index, this.slides.length - 1));
+                this.slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === this.currentSlide);
+                    // Small delay for .visible to trigger CSS transitions
+                    if (i === this.currentSlide) {
+                        requestAnimationFrame(() => {
+                            slide.classList.add('visible');
+                        });
+                    } else {
+                        slide.classList.remove('visible');
+                    }
+                });
+                this.updateIndicator();
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.slides.length - 1) {
+                    this.showSlide(this.currentSlide + 1);
+                }
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) {
+                    this.showSlide(this.currentSlide - 1);
+                }
+            }
+
+            updateIndicator() {
+                if (this.pageIndicator) {
+                    this.pageIndicator.textContent = `${this.currentSlide + 1} / ${this.slides.length}`;
+                }
+            }
+        }
+
+        /* ===========================================
+           INLINE EDITING
+           =========================================== */
+        class InlineEditor {
+            constructor() {
+                this.isActive = false;
+                this.toggleBtn = document.getElementById('editToggle');
+                this.saveIndicator = document.getElementById('saveIndicator');
+                this.setupHotzone();
+                this.setupToggle();
+                this.setupKeyboard();
+                this.setupAutoSave();
+            }
+
+            setupHotzone() {
+                const hotzone = document.querySelector('.edit-hotzone');
+                let hideTimeout = null;
+
+                const showBtn = () => {
+                    clearTimeout(hideTimeout);
+                    this.toggleBtn.classList.add('show');
+                };
+                const hideBtn = () => {
+                    hideTimeout = setTimeout(() => {
+                        if (!this.isActive) this.toggleBtn.classList.remove('show');
+                    }, 400);
+                };
+
+                hotzone.addEventListener('mouseenter', showBtn);
+                hotzone.addEventListener('mouseleave', hideBtn);
+                this.toggleBtn.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+                this.toggleBtn.addEventListener('mouseleave', hideBtn);
+                hotzone.addEventListener('click', () => this.toggleEditMode());
+            }
+
+            setupToggle() {
+                this.toggleBtn.addEventListener('click', () => this.toggleEditMode());
+            }
+
+            setupKeyboard() {
+                document.addEventListener('keydown', (e) => {
+                    if ((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')) {
+                        this.toggleEditMode();
+                    }
+                    // Ctrl+S to save
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's' && this.isActive) {
+                        e.preventDefault();
+                        this.saveToFile();
+                    }
+                });
+            }
+
+            toggleEditMode() {
+                this.isActive = !this.isActive;
+                this.toggleBtn.classList.toggle('active', this.isActive);
+                this.toggleBtn.textContent = this.isActive ? '✓' : '✏️';
+
+                // Make all text content editable
+                const editableSelectors = [
+                    '.title-main',
+                    '.title-sub',
+                    '.section-title',
+                    '.section-label',
+                    '.col-title',
+                    '.bullet-list li',
+                    '.bottom-info span',
+                    '.corner-info .label'
+                ];
+
+                document.querySelectorAll(editableSelectors.join(',')).forEach(el => {
+                    el.setAttribute('contenteditable', this.isActive);
+                });
+
+                // Show/hide save indicator
+                if (this.isActive) {
+                    this.showSaveIndicator('编辑模式已开启');
+                } else {
+                    this.showSaveIndicator('编辑模式已关闭');
+                }
+            }
+
+            setupAutoSave() {
+                document.addEventListener('input', (e) => {
+                    if (e.target.getAttribute('contenteditable') === 'true') {
+                        this.saveToLocalStorage();
+                    }
+                });
+            }
+
+            saveToLocalStorage() {
+                const data = {};
+                document.querySelectorAll('[contenteditable="true"]').forEach((el, i) => {
+                    data[i] = el.innerText;
+                });
+                localStorage.setItem('xiaowen-intro-edits', JSON.stringify(data));
+            }
+
+            showSaveIndicator(text) {
+                this.saveIndicator.textContent = text;
+                this.saveIndicator.classList.add('show');
+                setTimeout(() => {
+                    this.saveIndicator.classList.remove('show');
+                }, 2000);
+            }
+
+            saveToFile() {
+                const html = document.documentElement.outerHTML;
+                const blob = new Blob([html], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'xiaowen-intro.html';
+                a.click();
+                URL.revokeObjectURL(url);
+                this.showSaveIndicator('已下载文件');
+            }
+        }
+
+        /* ===========================================
+           INITIALIZE
+           =========================================== */
+        const deck = new SlidePresentation();
+        const editor = new InlineEditor();
+    </script>
+</body>
+</html>
